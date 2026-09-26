@@ -1,2 +1,2 @@
-# -adaptive-integration-runtime
+# adaptive-integration-runtime
     Adaptive Integration Runtime (AIR)
