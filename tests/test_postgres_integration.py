@@ -210,3 +210,20 @@ def test_audit_failure_rolls_back_artifact(database, repos):
             admin.execute('ALTER TABLE air.audit_events DROP CONSTRAINT fail_audit')
     with repos[0].transaction(tenant) as tx:
         assert tx.get('contract', key) is None
+
+
+def test_repository_enforces_idempotency_isolation_level(database):
+    dsn = psycopg.conninfo.make_conninfo(database['logins'][0],
+                                       options='-c default_transaction_isolation=serializable')
+    repo = PostgresRepository(PostgresConfig(dsn, allow_insecure_local=True))
+    with repo.transaction(database['tenants'][0]) as tx:
+        row = tx._connection.execute('SHOW transaction_isolation').fetchone()
+        assert row['transaction_isolation'] == 'read committed'
+
+
+def test_privileged_session_cannot_hide_behind_runtime_role(database):
+    dsn = psycopg.conninfo.make_conninfo(database['dsn'], options='-c role=air_runtime')
+    repo = PostgresRepository(PostgresConfig(dsn, allow_insecure_local=True))
+    with pytest.raises(ConfigurationError, match='unprivileged'):
+        with repo.transaction(database['tenants'][0]):
+            pytest.fail('privileged session accepted')
