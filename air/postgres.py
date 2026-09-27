@@ -170,6 +170,7 @@ class PostgresRepository:
                              connect_timeout=self.config.connect_timeout,
                              application_name="air-evidence") as connection:
             with connection.transaction():
+                connection.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
                 connection.execute("SET LOCAL search_path = pg_catalog, air")
                 connection.execute("SET LOCAL row_security = on")
                 for key, value in (("statement_timeout", self.config.statement_timeout_ms),
@@ -177,9 +178,9 @@ class PostgresRepository:
                                    ("idle_in_transaction_session_timeout", 30_000),
                                    ("air.tenant_id", str(tenant_id))):
                     connection.execute("SELECT set_config(%s, %s, true)", (key, str(value)))
-                role = connection.execute("""SELECT rolsuper, rolbypassrls, rolcreaterole,
-                    rolcreatedb, rolreplication FROM pg_roles WHERE rolname = current_user""").fetchone()
-                if role is None or any(role.values()):
+                roles = connection.execute("""SELECT rolsuper, rolbypassrls, rolcreaterole,
+                    rolcreatedb, rolreplication FROM pg_roles WHERE rolname IN (current_user, session_user)""").fetchall()
+                if not roles or any(any(role.values()) for role in roles):
                     raise ConfigurationError("runtime credentials must be unprivileged")
                 owner = connection.execute("""SELECT 1 FROM pg_class c JOIN pg_namespace n
                     ON c.relnamespace = n.oid WHERE n.nspname IN ('air', 'air_private')

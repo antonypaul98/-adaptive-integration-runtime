@@ -261,3 +261,9 @@ def test_transport_error_has_no_sensitive_details(network, monkeypatch):
         observe()
     assert str(exc.value) == 'transport_failure'
     assert exc.value.__suppress_context__
+
+
+def test_redaction_is_single_pass_and_cannot_amplify_its_markers():
+    value = {'nested': ['ERE', 'ordinary']}
+    result = obs.redact_contract(value, secrets=('E', 'R', 'D', 'A', 'C', 'T', ''))
+    assert result == {'nested': ['[REDACTED]' * 3, 'ordinary']}

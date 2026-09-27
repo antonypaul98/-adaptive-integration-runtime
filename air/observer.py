@@ -279,21 +279,26 @@ def parse_contract(body: bytes) -> dict[str, Any]:
 _SECRET_KEYS = re.compile(r'(?:password|passwd|secret|token|authorization|cookie|api[_-]?key|credential)', re.I)
 
 
-def redact_contract(value: Any, key: str = '', *, secrets: tuple[str, ...] = ()) -> Any:
+def redact_contract(value: Any, key: str = '', *, secrets: tuple[str, ...] = (),
+                    _pattern: re.Pattern | None = None) -> Any:
     # Strip example/default material conservatively: specs often embed real payloads.
     # Secret-bearing property names retain their schema shape when their value is an
     # object, but scalar credential values and example material are removed.
+    if _pattern is None and any(secrets):
+        _pattern = re.compile('|'.join(re.escape(secret) for secret in
+            sorted(set(filter(None, secrets)), key=len, reverse=True)))
     if key.lower() in ('example', 'examples', 'default'):
         return '[REDACTED]'
     if _SECRET_KEYS.search(key) and not isinstance(value, (dict, list)):
         return '[REDACTED]'
     if isinstance(value, dict):
-        return {k: redact_contract(v, k, secrets=secrets) for k, v in value.items()}
+        return {k: redact_contract(v, k, _pattern=_pattern) for k, v in value.items()}
     if isinstance(value, list):
-        return [redact_contract(item, key, secrets=secrets) for item in value]
+        return [redact_contract(item, key, _pattern=_pattern) for item in value]
     if isinstance(value, str):
-        for secret in secrets:
-            value = value.replace(secret, '[REDACTED]')
+        if _pattern is not None:
+            # One substitution pass: replacements must never be processed again.
+            value = _pattern.sub('[REDACTED]', value)
         # Free-form descriptions and extension values can contain arbitrary secrets.
         if key.lower() in ('description', 'summary') or key.startswith('x-'):
             return '[REDACTED]'
