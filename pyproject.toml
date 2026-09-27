@@ -13,3 +13,7 @@ test = ["pytest>=8,<9"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["postgres: requires an ephemeral PostgreSQL service"]
+
+[tool.setuptools.package-data]
+air = ["migrations/*.sql"]
