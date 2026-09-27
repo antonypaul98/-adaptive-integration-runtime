@@ -74,3 +74,55 @@ Migrations are forward-only. A failed upgrade rolls back atomically. Operational
 rollback uses a reviewed forward fix or backup restoration, never automatic
 artifact deletion. Database backups, retention, role rotation, encrypted disks,
 and external tamper-evident archives remain operator responsibilities.
+
+## Read-only REST/OpenAPI JSON observation
+
+```python
+from air.observer import ContractObserver, contract_changed
+
+snapshot = ContractObserver().observe(
+    authenticated_tenant_uuid, 'billing-contract',
+    'https://api.example.com/openapi.json',
+    headers={'Authorization': short_lived_read_only_credential},
+)
+with repo.transaction(authenticated_tenant_uuid) as tx:
+    snapshot.persist(tx, observation_id)
+```
+
+Only explicitly configured read-only contract endpoints should be observed.
+Provide an opaque `source_id` that your application binds to that endpoint and
+reuse the **same snapshot and observation ID** when retrying persistence. A new
+fetch is a new observation with its own timestamp and ID. `contract_changed(a,b)`
+compares deterministic normalized hashes only within the same tenant/source/origin.
+
+Security controls:
+
+- HTTPS on port 443 only; verified certificates and original hostname/SNI.
+- Rejects nonpublic IPs, metadata, loopback, private, reserved, multicast,
+  mapped/transition IPv6 and mixed safe/unsafe DNS answers.
+- Pins the socket to a validated numeric address; no second DNS lookup for connect.
+- At most two same-origin redirects by default; validates URL and DNS on every hop.
+  Never forwards credentials across origins; ignores proxy environment settings.
+- Default 3-second DNS, 5-second connect/read and 15-second total deadlines. A
+  watchdog interrupts stalled/dripping TLS/headers/chunk framing. DNS concurrency
+  is capped at four; timed-out OS resolver calls retain their slot until completion.
+- 512,000-byte body cap and 16,384-byte cumulative header/framing cap. Rejects
+  compressed bodies, ambiguous framing, truncated bodies, unsupported media types,
+  duplicate JSON keys, nonfinite numbers and excessive JSON depth/node counts.
+- Only JSON media types are accepted. OpenAPI 3.0/3.1 gets basic structural checks;
+  this is not full OpenAPI validation. YAML is deliberately unsupported. `$ref`
+  targets are stored as sanitized references and **never fetched**.
+- No raw URL path/query, request/response headers, or raw body is logged or saved.
+  Persisted provenance contains an opaque source ID, origin, UTC observation time,
+  validated destination IP, redirect count, normalization version and content hash.
+- Sanitized contract snapshots remove examples/defaults, free-form descriptions,
+  common credential fields, URL userinfo/query/fragment, bearer/basic values and
+  known request credential/query values. Semantic arrays retain their order.
+  Redacted-only changes intentionally do not alter the normalized hash.
+
+Redaction is conservative, not a general sensitive-data detector. Only observe
+approved contract documents; arbitrary response payloads may contain sensitive
+material under unknown fields. Do not feed production payloads into this observer.
+No data is sent to an LLM. Caller-managed source IDs and schema property names
+must not contain credentials or personal data. Network egress restrictions should
+also enforce the same public-HTTPS boundary in the deployment environment.

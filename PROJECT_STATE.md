@@ -53,3 +53,25 @@ This repository currently implements storage and is adding observation. It does
 not implement automatic deployment or claim the other lifecycle stages are
 complete. Consequential external changes require human approval. No LLM receives
 production payloads, credentials or customer data.
+
+## PostgreSQL merge verification
+
+PR #1 merged at main `6aa33a827dc2eef9c7cbac6e180b2c06c4458482`.
+Merged-main workflow 36344593469 passed both PostgreSQL 16 and 17 jobs.
+Documentation head `3b07f6c` also passed before merge (run 36344531788).
+
+## Observer implementation (CI pending)
+
+Implemented HTTPS-only, address-pinned, certificate-verified JSON/OpenAPI
+observation; DNS/host/IP/redirect validation; header/body/complexity/deadline
+limits; credential and provenance redaction; immutable normalized snapshots;
+tenant-checked PostgreSQL persistence; deterministic source-scoped change checks.
+
+Executed locally: 91 observer cases passed, including actual TLS socket tests for
+certificate trust/hostname validation, chunked responses, truncation, size limits,
+and slow header/chunk deadline interruption. Two database snapshot cases are
+included for the next exact-head PostgreSQL CI run. No live customer endpoint or
+production database has been contacted.
+
+Remaining acceptance: full observer + PostgreSQL CI on the pushed revision and
+merged main. Limitations and operational boundaries are explicit in README.md.
