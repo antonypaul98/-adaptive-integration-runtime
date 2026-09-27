@@ -2,76 +2,79 @@
 
 Updated 2026-09-27. GitHub is the source of truth.
 
-## Reconciled source
+## Source reconciliation
 
 The accessible repository is `antonypaul98/-adaptive-integration-runtime` (leading
-hyphen). The supplied non-hyphen name returned 404. At the start of this run main
-was `8ccd2db0e1f6ea31b0db021abab871d7b534ca05`, containing only README.md. The newest
-accessible implementation was recovery/postgres-tenant-isolation at `b80ca97`,
-containing packaging and a migration-loader stub, with no migrations or tests.
-No older commit history was reconstructed; the older 39-test result is not used
-as acceptance evidence for this repository.
+hyphen). The supplied non-hyphen name returned 404. This run started from main
+`8ccd2db0e1f6ea31b0db021abab871d7b534ca05` (README only) and continued the newest real
+implementation at recovery/postgres-tenant-isolation `b80ca97` (migration-loader
+stub and packaging; no migrations or tests). No historical Git reconstruction.
+The old 39-test claim is not acceptance evidence for this repository.
 
-## PostgreSQL checkpoint
+## Completed implementation
 
-Implemented and validated at code revision `406cd4bf4bd4b95347807132c34fdd7adbd1e841`:
+### PostgreSQL persistence and tenant isolation
 
 - Versioned, checksum-verified, advisory-locked transactional migrations.
-- Tenant-scoped immutable artifacts and database-created atomic audit events.
-- ENABLE + FORCE RLS with a protected database-login-to-tenant binding.
-- Missing, malformed, disabled or forged tenant contexts fail closed.
+- Tenant-scoped artifacts and atomic database-triggered audit events.
+- ENABLE + FORCE RLS with a protected authenticated-login/tenant binding.
+- Missing, malformed, disabled and forged tenant contexts fail closed.
 - Runtime cannot modify bindings, bypass RLS, mutate evidence or forge timestamps.
-- Database-generated SHA-256 hashes; idempotent insertion and conflict detection.
-- Explicit transactions, rollback on error, short-lived closed connections,
-  statement/lock/idle transaction timeouts, verify-full TLS by default.
-- Per-tenant database credentials, separately provisioned; no shared login tenant switch.
+- Database SHA-256 hashes; deterministic JSON; idempotent inserts and conflict errors.
+- Rollback boundaries, explicit READ COMMITTED semantics, closed short-lived
+  connections, statement/lock/idle timeouts and certificate-verified TLS defaults.
+- Guards reject privileged runtime/session identities, including SET ROLE masking.
 
-Validation actually executed:
+PR #1 merged as `6aa33a827dc2eef9c7cbac6e180b2c06c4458482`. Its merged-main run
+36344593469 passed PostgreSQL 16 and 17, 54 tests per job. The initial migration
+CI failure was fixed (hashing uses an insert trigger rather than a non-immutable
+PostgreSQL generated-column expression).
 
-- Local Python 3.12: 23 unit tests passed; compilation and git diff check passed.
-- GitHub PR #1 workflow run 36344305949 on exact head 406cd4b:
-  PostgreSQL 16 and 17 jobs both passed the complete 54-test suite, with no skips.
-  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36344305949
-- Initial CI exposed a non-immutable generated-column expression; fixed using an
-  insert trigger before recording the successful result above.
-- Local PostgreSQL installation was unavailable; database tests ran on actual
-  PostgreSQL service containers in CI, not an in-memory substitute.
+### Read-only REST/OpenAPI JSON observer
 
-The next documentation commit and merged main must also pass the same CI gate.
-No production database was changed or deployed.
+- HTTPS/443 only; strict URL, DNS and public-IP validation; pinned numeric sockets
+  with original-host TLS verification; revalidation on same-origin redirects.
+- Bounded DNS concurrency, connect/read/total deadlines; watchdog stops slow TLS,
+  headers and chunk framing; strict body/header/JSON-complexity limits.
+- No proxy inheritance, remote reference fetches, compression or write methods.
+- Sanitized provenance and contract snapshots; one-pass secret replacement;
+  immutable tenant-scoped persistence; deterministic normalized hashes and changes.
+- Explicit adversarial tests and actual TLS transport tests, not only mocks.
 
-## Next checkpoint
+## Latest executed evidence
 
-Read-only HTTPS REST/OpenAPI JSON observer with SSRF defenses, pinned DNS/TLS,
-bounded responses/time, redacted snapshots, tenant-scoped persistence and tests.
+Validated code head: `c46091fdbfeb69653267893bf15e41ff08d86391` on PR #2.
 
-## Lifecycle
+- Local Python 3.12: **115 passed**, 35 PostgreSQL cases deselected (not claimed as
+  local passes). Includes actual TLS tests for trusted/untrusted certificates,
+  hostname mismatch, chunked/truncated/oversized responses and drip deadlines.
+- Exact-head PR CI run **36345148788**: **150 passed, zero skipped** on both
+  PostgreSQL **16 and 17**. Includes 35 actual database integration cases.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36345148788
+- Local wheel built and inspected: PostgreSQL/observer code and migration SQL
+  resources are packaged. CI also verifies installed imports/resources outside
+  the source checkout.
+- Compilation and whitespace checks passed. No benchmarks were claimed.
 
-observe → detect → propose → sandbox → replay → verify → approve → deploy
+Local database installation was unavailable. PostgreSQL integration tests actually
+ran in GitHub service containers. No production database or customer endpoint was
+contacted. Subsequent documentation/package-verification revisions and merged main
+must pass the same full matrix before acceptance.
 
-This repository currently implements storage and is adding observation. It does
-not implement automatic deployment or claim the other lifecycle stages are
-complete. Consequential external changes require human approval. No LLM receives
-production payloads, credentials or customer data.
+## Boundaries and exact next implementation step
 
-## PostgreSQL merge verification
+Observer supports JSON and basic OpenAPI 3.0/3.1 structural checks, not full OpenAPI
+validation or YAML. Redaction is conservative; only approved contract documents
+are appropriate input. `$ref` URLs are never fetched. Source IDs must be bound to
+stable endpoints by the calling application. See README for trust/provisioning,
+normalization, sensitive-data, resolver, retention and operational limitations.
 
-PR #1 merged at main `6aa33a827dc2eef9c7cbac6e180b2c06c4458482`.
-Merged-main workflow 36344593469 passed both PostgreSQL 16 and 17 jobs.
-Documentation head `3b07f6c` also passed before merge (run 36344531788).
+Next: implement deterministic OpenAPI operation/parameter/response/schema change
+classification, persist tenant-scoped change evidence linked to the two immutable
+snapshot artifact IDs, and test breaking/nonbreaking/security drift. Proposal,
+sandbox, replay and approval enforcement follow that evidence boundary.
 
-## Observer implementation (CI pending)
-
-Implemented HTTPS-only, address-pinned, certificate-verified JSON/OpenAPI
-observation; DNS/host/IP/redirect validation; header/body/complexity/deadline
-limits; credential and provenance redaction; immutable normalized snapshots;
-tenant-checked PostgreSQL persistence; deterministic source-scoped change checks.
-
-Executed locally: 91 observer cases passed, including actual TLS socket tests for
-certificate trust/hostname validation, chunked responses, truncation, size limits,
-and slow header/chunk deadline interruption. Two database snapshot cases are
-included for the next exact-head PostgreSQL CI run. No live customer endpoint or
-production database has been contacted.
-
-Remaining acceptance: full observer + PostgreSQL CI on the pushed revision and
-merged main. Limitations and operational boundaries are explicit in README.md.
+Lifecycle: observe → detect → propose → sandbox → replay → verify → approve → deploy.
+No automatic deployment, production writes or LLM calls are implemented. Human
+approval remains mandatory for externally consequential changes. This checkpoint
+does not claim the rest of AIR's lifecycle is implemented.

@@ -31,6 +31,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install '.[test]'
+      - name: Verify installed package outside checkout
+        working-directory: ${{ runner.temp }}
+        run: >-
+          python -c "from air.postgres import migration_sql;
+          from air.observer import ContractObserver;
+          assert 'FORCE ROW LEVEL SECURITY' in migration_sql()"
       - run: python -m pytest -ra --junitxml=results.xml
       - uses: actions/upload-artifact@v4
         if: always()
