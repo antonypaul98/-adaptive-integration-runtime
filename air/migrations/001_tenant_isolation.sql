@@ -37,12 +37,22 @@ CREATE TABLE air.artifacts (
     idempotency_key TEXT NOT NULL CHECK (length(idempotency_key) BETWEEN 1 AND 256),
     payload TEXT NOT NULL CHECK (octet_length(payload) <= 1048576
                                 AND jsonb_typeof(payload::jsonb) = 'object'),
-    content_hash TEXT GENERATED ALWAYS AS
-        (encode(sha256(convert_to(payload, 'UTF8')), 'hex')) STORED,
+    content_hash TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     PRIMARY KEY (tenant_id, artifact_id),
     UNIQUE (tenant_id, kind, idempotency_key)
 );
+-- convert_to is STABLE, so compute in a protected insert trigger, not a generated column.
+CREATE FUNCTION air.hash_artifact() RETURNS trigger
+LANGUAGE plpgsql SET search_path = pg_catalog AS $$
+BEGIN
+    NEW.content_hash := encode(sha256(convert_to(NEW.payload, 'UTF8')), 'hex');
+    RETURN NEW;
+END $$;
+REVOKE ALL ON FUNCTION air.hash_artifact() FROM PUBLIC;
+CREATE TRIGGER artifact_hash BEFORE INSERT ON air.artifacts
+    FOR EACH ROW EXECUTE FUNCTION air.hash_artifact();
+
 CREATE TABLE air.audit_events (
     tenant_id UUID NOT NULL,
     event_id UUID NOT NULL,

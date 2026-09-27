@@ -100,6 +100,7 @@ def bind_tenant_login(connection: psycopg.Connection, login: str, tenant: str | 
     """
     tenant_id = tenant_uuid(tenant)
     with connection.transaction():
+        connection.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 714208315))", (login,))
         role = connection.execute("""SELECT rolcanlogin AND NOT (rolsuper OR rolbypassrls
             OR rolcreaterole OR rolcreatedb OR rolreplication) FROM pg_roles
             WHERE rolname = %s""", (login,)).fetchone()
