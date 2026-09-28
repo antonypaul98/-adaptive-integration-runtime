@@ -145,3 +145,7 @@ tenant isolation and the explicit registry completeness boundary.
 [Automatic mapping extraction](docs/MAPPING_EXTRACTION.md) derives dependencies
 from registered declarative adapter operation/field bindings and persists them
 through the existing immutable registry, with separately auditable provenance.
+
+[Transitive workflow impact](docs/WORKFLOW_IMPACT.md) follows explicitly registered
+downstream edges within the existing registry, with bounded cycle-safe traversal,
+deterministic shortest-path evidence and preserved tenant isolation.

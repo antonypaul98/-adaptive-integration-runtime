@@ -193,3 +193,45 @@ generation or sandbox/replay was started. Human approval remains mandatory.
 
 Exact next checkpoint: deterministic transitive workflow impact from explicitly
 registered workflow dependency edges, with immutable tenant-bound evidence.
+
+## Transitive workflow impact — validated implementation
+
+Starting main: `da63a8956a796dc7aba672173abbd73b7895162b`. PR #5 was merged;
+merged-main run 36459040057 passed 369 tests on each PostgreSQL version with zero
+skips. Baseline local suite: 249 passed, 120 database cases deselected.
+
+Existing registrations contained direct contract-to-mapping dependencies but no
+downstream edges. Added optional explicit WorkflowEdge relationships to the same
+registry and transitive results to the same impact API/artifact kind. Sorted
+multi-source BFS emits one canonical shortest path per original change and
+registered dependency, handles cycles/self-edges, and fails completely on bounds.
+Each hop retains endpoint values and edge hash, linked to the immutable registry
+and original change evidence. Legacy v1 payloads remain unchanged. PR #5 extraction
+preserves workflow edges when unioning an explicit registry. Migration 005 enforces
+same-registry endpoint membership and rejects tenant/registry override fields.
+
+Validated code head: `3633752bbb0bbe831075e87d3c4d46922a621d71` on PR #6.
+
+- Focused workflow suite: **28 passed**.
+- Complete local non-PostgreSQL suite: **277 passed**, 148 database cases deselected
+  (not claimed as local PostgreSQL passes).
+- Exact-code-head PR CI run **36461080596**: **425 passed, zero skipped** on each
+  of PostgreSQL **16 and 17**, including **148 actual database tests**.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36461080596
+- Added **56 tests**: 28 pure workflow cases and 28 PostgreSQL cases. Coverage
+  includes multi-hop paths, branching/convergence, duplicate paths, cycles/self
+  edges, deterministic ordering and shortest-path selection, depth/work/result/
+  byte bounds, missing/malformed edges, provenance, idempotency/reload, immutable
+  evidence, legacy v1 compatibility, explicit/extracted/mixed registrations,
+  cross-tenant inputs/reads/edge attacks, forged paths and concurrent analysis.
+- Whitespace and compilation checks passed. PostgreSQL execution occurred in
+  disposable CI service containers, not a local or production database.
+
+The documentation revision and merged main must pass the same exact-head matrix.
+PR #6 and Actions record final merge/post-merge acceptance. This checkpoint stops
+at verified transitive impact. See docs/WORKFLOW_IMPACT.md for same-registry scope,
+versioning, declared relationship semantics, traversal limits and trust boundaries.
+No repair generation, sandbox/replay, deployment or unrelated feature was started.
+
+Exact next checkpoint: immutable deterministic repair-proposal records and human
+approval gates, specified separately before implementing repair execution.
