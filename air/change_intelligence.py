@@ -18,6 +18,7 @@ from air.postgres import canonical_json
 
 DETECTOR_VERSION = 'air-openapi-diff-v1'
 MAX_CHANGES = 2000
+MAX_EXPANDED_BYTES = 4_194_304
 METHODS = frozenset(('get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'))
 ANNOTATIONS = frozenset(('description', 'summary', 'title', 'example', 'examples',
                         'externalDocs', 'tags'))
@@ -127,17 +128,27 @@ class _Document:
         if not re.fullmatch(r'3\.[01]\.\d+', str(self.raw.get('openapi', ''))):
             raise ContractError('unsupported_openapi_version')
         self.side, self.warnings, self.references, self.nodes = side, [], [], 0
+        self.expanded_bytes = 0
         self.value = _normalize(self.expand(self.raw, '', (), 0))
         self.validate()
 
     def warn(self, location: str, reason: str):
         self.warnings.append({'snapshot': self.side, 'location': location, 'reason': reason})
 
+    def charge(self, value):
+        self.expanded_bytes += len(_json(value).encode('utf-8'))
+        if self.expanded_bytes > MAX_EXPANDED_BYTES:
+            raise ContractError('reference_expansion_limit')
+        return value
+
     def expand(self, value: Any, location: str, stack: tuple, depth: int, mapping=False) -> Any:
         self.nodes += 1
+        self.expanded_bytes += 2
         if depth > 80 or self.nodes > 100_000:
             raise ContractError('reference_expansion_limit')
         if isinstance(value, dict):
+            for key in value:
+                self.charge(key)
             if '$ref' in value and not mapping:
                 ref = value['$ref']
                 if not isinstance(ref, str):
@@ -162,7 +173,7 @@ class _Document:
                     raise ContractError('unresolved_local_reference') from None
                 self.references.append({'snapshot': self.side, 'location': location, 'reference': ref})
                 return self.expand(target, location, stack + (ref,), depth + 1)
-            return {key: (_normalize(item, literal=True) if not mapping and key in
+            return {key: (_normalize(self.charge(item), literal=True) if not mapping and key in
                         ANNOTATIONS | {'enum', 'const', 'default'} else
                         self.expand(item, pointer(location, key), stack, depth + 1,
                                     mapping=not mapping and key in MAP_KEYS))
@@ -170,7 +181,7 @@ class _Document:
         if isinstance(value, list):
             return [self.expand(item, pointer(location, str(i)), stack, depth + 1)
                     for i, item in enumerate(value)]
-        return value
+        return self.charge(value)
 
     def validate(self):
         doc = self.value

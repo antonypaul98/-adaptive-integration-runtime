@@ -305,3 +305,18 @@ def test_added_paths_with_bad_schemas_are_rejected():
     b['paths']['/new'] = b['paths'].pop('/items')
     with pytest.raises(ContractError):
         compare_openapi(a, b)
+
+
+def test_reference_fanout_has_a_byte_budget_not_only_a_node_budget():
+    document = spec({'$ref': '#/components/schemas/Huge'})
+    document['components'] = {'schemas': {'Huge': {'type': 'string', 'enum': ['x' * 80_000]}}}
+    document['paths'] = {f'/item{i}': deepcopy(document['paths']['/items']) for i in range(60)}
+    with pytest.raises(ContractError, match='reference_expansion_limit'):
+        compare_openapi(document, document)
+
+
+def test_redundant_integer_union_and_cross_version_boolean_schema():
+    assert not changes(spec({'type': 'number'}), spec({'type': ['integer', 'number']}))
+    old, new = spec({}), spec(True)
+    old['openapi'] = '3.0.3'
+    assert any(c.classification == C.REVIEW_REQUIRED for c in changes(old, new))

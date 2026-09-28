@@ -91,7 +91,7 @@ for those areas. Documentation-only annotations are ignored by supported rules.
 ## Limits and safety
 
 Inputs use existing observer parsing bounds. Expansion is limited to 100,000
-nodes, comparison to 2,000 changes, and persisted evidence to the repository's
+nodes and 4 MiB of expanded values, comparison to 2,000 changes, and persisted evidence to the repository's
 1 MiB payload limit. Exceeding a limit fails explicitly before persistence; no
 partial/truncated change set is reported as complete. OpenAPI 2 and unsupported
 versions, unresolved local references and malformed supported structures fail.
