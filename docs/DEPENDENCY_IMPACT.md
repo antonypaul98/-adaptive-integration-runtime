@@ -32,7 +32,9 @@ contract change ID → integration/kind → mapping/operation → match/reason �
 
 - Consequential changes with overlapping pointer tokens produce `LOCATION_OVERLAP`.
   Both ancestor removal and changes below a registered schema/operation are covered.
-- Other changes to the declared operation produce `OPERATION_REVIEW`, a conservative
+- Enclosing schema/parameter constraints produce `SCHEMA_REVIEW`, including
+  required-property changes whose effective location differs from the property.
+- Other changes to the declared operation (or operation inferred from its pointer) produce `OPERATION_REVIEW`, a conservative
   potential impact. This includes indirect constraints and sibling field effects.
 - Global authentication changes produce `GLOBAL_SECURITY_REVIEW` for registered
   consumers. This may over-report consumers of an unused authentication scheme.

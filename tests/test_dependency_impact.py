@@ -64,8 +64,17 @@ def test_operation_fallback_is_conservative_and_other_operations_are_excluded():
 
 def test_pointer_matching_is_token_based():
     result = analyze_changes(changed(), [dep(operation=None, location=LOCATION + 'entifier')]).to_dict()
-    assert result['impacts'] == []
-    assert result['review_required']  # Empty matching does not authorize deployment.
+    # Similar text is not a direct pointer match; only the operation fallback applies.
+    assert [i['match'] for i in result['impacts']] == ['OPERATION_REVIEW']
+    assert result['review_required']
+    old = contract()
+    old['components'] = {'schemas': {'id': {'type': 'string'}, 'identifier': {'type': 'string'}}}
+    new = deepcopy(old)
+    new['components']['schemas']['id']['type'] = 'integer'
+    report = analyze_changes(compare_openapi(old, new), [dep(operation=None,
+        location='/components/schemas/identifier')]).to_dict()
+    assert report['impacts'] == []
+    assert report['review_required']  # Empty matching does not authorize deployment.
 
 
 def test_order_deduplication_and_hash_are_deterministic():
@@ -140,3 +149,28 @@ def test_effective_locations_support_local_refs_and_inherited_parameters():
         _validate_locations(old, [dep(location=LOCATION + '/missing').__dict__])
     with pytest.raises(ImpactError, match='operation_not_found'):
         _validate_locations(old, [dep(operation='POST /items', location='/paths/~1items').__dict__])
+
+
+def test_operation_inferred_for_selector_without_explicit_operation():
+    result = analyze_changes(changed(), [dep(operation=None, location=LOCATION[:-2] + 'identifier')]).to_dict()
+    assert result['impacts'][0]['match'] == 'OPERATION_REVIEW'
+
+
+def test_required_property_affects_component_property_without_operation():
+    old = contract()
+    old['components'] = {'schemas': {'Item': {'type': 'object', 'properties': {'id': {'type': 'string'}}}}}
+    new = deepcopy(old)
+    new['components']['schemas']['Item']['required'] = ['id']
+    report = analyze_changes(compare_openapi(old, new), [dep(operation=None,
+        location='/components/schemas/Item/properties/id')]).to_dict()
+    assert report['impacts'][0]['match'] == 'SCHEMA_REVIEW'
+
+
+def test_enclosing_schema_type_change_affects_nested_field_without_operation():
+    old = contract()
+    old['components'] = {'schemas': {'Item': {'type': 'object', 'properties': {'id': {'type': 'string'}}}}}
+    new = deepcopy(old)
+    new['components']['schemas']['Item']['type'] = ['object', 'null']
+    report = analyze_changes(compare_openapi(old, new), [dep(operation=None,
+        location='/components/schemas/Item/properties/id')]).to_dict()
+    assert report['impacts'][0]['match'] == 'SCHEMA_REVIEW'

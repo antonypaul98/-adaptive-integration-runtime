@@ -111,11 +111,19 @@ def analyze_changes(changes: ChangeSet, dependencies: Iterable[Dependency]) -> I
         for dependency in registrations:
             selected = _tokens(dependency['location'])
             operation = dependency['operation']
+            if operation is None and len(selected) >= 3 and selected[0] == 'paths' and selected[2] in METHODS:
+                operation = selected[2].upper() + ' ' + selected[1]
             if operation is not None and change.operation is not None and operation != change.operation:
                 continue
             overlap = changed[:len(selected)] == selected or selected[:len(changed)] == changed
+            scope = changed[:-2] if change.change_type.startswith('REQUIRED_PROPERTY_') else changed[:-1]
+            schema_overlap = (change.context in ('request', 'response', 'neutral') and
+                change.change_type not in ('PROPERTY_ADDED', 'PROPERTY_REMOVED') and
+                (scope[:len(selected)] == selected or selected[:len(scope)] == scope))
             if overlap:
                 match, reason = 'LOCATION_OVERLAP', 'Changed contract location overlaps the declared dependency.'
+            elif schema_overlap:
+                match, reason = 'SCHEMA_REVIEW', 'An enclosing schema or parameter constraint changed; dependent fields require review.'
             elif change.operation and operation == change.operation:
                 match, reason = 'OPERATION_REVIEW', 'The registered operation changed; indirect mapping effects require review.'
             elif change.classification == 'SECURITY_RELEVANT' and change.operation is None:
