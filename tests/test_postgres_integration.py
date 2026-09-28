@@ -142,23 +142,28 @@ def test_migration_rerun_checksum_and_rollback(database, tmp_path):
     with psycopg.connect(database['dsn'], autocommit=True) as conn:
         apply_migrations(conn)
         original = conn.execute('SELECT version, checksum FROM air.schema_migrations').fetchall()
+        migrations = sorted(MIGRATION_PATH.parent.glob('[0-9][0-9][0-9]_*.sql'))
+        for migration in migrations:
+            (tmp_path / migration.name).write_text(migration.read_text())
+        next_version = len(migrations) + 1
+        upgrade_path = tmp_path / f'{next_version:03d}_failure.sql'
         (tmp_path / MIGRATION_PATH.name).write_text(MIGRATION_PATH.read_text() + '\n-- altered')
         with pytest.raises(ConfigurationError, match='checksum'):
             apply_migrations(conn, directory=tmp_path)
         (tmp_path / MIGRATION_PATH.name).write_text(MIGRATION_PATH.read_text())
-        (tmp_path / '002_failure.sql').write_text('CREATE TABLE air.rollback_probe (id INT); SELECT 1/0;')
+        upgrade_path.write_text('CREATE TABLE air.rollback_probe (id INT); SELECT 1/0;')
         with pytest.raises(psycopg.errors.DivisionByZero):
             apply_migrations(conn, directory=tmp_path)
         assert conn.execute("SELECT to_regclass('air.rollback_probe')").fetchone()[0] is None
         assert conn.execute('SELECT version, checksum FROM air.schema_migrations').fetchall() == original
         # Real successful upgrade and re-run, then transactional cleanup for isolation.
-        (tmp_path / '002_failure.sql').write_text('CREATE TABLE air.upgrade_probe (id INT);')
+        upgrade_path.write_text('CREATE TABLE air.upgrade_probe (id INT);')
         apply_migrations(conn, directory=tmp_path)
         apply_migrations(conn, directory=tmp_path)
         assert conn.execute("SELECT to_regclass('air.upgrade_probe')").fetchone()[0]
         with conn.transaction():
             conn.execute('DROP TABLE air.upgrade_probe')
-            conn.execute('DELETE FROM air.schema_migrations WHERE version = 2')
+            conn.execute('DELETE FROM air.schema_migrations WHERE version = %s', (next_version,))
 
 
 def test_runtime_cannot_migrate(database):

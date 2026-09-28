@@ -219,6 +219,12 @@ class EvidenceTransaction:
             WHERE tenant_id = %s AND kind = %s AND idempotency_key = %s""",
             (self.tenant_id, kind, key)).fetchone()
 
+    def get_by_id(self, artifact_id: str | UUID, *, kind: str) -> dict[str, Any] | None:
+        """Resolve immutable evidence by identity through both tenant predicate and RLS."""
+        return self._connection.execute("""SELECT * FROM air.artifacts
+            WHERE tenant_id = %s AND artifact_id = %s AND kind = %s""",
+            (self.tenant_id, UUID(str(artifact_id)), kind)).fetchone()
+
     def audit(self) -> list[dict[str, Any]]:
         return self._connection.execute("""SELECT * FROM air.audit_events
             WHERE tenant_id = %s ORDER BY created_at, event_id""", (self.tenant_id,)).fetchall()
