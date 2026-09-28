@@ -72,7 +72,8 @@ revisions remains explicit, and no unregistered dependencies are discovered.
 
 Limits: 1,000 dependency entries, 2,000 supplied edge entries before deduplication,
 32 downstream hops, 100,000 examined edges across all original changes, 5,000 direct
-plus downstream results, and the existing 1 MiB evidence payload limit. Limits are
+plus downstream results, and the existing 1 MiB evidence payload limit. Path
+evidence also has an incremental byte budget, preventing large intermediate reports. Limits are
 versioned code policy. Exceeding any bound raises an error before persisting impact;
 there is no partial successful result. Back/cycle edges to seen nodes do not consume
 new depth. Unreachable nodes are never reported as safe: existing coverage warnings

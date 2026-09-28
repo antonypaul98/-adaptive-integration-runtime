@@ -15,13 +15,14 @@ from uuid import UUID
 
 from air.change_evidence import _snapshot, load_change_evidence
 from air.change_intelligence import ChangeSet, METHODS, _Document, _parameters, compare_openapi
-from air.postgres import EvidenceTransaction, canonical_json
+from air.postgres import EvidenceTransaction, MAX_PAYLOAD_BYTES, canonical_json
 
 IMPACT_VERSION = 'air-dependency-impact-v1'
 WORKFLOW_VERSION = 'air-dependency-impact-v2'
 MAX_WORKFLOW_EDGES = 2000
 MAX_WORKFLOW_HOPS = 32
 MAX_TRAVERSAL_STEPS = 100_000
+MAX_WORKFLOW_OUTPUT_BYTES = MAX_PAYLOAD_BYTES
 MAX_DEPENDENCIES = 1000
 MAX_COMPARISONS = 200_000
 MAX_IMPACTS = 5000
@@ -136,6 +137,8 @@ def _propagate(report, registrations, edges):
     prevents cycles and path explosion. Bounds abort the entire analysis instead
     of publishing an apparently complete truncated result.
     """
+    edge_hash = _digest({'workflow_edges': edges})
+    output_bytes = len(canonical_json(report).encode())
     nodes = {_digest(d): d for d in registrations}
     adjacency = {node: [] for node in nodes}
     for edge in edges:
@@ -174,13 +177,17 @@ def _propagate(report, registrations, edges):
                     'match': 'TRANSITIVE_REVIEW',
                     'reason': 'Registered consumes_output edges connect this dependency to an impacted dependency; downstream behavior requires review.',
                     'hops': len(next_edges), 'path': {'nodes': next_nodes, 'edges': next_edges}}
-                downstream.append({'impact_id': _digest(impact), **impact})
+                result = {'impact_id': _digest(impact), **impact}
+                output_bytes += len(canonical_json(result).encode()) + 1
+                if output_bytes > MAX_WORKFLOW_OUTPUT_BYTES:
+                    raise ImpactError('workflow_evidence_size_limit')
+                downstream.append(result)
                 if len(report['impacts']) + len(downstream) > MAX_IMPACTS:
                     raise ImpactError('impact_result_limit')
                 queue.append((target, root, next_nodes, next_edges))
     downstream.sort(key=lambda item: (item['change_id'], item['dependency_id']))
     return {**report, 'impact_version': WORKFLOW_VERSION, 'downstream_impacts': downstream,
-        'workflow_edges_hash': _digest({'workflow_edges': edges}),
+        'workflow_edges_hash': edge_hash,
         'traversal': {'algorithm': 'sorted_multi_source_bfs_v1', 'max_hops': MAX_WORKFLOW_HOPS,
                       'max_steps': MAX_TRAVERSAL_STEPS, 'examined_edges': steps,
                       'path_policy': 'one_canonical_shortest_path_per_change_and_dependency'}}

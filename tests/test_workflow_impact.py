@@ -1,6 +1,5 @@
 from copy import deepcopy
 from dataclasses import asdict
-from hashlib import sha256
 
 import pytest
 
@@ -163,3 +162,10 @@ def test_no_change_nonbreaking_and_legacy_direct_report():
         assert report['impacts'] == [] and report['downstream_impacts'] == []
         assert not report['review_required']
     assert 'downstream_impacts' not in analyze_changes(changes(), deps).to_dict()
+
+
+def test_path_evidence_byte_budget_fails_before_materializing_large_output(monkeypatch):
+    import air.dependency_impact as module
+    monkeypatch.setattr(module, 'MAX_WORKFLOW_OUTPUT_BYTES', 100)
+    with pytest.raises(ImpactError, match='evidence_size_limit'):
+        run([(0,1),(1,2),(2,3)])

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from dataclasses import asdict, replace
+from dataclasses import replace
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
