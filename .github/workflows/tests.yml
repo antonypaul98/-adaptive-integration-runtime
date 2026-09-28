@@ -36,6 +36,8 @@ jobs:
         run: >-
           python -c "from air.postgres import migration_sql;
           from air.observer import ContractObserver;
+          from air.change_evidence import detect_and_persist;
+          from air.change_intelligence import compare_openapi;
           assert 'FORCE ROW LEVEL SECURITY' in migration_sql()"
       - run: python -m pytest -ra --junitxml=results.xml
       - uses: actions/upload-artifact@v4

@@ -78,3 +78,19 @@ Lifecycle: observe → detect → propose → sandbox → replay → verify → 
 No automatic deployment, production writes or LLM calls are implemented. Human
 approval remains mandatory for externally consequential changes. This checkpoint
 does not claim the rest of AIR's lifecycle is implemented.
+
+## Change intelligence implementation — validation in progress
+
+Continuation starting main: `30b1733876fd1fa2b67be7e7a4a2f7ba1a9b5841`.
+Implemented deterministic OpenAPI comparison, structured immutable change sets,
+reference/coverage evidence, directional request/response compatibility rules,
+security drift classification, persisted snapshot verification, idempotent
+change evidence and database-enforced tenant-scoped snapshot links (migration 002).
+
+Executed locally in this continuation: 67 classifier tests passed; complete
+non-PostgreSQL suite: 182 passed. Database acceptance awaits PostgreSQL 16/17 CI.
+Prior main's 150-test PostgreSQL matrix remains the verified baseline, not evidence
+for the new migration. No dependency-impact implementation has started.
+
+Next acceptance action: push the feature branch, execute the full PostgreSQL
+matrix, fix failures, merge only on a passing exact head, then verify merged main.

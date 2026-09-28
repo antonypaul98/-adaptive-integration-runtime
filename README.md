@@ -126,3 +126,13 @@ material under unknown fields. Do not feed production payloads into this observe
 No data is sent to an LLM. Caller-managed source IDs and schema property names
 must not contain credentials or personal data. Network egress restrictions should
 also enforce the same public-HTTPS boundary in the deployment environment.
+
+## Deterministic OpenAPI change intelligence
+
+`air.change_intelligence.compare_openapi` classifies contract changes without an
+LLM. `air.change_evidence.detect_and_persist` compares two authorized persisted
+snapshot IDs and stores an immutable, idempotent change set with provenance and
+atomic audit evidence. `load_change_evidence` verifies persisted results by
+recomputation. Migration 002 enforces same-tenant snapshot links in PostgreSQL.
+See [comparison policy and usage](docs/CHANGE_INTELLIGENCE.md) for supported
+request/response rules, coverage warnings, limits and trust boundaries.
