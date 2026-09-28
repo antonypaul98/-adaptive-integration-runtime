@@ -1,6 +1,6 @@
 # AIR implementation state
 
-Updated 2026-09-27. GitHub is the source of truth.
+Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation
 
@@ -152,3 +152,44 @@ against known mappings before adding transitive workflow impact propagation.
 Registry revision selection remains explicit; there is no claim of automatic
 runtime dependency discovery or completeness. No repair generation, LLM calls or
 production deployment were added. Human approval remains mandatory.
+
+## Automatic dependency extraction — validated implementation
+
+Started from verified main `9188aab3a658a7f9ae252a21cb7b6bff5ed053db`.
+PRs #3 and #4 were merged, and main CI run 36366956866 passed 292 tests on each
+of PostgreSQL 16 and 17 with zero skips. Baseline local run: 211 passed.
+
+Repository inspection found no existing adapter-mapping representation. Added a
+bounded versioned declarative mapping registration format and deterministic
+operation/parameter/body-field extraction into the existing immutable registry.
+Separate immutable extraction evidence explains each dependency using registered
+mapping artifact/hash, mapping ID and canonical source pointer. Optional explicit
+registrations are unioned without overwriting records. Migration 004 enforces
+same-tenant ownership and snapshot/registry/mapping/provenance links. Verified
+reload, content-addressed retries and savepoint-protected writes are implemented.
+
+Validated code head: `d7d8938de74bde7deefb097951b63f56c58d7d7d` on PR #5.
+
+- Focused extractor suite: **38 passed**.
+- Complete local non-PostgreSQL suite: **249 passed**, 120 database tests deselected
+  (not claimed as local database passes).
+- Exact-code-head PR CI run **36458560289**: **369 passed, zero skipped** on each
+  of PostgreSQL **16 and 17**, including **120 actual database integration tests**.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36458560289
+- Added **77 tests**: 38 pure extraction and 39 PostgreSQL cases. Coverage includes
+  deterministic normalization/deduplication, multiple operations/mappings/adapters,
+  provenance pointers/hashes, explicit registry reuse/union, persisted reload,
+  malformed/unsupported/ambiguous ownership, cross-tenant inputs/reads/forged links,
+  immutable rows, concurrent idempotency, savepoint rollback and existing impact
+  analysis consuming extracted dependencies.
+- Whitespace and compilation checks passed. Database tests ran in disposable
+  GitHub service containers; no production data or endpoints were used.
+
+The documentation revision and merged main must pass the same exact-head matrix.
+PR #5 and Actions record the final merge and post-merge acceptance evidence.
+See docs/MAPPING_EXTRACTION.md for the supported declarative format and trust limits.
+No arbitrary adapter-code discovery, transitive workflow analysis, repair
+generation or sandbox/replay was started. Human approval remains mandatory.
+
+Exact next checkpoint: deterministic transitive workflow impact from explicitly
+registered workflow dependency edges, with immutable tenant-bound evidence.
