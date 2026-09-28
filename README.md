@@ -136,3 +136,8 @@ atomic audit evidence. `load_change_evidence` verifies persisted results by
 recomputation. Migration 002 enforces same-tenant snapshot links in PostgreSQL.
 See [comparison policy and usage](docs/CHANGE_INTELLIGENCE.md) for supported
 request/response rules, coverage warnings, limits and trust boundaries.
+
+Explicit integration/adapter/workflow dependencies can be registered against an
+immutable snapshot and matched deterministically to verified contract changes.
+See [dependency impact](docs/DEPENDENCY_IMPACT.md) for APIs, conservative matching,
+tenant isolation and the explicit registry completeness boundary.
