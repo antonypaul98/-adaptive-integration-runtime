@@ -141,3 +141,7 @@ Explicit integration/adapter/workflow dependencies can be registered against an
 immutable snapshot and matched deterministically to verified contract changes.
 See [dependency impact](docs/DEPENDENCY_IMPACT.md) for APIs, conservative matching,
 tenant isolation and the explicit registry completeness boundary.
+
+[Automatic mapping extraction](docs/MAPPING_EXTRACTION.md) derives dependencies
+from registered declarative adapter operation/field bindings and persists them
+through the existing immutable registry, with separately auditable provenance.

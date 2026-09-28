@@ -39,6 +39,7 @@ jobs:
           from air.change_evidence import detect_and_persist;
           from air.change_intelligence import compare_openapi;
           from air.dependency_impact import analyze_and_persist;
+          from air.mapping_extraction import extract_registered_dependencies;
           assert 'FORCE ROW LEVEL SECURITY' in migration_sql()"
       - run: python -m pytest -ra --junitxml=results.xml
       - uses: actions/upload-artifact@v4

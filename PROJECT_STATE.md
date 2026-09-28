@@ -152,3 +152,23 @@ against known mappings before adding transitive workflow impact propagation.
 Registry revision selection remains explicit; there is no claim of automatic
 runtime dependency discovery or completeness. No repair generation, LLM calls or
 production deployment were added. Human approval remains mandatory.
+
+## Adapter mapping extraction — implementation awaiting database validation
+
+Started from verified main `9188aab3a658a7f9ae252a21cb7b6bff5ed053db`.
+PRs #3 and #4 were merged, and main CI run 36366956866 passed 292 tests on each
+of PostgreSQL 16 and 17 with zero skips. Baseline local run: 211 passed.
+
+Repository inspection found no existing adapter-mapping representation. Added a
+bounded versioned declarative mapping registration format and deterministic
+operation/parameter/body-field extraction into the existing immutable registry.
+Separate immutable extraction evidence explains each dependency using registered
+mapping artifact/hash, mapping ID and canonical source pointer. Optional explicit
+registrations are unioned without overwriting records. Migration 004 enforces
+same-tenant ownership and snapshot/registry/mapping/provenance links. Verified
+reload, content-addressed retries and savepoint-protected writes are implemented.
+
+Focused extractor suite: 38 passed locally. PostgreSQL validation is pending;
+no unexecuted database tests are claimed. See docs/MAPPING_EXTRACTION.md for API,
+format, ownership, unsupported semantics and trust boundaries. No transitive
+workflow analysis, repair generation or sandbox/replay was started.
