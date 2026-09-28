@@ -111,16 +111,12 @@ Executed evidence:
 - Local PostgreSQL service installation was unavailable; integration execution
   occurred in GitHub service containers. No production data or endpoints were used.
 
-Documentation revision and merged main must pass the same exact-head matrix before
-merge acceptance. PR #3 and GitHub Actions record that final gate.
+Final PR #3 head `e2ff3aaf251139e31a1eb13e82664aa5be5b30a0` passed the full
+242-test PostgreSQL 16/17 matrix (run 36366080073). Merged main
+`e5385fd745b84fad279c8b16f6b06147e978233a` passed the same matrix
+(run 36366147860). The change-intelligence checkpoint is merged and verified.
 
-Dependency impact has not started. Exact next implementation step after verified
-merge: register tenant-scoped integration dependencies on snapshot contract
-locations and persist deterministic impact evidence linking verified changes to
-integration, mapping/operation and reason. No LLM assistance or automatic deployment
-is added; the approval lifecycle and human approval boundary remain unchanged.
-
-## Dependency impact foundation — validation in progress
+## Dependency impact foundation — validated implementation
 
 Change intelligence was merged by PR #3 into
 `e5385fd745b84fad279c8b16f6b06147e978233a`. Exact final PR head
@@ -134,6 +130,25 @@ and migration 003 for database-enforced tenant/link integrity. This is an explic
 registry foundation; automatic extraction and transitive workflow propagation are
 not implemented. See docs/DEPENDENCY_IMPACT.md for exact matching/coverage limits.
 
-Executed locally: 23 targeted impact tests passed; the complete non-PostgreSQL
-suite passed 208 tests. Database integration validation of this extension is
-pending PostgreSQL 16/17 CI; no unexecuted database pass is claimed.
+Validated code head: `a66b8e2f9a5249b91cf264801adb8e8484b44ab9` on PR #4.
+
+- Targeted impact suite: **26 passed**.
+- Complete local non-PostgreSQL suite: **211 passed**, 81 database cases deselected.
+- Exact-code-head PR CI run **36366772178**: **292 passed, zero skipped** on each
+  of PostgreSQL **16 and 17**, including **81 actual database integration tests**.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36366772178
+- New database cases verify persisted reload, cross-tenant reads and inputs,
+  forged links/tenants, snapshot binding, immutable registry/impact rows, rollback,
+  concurrent idempotency and recomputation rejecting forged impact results.
+- Compilation and whitespace checks passed. PostgreSQL execution occurred in
+  disposable GitHub service containers, not a local or production database.
+
+The documentation revision and merged main must pass the same matrix as the final
+acceptance gate. PR #4 and Actions record that final merge/post-merge result.
+
+Next implementation step: extract explicit operation/field dependencies from a
+registered adapter mapping into this immutable registry, and validate extraction
+against known mappings before adding transitive workflow impact propagation.
+Registry revision selection remains explicit; there is no claim of automatic
+runtime dependency discovery or completeness. No repair generation, LLM calls or
+production deployment were added. Human approval remains mandatory.
