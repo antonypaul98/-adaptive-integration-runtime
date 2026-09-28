@@ -307,9 +307,11 @@ def test_added_paths_with_bad_schemas_are_rejected():
         compare_openapi(a, b)
 
 
-def test_reference_fanout_has_a_byte_budget_not_only_a_node_budget():
+@pytest.mark.parametrize('external', [False, True])
+def test_reference_fanout_has_a_byte_budget_not_only_a_node_budget(external):
     document = spec({'$ref': '#/components/schemas/Huge'})
-    document['components'] = {'schemas': {'Huge': {'type': 'string', 'enum': ['x' * 80_000]}}}
+    document['components'] = {'schemas': {'Huge': ({'$ref': 'https://example.com/' + 'x' * 80_000}
+        if external else {'type': 'string', 'enum': ['x' * 80_000]})}}
     document['paths'] = {f'/item{i}': deepcopy(document['paths']['/items']) for i in range(60)}
     with pytest.raises(ContractError, match='reference_expansion_limit'):
         compare_openapi(document, document)

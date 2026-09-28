@@ -155,13 +155,13 @@ class _Document:
                     raise ContractError('invalid_reference')
                 if not ref.startswith('#/'):
                     self.warn(location, 'external_or_anchor_reference_not_resolved')
-                    return _normalize(value)
+                    return _normalize(self.charge(value))
                 if ref in stack:
                     self.warn(location, 'recursive_reference_requires_review')
-                    return _normalize(value)
+                    return _normalize(self.charge(value))
                 if set(value) - {'$ref'} - ANNOTATIONS:
                     self.warn(location, 'reference_sibling_semantics_not_supported')
-                    return _normalize(value)
+                    return _normalize(self.charge(value))
                 target = self.raw
                 try:
                     for token in ref[2:].split('/'):
