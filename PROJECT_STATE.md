@@ -119,3 +119,21 @@ merge: register tenant-scoped integration dependencies on snapshot contract
 locations and persist deterministic impact evidence linking verified changes to
 integration, mapping/operation and reason. No LLM assistance or automatic deployment
 is added; the approval lifecycle and human approval boundary remain unchanged.
+
+## Dependency impact foundation — validation in progress
+
+Change intelligence was merged by PR #3 into
+`e5385fd745b84fad279c8b16f6b06147e978233a`. Exact final PR head
+`e2ff3aaf251139e31a1eb13e82664aa5be5b30a0` passed 242 tests on both PostgreSQL
+versions (run 36366080073), and merged main passed the same 242-test matrix
+(run 36366147860). Only then did dependency impact implementation start.
+
+Implemented immutable snapshot-bound dependency registrations, deterministic
+location/operation/security impact links, verified reload, idempotent persistence
+and migration 003 for database-enforced tenant/link integrity. This is an explicit
+registry foundation; automatic extraction and transitive workflow propagation are
+not implemented. See docs/DEPENDENCY_IMPACT.md for exact matching/coverage limits.
+
+Executed locally: 23 targeted impact tests passed; the complete non-PostgreSQL
+suite passed 208 tests. Database integration validation of this extension is
+pending PostgreSQL 16/17 CI; no unexecuted database pass is claimed.
