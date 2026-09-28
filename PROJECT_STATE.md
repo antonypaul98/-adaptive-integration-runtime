@@ -193,3 +193,25 @@ generation or sandbox/replay was started. Human approval remains mandatory.
 
 Exact next checkpoint: deterministic transitive workflow impact from explicitly
 registered workflow dependency edges, with immutable tenant-bound evidence.
+
+## Transitive workflow impact — implementation awaiting database validation
+
+Starting main: `da63a8956a796dc7aba672173abbd73b7895162b`. PR #5 was merged;
+merged-main run 36459040057 passed 369 tests on each PostgreSQL version with zero
+skips. Baseline local suite: 249 passed, 120 database cases deselected.
+
+Existing registrations contained direct contract-to-mapping dependencies but no
+downstream edges. Added optional explicit WorkflowEdge relationships to the same
+registry and transitive results to the same impact API/artifact kind. Sorted
+multi-source BFS emits one canonical shortest path per original change and
+registered dependency, handles cycles/self-edges, and fails completely on bounds.
+Each hop retains endpoint values and edge hash, linked to the immutable registry
+and original change evidence. Legacy v1 payloads remain unchanged. PR #5 extraction
+preserves workflow edges when unioning an explicit registry. Migration 005 enforces
+same-registry endpoint membership and rejects tenant/registry override fields.
+
+Executed locally: 27 focused workflow tests passed; complete non-PostgreSQL suite:
+276 passed, 148 database cases deselected. PostgreSQL 16/17 validation is pending;
+no unexecuted database pass is claimed. See docs/WORKFLOW_IMPACT.md for exact scope,
+traversal limits, path selection, versioning and trust boundaries. No repair,
+sandbox/replay or unrelated functionality was started.

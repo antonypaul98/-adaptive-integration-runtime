@@ -15,7 +15,7 @@ from uuid import UUID
 from air.change_evidence import _snapshot
 from air.change_intelligence import METHODS, pointer
 from air.dependency_impact import (Dependency, _dependencies, _tokens, _validate_locations,
-    load_registry, register_dependencies)
+    load_registry, register_dependencies, _edge)
 from air.postgres import EvidenceTransaction, canonical_json, tenant_uuid
 
 MAPPING_VERSION = 'air-adapter-mapping-v1'
@@ -260,7 +260,7 @@ def _inputs(transaction, mapping_ids, explicit_registry_id):
         dependencies.extend(extraction.dependencies)
         for item in extraction.to_dict()['provenance']:
             provenance.append({**item, 'mapping_artifact': reference})
-    base = None
+    base, workflow_edges = None, []
     if explicit_registry_id is not None:
         record = load_registry(transaction, explicit_registry_id)
         base = _reference(record)
@@ -268,9 +268,10 @@ def _inputs(transaction, mapping_ids, explicit_registry_id):
         if payload['snapshot'] != snapshot:
             raise ExtractionError('mapping_registry_snapshot_mismatch')
         dependencies.extend(Dependency(**d) for d in payload['dependencies'])
+        workflow_edges = payload.get('workflow_edges', [])
     normalized = _dependencies(dependencies)
     return snapshot, normalized, {'extractor_version': EXTRACTOR_VERSION, 'mappings': references,
-        'explicit_registry': base, 'provenance': sorted(provenance, key=canonical_json)}
+        'explicit_registry': base, 'provenance': sorted(provenance, key=canonical_json)}, workflow_edges
 
 
 def _extraction_payload(transaction, registry, snapshot, sources):
@@ -286,10 +287,11 @@ def extract_registered_dependencies(transaction: EvidenceTransaction, mapping_id
     inside their outer transaction. Authoritative extraction never trusts caller
     dictionaries; it reloads the selected registered artifacts through RLS.
     """
-    snapshot, dependencies, sources = _inputs(transaction, mapping_ids, explicit_registry_id)
+    snapshot, dependencies, sources, edges = _inputs(transaction, mapping_ids, explicit_registry_id)
     with transaction._connection.transaction():
         registry = register_dependencies(transaction, snapshot['artifact_id'],
-                                         [Dependency(**d) for d in dependencies])
+                                         [Dependency(**d) for d in dependencies],
+                                         workflow_edges=[_edge(e) for e in edges])
         payload = _extraction_payload(transaction, registry, snapshot, sources)
         extraction = transaction.put('adapter_dependency_extraction', _hash(payload), payload)
     return {'registry': registry, 'extraction': extraction}
@@ -302,11 +304,12 @@ def load_extraction(transaction: EvidenceTransaction, identity: str | UUID) -> d
         if payload['extractor_version'] != EXTRACTOR_VERSION:
             raise ExtractionError('unsupported_extractor_version')
         base = payload['explicit_registry']
-        snapshot, dependencies, sources = _inputs(transaction,
+        snapshot, dependencies, sources, edges = _inputs(transaction,
             [ref['artifact_id'] for ref in payload['mappings']], base['artifact_id'] if base else None)
         registry = load_registry(transaction, payload['registry']['artifact_id'])
         registered = json.loads(registry['payload'])
-        if registered['snapshot'] != snapshot or registered['dependencies'] != dependencies:
+        if (registered['snapshot'] != snapshot or registered['dependencies'] != dependencies or
+                registered.get('workflow_edges', []) != edges):
             raise ExtractionError('extraction_registry_mismatch')
         actual = _extraction_payload(transaction, registry, snapshot, sources)
         if canonical_json(actual) != record['payload'] or _hash(actual) != record['content_hash']:

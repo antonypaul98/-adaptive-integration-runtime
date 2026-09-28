@@ -5,6 +5,7 @@ integrators, never claims that all runtime dependencies have been discovered.
 """
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
@@ -17,6 +18,10 @@ from air.change_intelligence import ChangeSet, METHODS, _Document, _parameters, 
 from air.postgres import EvidenceTransaction, canonical_json
 
 IMPACT_VERSION = 'air-dependency-impact-v1'
+WORKFLOW_VERSION = 'air-dependency-impact-v2'
+MAX_WORKFLOW_EDGES = 2000
+MAX_WORKFLOW_HOPS = 32
+MAX_TRAVERSAL_STEPS = 100_000
 MAX_DEPENDENCIES = 1000
 MAX_COMPARISONS = 200_000
 MAX_IMPACTS = 5000
@@ -81,6 +86,106 @@ def _dependencies(values: Iterable[Dependency]) -> list[dict]:
     return [result[key] for key in sorted(result)]
 
 
+
+@dataclass(frozen=True)
+class WorkflowEdge:
+    """An explicit upstream-to-downstream relationship within one registry.
+
+    Both endpoints must be existing Dependency values in that registry. There
+    are no external registry IDs or implicit edges between similarly named nodes.
+    """
+    upstream: Dependency
+    downstream: Dependency
+    relation: str = 'consumes_output'
+
+    def __post_init__(self):
+        if not isinstance(self.upstream, Dependency) or not isinstance(self.downstream, Dependency):
+            raise ImpactError('invalid_workflow_endpoint')
+        if self.relation != 'consumes_output':
+            raise ImpactError('unsupported_workflow_relation')
+
+
+def _edge(value):
+    try:
+        if not isinstance(value, dict) or set(value) != {'upstream', 'downstream', 'relation'}:
+            raise ImpactError('invalid_workflow_edge')
+        return WorkflowEdge(Dependency(**value['upstream']), Dependency(**value['downstream']), value['relation'])
+    except (KeyError, TypeError):
+        raise ImpactError('invalid_workflow_edge') from None
+
+
+def _workflow_edges(values, registrations):
+    registered = {canonical_json(d) for d in registrations}
+    normalized = {}
+    for index, edge in enumerate(values):
+        if index >= MAX_WORKFLOW_EDGES:
+            raise ImpactError('workflow_edge_limit')
+        if not isinstance(edge, WorkflowEdge):
+            raise ImpactError('invalid_workflow_edge')
+        value = asdict(edge)
+        if any(canonical_json(value[key]) not in registered for key in ('upstream', 'downstream')):
+            raise ImpactError('workflow_endpoint_not_registered')
+        normalized[canonical_json(value)] = value
+    return [normalized[key] for key in sorted(normalized)]
+
+
+def _propagate(report, registrations, edges):
+    """Multi-source BFS: one canonical shortest explanation per change/node.
+
+    Seed IDs and outgoing edge IDs are sorted before traversal. Seen-on-enqueue
+    prevents cycles and path explosion. Bounds abort the entire analysis instead
+    of publishing an apparently complete truncated result.
+    """
+    nodes = {_digest(d): d for d in registrations}
+    adjacency = {node: [] for node in nodes}
+    for edge in edges:
+        adjacency[_digest(edge['upstream'])].append((_digest(edge), edge))
+    for outgoing in adjacency.values():
+        outgoing.sort(key=lambda item: item[0])
+    seeds = {}
+    for impact in report['impacts']:
+        seeds.setdefault(impact['change_id'], []).append(impact)
+    downstream, steps = [], 0
+    for change_id in sorted(seeds):
+        queue, seen = deque(), set()
+        for impact in sorted(seeds[change_id], key=lambda item: (_digest(item['dependency']), item['impact_id'])):
+            node = _digest(impact['dependency'])
+            if node not in seen:
+                seen.add(node)
+                queue.append((node, impact, [node], []))
+        while queue:
+            node, root, node_path, edge_path = queue.popleft()
+            for edge_id, edge in adjacency[node]:
+                steps += 1
+                if steps > MAX_TRAVERSAL_STEPS:
+                    raise ImpactError('workflow_traversal_limit')
+                target = _digest(edge['downstream'])
+                if target in seen:
+                    continue
+                if len(edge_path) >= MAX_WORKFLOW_HOPS:
+                    raise ImpactError('workflow_depth_limit')
+                seen.add(target)
+                next_nodes = node_path + [target]
+                next_edges = edge_path + [{'edge_id': edge_id, **edge}]
+                impact = {'change_id': change_id, 'change_location': root['change_location'],
+                    'change_type': root['change_type'], 'classification': root['classification'],
+                    'dependency': nodes[target], 'dependency_id': target,
+                    'root_impact_id': root['impact_id'], 'root_dependency_id': node_path[0],
+                    'match': 'TRANSITIVE_REVIEW',
+                    'reason': 'Registered consumes_output edges connect this dependency to an impacted dependency; downstream behavior requires review.',
+                    'hops': len(next_edges), 'path': {'nodes': next_nodes, 'edges': next_edges}}
+                downstream.append({'impact_id': _digest(impact), **impact})
+                if len(report['impacts']) + len(downstream) > MAX_IMPACTS:
+                    raise ImpactError('impact_result_limit')
+                queue.append((target, root, next_nodes, next_edges))
+    downstream.sort(key=lambda item: (item['change_id'], item['dependency_id']))
+    return {**report, 'impact_version': WORKFLOW_VERSION, 'downstream_impacts': downstream,
+        'workflow_edges_hash': _digest({'workflow_edges': edges}),
+        'traversal': {'algorithm': 'sorted_multi_source_bfs_v1', 'max_hops': MAX_WORKFLOW_HOPS,
+                      'max_steps': MAX_TRAVERSAL_STEPS, 'examined_edges': steps,
+                      'path_policy': 'one_canonical_shortest_path_per_change_and_dependency'}}
+
+
 @dataclass(frozen=True)
 class ImpactReport:
     payload_json: str
@@ -93,7 +198,8 @@ class ImpactReport:
         return sha256(self.payload_json.encode()).hexdigest()
 
 
-def analyze_changes(changes: ChangeSet, dependencies: Iterable[Dependency]) -> ImpactReport:
+def analyze_changes(changes: ChangeSet, dependencies: Iterable[Dependency],
+                    *, workflow_edges: Iterable[WorkflowEdge] = ()) -> ImpactReport:
     """Match consequential changes to declared dependencies, with conservative fallbacks.
 
     Overlapping pointers are direct evidence. Other changes to a registered
@@ -101,6 +207,7 @@ def analyze_changes(changes: ChangeSet, dependencies: Iterable[Dependency]) -> I
     review. Empty results never prove an integration safe or a registry complete.
     """
     registrations = _dependencies(dependencies)
+    edges = _workflow_edges(workflow_edges, registrations)
     if len(changes.changes) * len(registrations) > MAX_COMPARISONS:
         raise ImpactError('impact_comparison_limit')
     impacts = []
@@ -138,10 +245,13 @@ def analyze_changes(changes: ChangeSet, dependencies: Iterable[Dependency]) -> I
                 raise ImpactError('impact_result_limit')
     impacts.sort(key=lambda i: (i['dependency']['integration_id'], i['dependency']['mapping_id'],
                                i['change_location'], i['impact_id']))
-    return ImpactReport(canonical_json({'impact_version': IMPACT_VERSION,
+    report = {'impact_version': IMPACT_VERSION,
         'change_set_hash': changes.content_hash, 'dependencies_hash': _digest({'dependencies': registrations}),
         'impacts': impacts, 'coverage_warnings': changes.to_dict()['coverage_warnings'],
-        'scope': 'explicit_registry_only', 'review_required': bool(impacts) or changes.review_required}))
+        'scope': 'explicit_registry_only', 'review_required': bool(impacts) or changes.review_required}
+    if edges:
+        report = _propagate(report, registrations, edges)
+    return ImpactReport(canonical_json(report))
 
 
 def _validate_locations(contract, dependencies):
@@ -175,18 +285,22 @@ def _validate_locations(contract, dependencies):
             raise ImpactError('dependency_location_not_found') from None
 
 
-def _registry_payload(transaction, snapshot_id, dependencies):
+def _registry_payload(transaction, snapshot_id, dependencies, workflow_edges=()):
     snapshot, contract = _snapshot(transaction, snapshot_id)
     normalized = _dependencies(dependencies)
     _validate_locations(contract, normalized)
-    return {'tenant_id': str(transaction.tenant_id), 'registry_version': IMPACT_VERSION,
-            'snapshot': snapshot, 'dependencies': normalized}
+    edges = _workflow_edges(workflow_edges, normalized)
+    return {'tenant_id': str(transaction.tenant_id),
+            'registry_version': WORKFLOW_VERSION if edges else IMPACT_VERSION,
+            'snapshot': snapshot, 'dependencies': normalized,
+            **({'workflow_edges': edges} if edges else {})}
 
 
 def register_dependencies(transaction: EvidenceTransaction, snapshot_id: str | UUID,
-                          dependencies: Iterable[Dependency]) -> dict:
+                          dependencies: Iterable[Dependency],
+                          *, workflow_edges: Iterable[WorkflowEdge] = ()) -> dict:
     """Persist an immutable, content-addressed registry revision for one snapshot."""
-    payload = _registry_payload(transaction, snapshot_id, dependencies)
+    payload = _registry_payload(transaction, snapshot_id, dependencies, workflow_edges)
     return transaction.put('contract_dependency_registry', _digest(payload), payload)
 
 
@@ -204,10 +318,11 @@ def load_registry(transaction: EvidenceTransaction, identity: str | UUID) -> dic
     record = _artifact(transaction, identity, 'contract_dependency_registry')
     try:
         payload = json.loads(record['payload'])
-        if payload['registry_version'] != IMPACT_VERSION:
+        if payload['registry_version'] not in (IMPACT_VERSION, WORKFLOW_VERSION):
             raise ImpactError('unsupported_registry_version')
         actual = _registry_payload(transaction, payload['snapshot']['artifact_id'],
-                                   [Dependency(**d) for d in payload['dependencies']])
+                                   [Dependency(**d) for d in payload['dependencies']],
+                                   [_edge(e) for e in payload.get('workflow_edges', [])])
         if canonical_json(actual) != record['payload'] or _digest(actual) != record['content_hash']:
             raise ImpactError('registry_integrity_failure')
     except (KeyError, TypeError, json.JSONDecodeError):
@@ -224,8 +339,9 @@ def _impact_payload(transaction, change_id, registry_id):
     _, previous = _snapshot(transaction, change_payload['previous_snapshot']['artifact_id'])
     _, current = _snapshot(transaction, change_payload['new_snapshot']['artifact_id'])
     report = analyze_changes(compare_openapi(previous, current),
-                             [Dependency(**d) for d in registered['dependencies']])
-    return {'tenant_id': str(transaction.tenant_id), 'impact_version': IMPACT_VERSION,
+                             [Dependency(**d) for d in registered['dependencies']],
+                             workflow_edges=[_edge(e) for e in registered.get('workflow_edges', [])])
+    return {'tenant_id': str(transaction.tenant_id), 'impact_version': report.to_dict()['impact_version'],
         'change_evidence': {'artifact_id': str(change['artifact_id']), 'artifact_hash': change['content_hash']},
         'registry': {'artifact_id': str(registry['artifact_id']), 'artifact_hash': registry['content_hash']},
         'impact_hash': report.content_hash, 'analysis': report.to_dict()}
@@ -241,7 +357,7 @@ def load_impact(transaction: EvidenceTransaction, identity: str | UUID) -> dict:
     record = _artifact(transaction, identity, 'contract_dependency_impact')
     try:
         payload = json.loads(record['payload'])
-        if payload['impact_version'] != IMPACT_VERSION:
+        if payload['impact_version'] not in (IMPACT_VERSION, WORKFLOW_VERSION):
             raise ImpactError('unsupported_impact_version')
         actual = _impact_payload(transaction, payload['change_evidence']['artifact_id'],
                                   payload['registry']['artifact_id'])
