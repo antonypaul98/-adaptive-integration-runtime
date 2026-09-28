@@ -193,4 +193,3 @@ generation or sandbox/replay was started. Human approval remains mandatory.
 
 Exact next checkpoint: deterministic transitive workflow impact from explicitly
 registered workflow dependency edges, with immutable tenant-bound evidence.
-
