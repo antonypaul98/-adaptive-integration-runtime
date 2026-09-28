@@ -41,7 +41,7 @@ PostgreSQL generated-column expression).
   immutable tenant-scoped persistence; deterministic normalized hashes and changes.
 - Explicit adversarial tests and actual TLS transport tests, not only mocks.
 
-## Latest executed evidence
+## Observer checkpoint evidence
 
 Validated code head: `c46091fdbfeb69653267893bf15e41ff08d86391` on PR #2.
 
@@ -61,7 +61,7 @@ ran in GitHub service containers. No production database or customer endpoint wa
 contacted. Subsequent documentation/package-verification revisions and merged main
 must pass the same full matrix before acceptance.
 
-## Boundaries and exact next implementation step
+## Observer checkpoint boundaries and then-next step
 
 Observer supports JSON and basic OpenAPI 3.0/3.1 structural checks, not full OpenAPI
 validation or YAML. Redaction is conservative; only approved contract documents
@@ -79,18 +79,43 @@ No automatic deployment, production writes or LLM calls are implemented. Human
 approval remains mandatory for externally consequential changes. This checkpoint
 does not claim the rest of AIR's lifecycle is implemented.
 
-## Change intelligence implementation — validation in progress
+## Deterministic change intelligence — validated implementation
 
 Continuation starting main: `30b1733876fd1fa2b67be7e7a4a2f7ba1a9b5841`.
-Implemented deterministic OpenAPI comparison, structured immutable change sets,
-reference/coverage evidence, directional request/response compatibility rules,
-security drift classification, persisted snapshot verification, idempotent
-change evidence and database-enforced tenant-scoped snapshot links (migration 002).
+Validated code head: `224fb618c97a33b94e84c1345ce49013fe5a1a55` on PR #3.
 
-Executed locally in this continuation: 67 classifier tests passed; complete
-non-PostgreSQL suite: 182 passed. Database acceptance awaits PostgreSQL 16/17 CI.
-Prior main's 150-test PostgreSQL matrix remains the verified baseline, not evidence
-for the new migration. No dependency-impact implementation has started.
+Implemented deterministic OpenAPI 3.0/3.1 comparison with stable ordering,
+structured immutable change sets, bounded local reference expansion and coverage
+warnings. Request/response variance, paths, operations, parameters, bodies,
+responses, properties, requiredness, types, enums, nullability and security drift
+have explicit deterministic classifications. Unsupported semantics require review.
 
-Next acceptance action: push the feature branch, execute the full PostgreSQL
-matrix, fix failures, merge only on a passing exact head, then verify merged main.
+Tenant-bound evidence verifies snapshot content and provenance, stores both snapshot
+IDs/hashes with detector version and normalized comparison hash, and supports
+idempotent persistence and verified reload. Migration 002 enforces same-tenant
+snapshot links in PostgreSQL; existing RLS, immutable rows and atomic audit remain
+in force. Classification integrity on reload is checked by recomputation. See
+[CHANGE_INTELLIGENCE.md](docs/CHANGE_INTELLIGENCE.md) for policy and trust limits.
+
+Executed evidence:
+
+- Targeted classifier suite: **70 passed**.
+- Complete local non-PostgreSQL suite: **185 passed**, 57 database tests deselected
+  (not claimed as local database passes).
+- Exact-code-head PR CI run **36365861829**: **242 passed, zero skipped** on each
+  of PostgreSQL **16 and 17**, including **57 actual PostgreSQL integration tests**.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/36365861829
+- Database cases cover immutable evidence, cross-tenant input/read/link attacks,
+  provenance/hash tampering, concurrent idempotency, rollback, migration re-run and
+  failed-upgrade behavior. CI verifies installed modules and migration resources.
+- Local PostgreSQL service installation was unavailable; integration execution
+  occurred in GitHub service containers. No production data or endpoints were used.
+
+Documentation revision and merged main must pass the same exact-head matrix before
+merge acceptance. PR #3 and GitHub Actions record that final gate.
+
+Dependency impact has not started. Exact next implementation step after verified
+merge: register tenant-scoped integration dependencies on snapshot contract
+locations and persist deterministic impact evidence linking verified changes to
+integration, mapping/operation and reason. No LLM assistance or automatic deployment
+is added; the approval lifecycle and human approval boundary remain unchanged.
