@@ -93,8 +93,18 @@ Sandbox, replay, verification and deployment approval remain future, separate ga
 - Exact implementation-head PR CI run **36668960578**: **501 passed, no skips**
   on each of PostgreSQL **16 and 17**, including all 188 database cases.
 - Canonical integration: PR **#7**, `work/repair-proposal-foundation`.
-  The final documentation head must also pass both PostgreSQL jobs before merge.
+  The final implementation/documentation head passed both PostgreSQL jobs before merge (receipt below).
 - The empty local `work/repair-proposal-approval` branch is superseded by this
   canonical workstream; recovered historical commits remain preserved.
 - No physical database deployment, repair execution, identity-provider integration,
   sandbox/replay stage or infrastructure deployment is claimed by this checkpoint.
+
+## Verified integration — 2026-09-30
+
+Checkpoint **AIR accepted on main** through PR #7.
+
+- Exact PR head: `99299c1698d3c4a9542bb207f4b104b33bec9853`; CI run `36669301907` succeeded.
+- Merge: `bd98462682b1e9775ac565b47dc6dc60a4c4e55d`, fetched and verified locally.
+- Merged-main CI run `36669480007` succeeded.
+- Local reviewed/tested source tree equals the merged implementation tree.
+- This follow-up records the completed integration; it changes documentation only.
