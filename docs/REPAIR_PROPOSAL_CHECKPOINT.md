@@ -40,3 +40,58 @@ Neither proposal creation nor approval executes a repair.
 4. Add PostgreSQL adversarial tests for RLS, forged/cross-tenant links,
    immutability, idempotency, conflicting/concurrent decisions and reload.
 5. Run the full PostgreSQL 16/17 matrix on the exact branch head before merge.
+
+## Implementation increment (2026-09-29, not yet database-validated)
+
+`air.repair_proposal` now supplies `create_proposal`, `load_proposal`, `decide`,
+`authorization`, and `proposal_status`. Descriptions are bounded declarative JSON,
+with a supported change type, proposed state, rationale, risk and human/deterministic
+provenance. The exact direct or transitive impact item supplies the target and
+current-state registry reference; its immutable impact links preserve change and
+observation provenance. There is no execution or LLM capability.
+
+The canonical artifact content hash is the deterministic proposal identity and
+idempotency key. Artifact UUIDs remain the existing storage identity. Revisions
+reference the exact prior artifact/hash, retain the target integration/mapping and
+increment revision, bounded at 100. Database-created timestamps and append-only
+audit entries provide creation/decision time. No timestamp is included in the
+idempotent semantic payload.
+
+Migration 006 reuses artifacts, audit and RLS. It validates proposal/impact/parent
+and decision links, binds exact revision/hash, prevents multiple successors or
+conflicting decisions with unique indexes, and serializes revision/decision writes
+with transaction advisory locks. Lifecycle is derived from immutable evidence:
+PROPOSED, APPROVED, REJECTED, SUPERSEDED. A revision invalidates the prior proposal's
+authorization even if it had been approved.
+
+Human identities must be provisioned by an administrator using `bind_reviewer`
+with a dedicated authenticated database login. Service credentials cannot approve,
+self-provision or impersonate reviewers via a caller-supplied name/GUC. An identity
+provider/UI integration is not provided. Reviewers must explicitly choose APPROVED
+or REJECTED and confirm the exact proposal hash/revision. The stored reviewer comes
+from authenticated `session_user`, not request data. Repeated identical decisions
+are idempotent; changes of decision or reviewer conflict.
+
+`authorization` requires the exact proposal hash/revision and caller's current
+impact identity. AIR has no global mutable current-contract pointer; this API does
+not invent one or infer that historical evidence is globally current. Later stage
+controllers must supply their authoritative current impact and recheck the gate.
+The returned decision is evidence, not a transferable execution/deployment token.
+Sandbox, replay, verification and deployment approval remain future, separate gates.
+
+### Validation and remaining work
+
+- Starting main independently verified: `8e57f6000b94525cfc82526e251c6ba5e1f9a34a`.
+- Main CI run 36464674043 logs: 425 passed on PostgreSQL 16 and PostgreSQL 17.
+- Local baseline: 277 passed, 148 PostgreSQL tests deselected.
+- Final full local run: **313 passed, 188 skipped** (all skips require PostgreSQL).
+- This increment adds 36 unit cases and 40 PostgreSQL cases, including extracted
+  and transitive impact inputs, RLS, raw forged writes, immutability, concurrent
+  decisions and revision races. New PostgreSQL cases have NOT executed locally.
+- Local PostgreSQL is unavailable: the container maps only UID 0 and cannot create
+  an unprivileged PostgreSQL user namespace. Do not treat skipped tests as passing.
+- Normal Git fetch succeeds, but Git push reports missing HTTPS credentials.
+  No connector source writes are used. Source must be pushed after normal Git
+  authentication is provisioned; then run the existing PostgreSQL 16/17 CI matrix,
+  fix failures, inspect the exact head, merge, and verify main CI. Checkpoint remains
+  incomplete until those steps pass.
