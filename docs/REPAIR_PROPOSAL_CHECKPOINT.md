@@ -28,7 +28,7 @@ decision is an explicit APPROVED record. REJECTED is terminal evidence but not
 authorization. Conflicting retries must fail closed rather than replace a decision.
 Neither proposal creation nor approval executes a repair.
 
-## Next implementation slice
+## Implemented slice
 
 1. Add `air/repair_proposal.py` with deterministic proposal identity, immutable
    revisions, exact impact binding, explicit APPROVED/REJECTED decision evidence,
@@ -41,7 +41,7 @@ Neither proposal creation nor approval executes a repair.
    immutability, idempotency, conflicting/concurrent decisions and reload.
 5. Run the full PostgreSQL 16/17 matrix on the exact branch head before merge.
 
-## Implementation increment (2026-09-29, not yet database-validated)
+## Implementation increment (recovered and database-validated 2026-09-30)
 
 `air.repair_proposal` now supplies `create_proposal`, `load_proposal`, `decide`,
 `authorization`, and `proposal_status`. Descriptions are bounded declarative JSON,
@@ -79,19 +79,22 @@ controllers must supply their authoritative current impact and recheck the gate.
 The returned decision is evidence, not a transferable execution/deployment token.
 Sandbox, replay, verification and deployment approval remain future, separate gates.
 
-### Validation and remaining work
+### Validation and recovery evidence
 
-- Starting main independently verified: `8e57f6000b94525cfc82526e251c6ba5e1f9a34a`.
-- Main CI run 36464674043 logs: 425 passed on PostgreSQL 16 and PostgreSQL 17.
-- Local baseline: 277 passed, 148 PostgreSQL tests deselected.
-- Final full local run: **313 passed, 188 skipped** (all skips require PostgreSQL).
-- This increment adds 36 unit cases and 40 PostgreSQL cases, including extracted
-  and transitive impact inputs, RLS, raw forged writes, immutability, concurrent
-  decisions and revision races. New PostgreSQL cases have NOT executed locally.
-- Local PostgreSQL is unavailable: the container maps only UID 0 and cannot create
-  an unprivileged PostgreSQL user namespace. Do not treat skipped tests as passing.
-- Normal Git fetch succeeds, but Git push reports missing HTTPS credentials.
-  No connector source writes are used. Source must be pushed after normal Git
-  authentication is provisioned; then run the existing PostgreSQL 16/17 CI matrix,
-  fix failures, inspect the exact head, merge, and verify main CI. Checkpoint remains
-  incomplete until those steps pass.
+- Starting main: `8e57f6000b94525cfc82526e251c6ba5e1f9a34a`.
+- Recovered actual local commit `60c44934504ac64c5f43376580dfc9993ba82fcd`
+  from the existing Work checkout, branch and reflog. No source was rebuilt.
+- Normal HTTPS Git push lacked credentials. The connected GitHub API transplanted
+  the source as `113bdc7f6cbc60ffe765e33d77278179027da5c7`; its exact tree
+  `4ceed30608615e3f7052f73e4f884b33cadb862d` equals the recovered commit's tree.
+  The historical local SHA is not claimed to exist on GitHub.
+- Local proposal suite: 36 passed. Full non-PostgreSQL suite: 313 passed,
+  188 database cases deselected.
+- Exact implementation-head PR CI run **36668960578**: **501 passed, no skips**
+  on each of PostgreSQL **16 and 17**, including all 188 database cases.
+- Canonical integration: PR **#7**, `work/repair-proposal-foundation`.
+  The final documentation head must also pass both PostgreSQL jobs before merge.
+- The empty local `work/repair-proposal-approval` branch is superseded by this
+  canonical workstream; recovered historical commits remain preserved.
+- No physical database deployment, repair execution, identity-provider integration,
+  sandbox/replay stage or infrastructure deployment is claimed by this checkpoint.
