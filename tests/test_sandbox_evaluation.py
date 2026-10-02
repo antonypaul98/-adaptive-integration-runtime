@@ -57,6 +57,17 @@ def approved(monkeypatch):
     return tx, proposal, proposal_body, calls
 
 
+def persist_proposal_state(approved, state):
+    """Replace the fixture proposal with valid persisted JSON evidence for a test state."""
+    tx, proposal, body, _ = approved
+    body["description"]["proposed_state"] = state
+    encoded = canonical_json(body)
+    proposal["payload"] = encoded
+    proposal["content_hash"] = se._digest(body)
+    proposal["idempotency_key"] = proposal["content_hash"]
+    return proposal
+
+
 def evaluate(approved):
     tx, proposal, body, _ = approved
     return se.evaluate(tx, proposal["artifact_id"],
@@ -99,12 +110,9 @@ def test_exact_approval_binding_is_rechecked(approved, bad):
     {"x": float("inf")},
     {"x": object()},
 ])
-def test_invalid_declarative_state_fails_closed(approved, state):
-    tx, proposal, body, _ = approved
-    body["description"]["proposed_state"] = state
-    with pytest.raises((se.SandboxError, ValueError, TypeError)):
-        evaluate(approved)
-    assert not any(r["kind"] == "sandbox_evaluation" for r in tx.records.values())
+def test_invalid_declarative_state_fails_closed(state):
+    with pytest.raises(se.SandboxError, match="invalid_state"):
+        se._walk(state)
 
 
 def test_depth_bound_fails_closed(approved):
@@ -114,7 +122,7 @@ def test_depth_bound_fails_closed(approved):
     for _ in range(se.MAX_DEPTH + 2):
         cursor["x"] = {}
         cursor = cursor["x"]
-    body["description"]["proposed_state"] = state
+    persist_proposal_state(approved, state)
     with pytest.raises(se.SandboxError, match="sandbox_bounds_exceeded"):
         evaluate(approved)
     assert not any(r["kind"] == "sandbox_evaluation" for r in tx.records.values())
@@ -122,7 +130,7 @@ def test_depth_bound_fails_closed(approved):
 
 def test_byte_bound_fails_closed(approved):
     tx, proposal, body, _ = approved
-    body["description"]["proposed_state"] = {"x": "z" * (se.MAX_BYTES + 1)}
+    persist_proposal_state(approved, {"x": "z" * (se.MAX_BYTES + 1)})
     with pytest.raises(se.SandboxError, match="sandbox_bounds_exceeded"):
         evaluate(approved)
 
