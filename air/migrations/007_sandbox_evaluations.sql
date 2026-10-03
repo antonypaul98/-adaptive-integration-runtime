@@ -27,7 +27,7 @@ BEGIN
        (p#>>'{result,state_hash}') !~ '^[0-9a-f]{64}$' OR
        p#>'{result,checks}' IS DISTINCT FROM
           '["canonical_state","bounded_structure","declarative_only"]'::jsonb OR
-       p->'result' - ARRAY['status','state_hash','checks'] <> '{}'::jsonb OR
+       (p->'result') - ARRAY['status','state_hash','checks'] <> '{}'::jsonb OR
        NEW.idempotency_key IS DISTINCT FROM NEW.content_hash THEN
         RAISE EXCEPTION 'invalid sandbox evidence' USING ERRCODE='23514';
     END IF;
