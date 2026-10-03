@@ -235,3 +235,51 @@ No repair generation, sandbox/replay, deployment or unrelated feature was starte
 
 Exact next checkpoint: immutable deterministic repair-proposal records and human
 approval gates, specified separately before implementing repair execution.
+
+## Bounded sandbox evaluation — verified code, merge pending
+
+- Checkpoint branch: `work/sandbox-evaluation-foundation`.
+- Session starting main: `6a7e985d73a04b350eb5c6242ad880a3fd3f4e94`.
+- Session starting branch: `1d96ad3f73da30660e7e48df8a2d7c164fbd965f`.
+- Verified code SHA: `f1b5a582abf68b421b19a87387751379824aa821`.
+- Exact-head AIR validation **#69**, run **37100159212**:
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37100159212
+  PostgreSQL **16: 534 passed**, PostgreSQL **17: 534 passed**, zero skips.
+- Local Python 3.12 / PostgreSQL 16: **534 passed**. Separate non-PostgreSQL
+  run: **324 passed, 204 deselected** before six additional database cases.
+- Migration **007** is preserved byte-for-byte. Forward migration **008** fixes
+  result-key subtraction precedence and enforces exact approved proposal binding,
+  proposed-state hash, byte/depth/node bounds, and the shared supersession lock.
+  A local upgrade from original migrations 001–007 to 008, unchanged prefix
+  checksums, and idempotent migration rerun were verified before the full suite.
+- Reused `reviewer` and `saved` fixtures rather than duplicating them. Run #65
+  had 512 passes and 16 fixture errors on each PostgreSQL version. After imports,
+  run #66 exposed the SQL precedence bug (513 passed / 15 failed per version).
+  Direct-insert regression tests also demonstrated missing/rejected approval and
+  false well-formed state hashes were accepted before the forward correction.
+- Sandbox PostgreSQL suite: **22 cases**, including committed/reloaded evidence,
+  deterministic retries and single audit entry; forged proposal ID/hash/revision,
+  impact/change evidence, tenant and malformed results; cross-tenant SQL reads and
+  inserts; immutable UPDATE/DELETE; API and raw-insert supersession rejection;
+  missing/rejected approval; false state hash; excessive depth/node counts.
+  These tests execute real tenant-login SQL and database triggers, not mocks.
+- Existing sandbox Python and repair-proposal implementation were not rewritten.
+  RLS and immutable evidence remain in force. Evaluation only checks bounded
+  declarative state; PASS is not behavioral replay or deployment authorization.
+  There is no arbitrary adapter, network, filesystem, subprocess or deployment
+  capability in the sandbox evaluator. Current impact is explicitly caller-bound,
+  not automatically inferred as globally latest. Historical evidence reload is
+  not an authorization token; later lifecycle actions must recheck authorization.
+
+Remaining lifecycle step for this checkpoint: validate this documentation head,
+open the single canonical PR, require PostgreSQL 16/17 green at its exact head,
+merge, then verify merged-main CI. The checkpoint is not complete until then.
+
+Next checkpoint after verified merge: bounded declarative replay/verification.
+Smallest first implementation step: specify a versioned, size-limited replay
+fixture (input and expected output) bound to an exact approved proposal and
+sandbox evaluation; implement pure deterministic comparison with explicit
+unsupported-case rejection before adding persistence. Recheck current approval,
+revision, impact/change evidence and tenant on every consequential transition.
+Preserve RLS, append-only provenance, bounded resources and capability isolation.
+No next-checkpoint implementation is included in this run.
