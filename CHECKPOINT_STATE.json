@@ -1,26 +1,26 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "sandbox-evaluation foundation",
-  "active_branch": "work/sandbox-evaluation-foundation",
+  "active_branch": "main",
   "main_sha_at_start": "3d6c895048c6fca246786829fc2c3677fc57a44b",
-  "current_branch_sha": "0db1bfabba3cf7a13f0f4cc4e0a0c1d40438d63f",
+  "current_branch_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Present and synchronized at observation; 0 behind origin/main. Refresh live refs on every resume.",
+  "branch_remote_status": "PR #9 merged; resulting main verified at 7dae128983f4718f7c2bd660b800e7711844bf1b",
   "local_test_status": "Product tests not run in this infrastructure-only run.",
   "pr_number": 9,
-  "ci_status": "Run 37100373417 passed at historical head 12515b8f17f800b87aeccd64601012bfbc4fd47f. Observed infrastructure head 0db1bfabba3cf7a13f0f4cc4e0a0c1d40438d63f skipped CI and is not validated.",
-  "merge_status": "PR #9 open; current authorized run is completion-only. Exact new documentation-head CI required before merge.",
+  "ci_status": "Merged-main AIR validation #74 / 37140043267: PostgreSQL 16 and 17 each 534 passed, zero product/database skips.",
+  "merge_status": "MERGED AND VERIFIED",
   "external_acceptance_required": [],
-  "known_blocker": "Shell git push dry-run fails: could not read Username; gh absent. Connector API preservation remains available.",
-  "next_action": "Require PostgreSQL 16/17 on exact current PR #9 head, merge, verify merged-main CI, record completion and STOP. Replay NOT STARTED.",
-  "feature_checkpoint_advanced": false,
+  "known_blocker": null,
+  "next_action": "STOP. Sandbox checkpoint COMPLETE. Bounded replay/verification is next and NOT STARTED; no further implementation authorized in this run.",
+  "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
   "observed_at_utc": "2026-10-03T15:53:16.648557+00:00",
-  "observed_branch_sha": "0db1bfabba3cf7a13f0f4cc4e0a0c1d40438d63f",
+  "observed_branch_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
   "observed_feature_sha": "f1b5a582abf68b421b19a87387751379824aa821",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
@@ -31,39 +31,47 @@
   },
   "pr_state": {
     "number": 9,
-    "state": "open",
-    "head_sha": "0db1bfabba3cf7a13f0f4cc4e0a0c1d40438d63f",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9"
+    "state": "merged",
+    "head_sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9",
+    "merge_commit_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b"
   },
   "ci_state": {
-    "observed_runs": [
-      {
-        "id": 37100373417,
-        "sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37100373417"
-      },
-      {
-        "id": 37100280869,
-        "sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37100280869"
-      }
-    ],
-    "infrastructure_revision": "not_run_intentional_skip",
-    "required_next_verification": "Next normal commit/PR event must run exact-head CI; historical success is not current-head validation."
+    "pr_run": {
+      "id": 37139935369,
+      "number": 73,
+      "sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
+      "event": "pull_request",
+      "conclusion": "success"
+    },
+    "merged_main_run": {
+      "id": 37140043267,
+      "number": 74,
+      "sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+      "event": "push",
+      "conclusion": "success"
+    },
+    "postgres_16": {
+      "passed": 534,
+      "failed": 0,
+      "skipped": 0
+    },
+    "postgres_17": {
+      "passed": 534,
+      "failed": 0,
+      "skipped": 0
+    },
+    "database_tests_executed": true,
+    "zero_database_skips_required": true,
+    "separate_infrastructure_suite": "15 passed, 1 Memory-only test skipped; not a database skip"
   },
   "stabilization_scope": "Infrastructure only; flag describes this run, not prior feature work.",
   "last_session_exit": {
-    "BLOCKED_LAYER": "external",
-    "BLOCKER": "GitHub API: gh unavailable; connector authorization must be checked separately; git push: authentication/authorization unavailable",
-    "SAFE_WORK_COMPLETED": "No implementation changed by preflight; existing files preserved. Remote backup not inferred.",
-    "REMOTE_SHA": "0db1bfabba3cf7a13f0f4cc4e0a0c1d40438d63f",
-    "NEXT_ACTION": "Use the connected-GitHub fallback in AGENTS.md to preserve current work; restore shell credentials before substantial implementation"
+    "BLOCKED_LAYER": null,
+    "BLOCKER": null,
+    "SAFE_WORK_COMPLETED": "PR #9 merged; exact PR-head and merged-main PostgreSQL 16/17 validated. Replay NOT STARTED. Completion receipt only follows.",
+    "REMOTE_SHA": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+    "NEXT_ACTION": "STOP; bounded replay/verification requires a separate run."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -76,5 +84,10 @@
     "new_head_CI": "intentionally_not_run"
   },
   "next_checkpoint": "bounded replay/verification",
-  "replay_started": false
+  "replay_started": false,
+  "checkpoint_status": "COMPLETE",
+  "merge_commit_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+  "verified_main_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+  "final_pr_head": "c2e8c44661767fad93c5a770a9ed88dc70553209",
+  "shell_transport_limitation": "gh absent and shell Git push authentication unavailable; authorized connected GitHub API publication and merge succeeded."
 }

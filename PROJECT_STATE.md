@@ -236,7 +236,7 @@ No repair generation, sandbox/replay, deployment or unrelated feature was starte
 Exact next checkpoint: immutable deterministic repair-proposal records and human
 approval gates, specified separately before implementing repair execution.
 
-## Bounded sandbox evaluation — verified code, merge pending
+## Bounded sandbox evaluation — COMPLETE
 
 - Checkpoint branch: `work/sandbox-evaluation-foundation`.
 - Session starting main: `6a7e985d73a04b350eb5c6242ad880a3fd3f4e94`.
@@ -271,9 +271,23 @@ approval gates, specified separately before implementing repair execution.
   not automatically inferred as globally latest. Historical evidence reload is
   not an authorization token; later lifecycle actions must recheck authorization.
 
-Remaining lifecycle step for this checkpoint: validate this documentation head,
-open the single canonical PR, require PostgreSQL 16/17 green at its exact head,
-merge, then verify merged-main CI. The checkpoint is not complete until then.
+Final acceptance verified on 2026-10-03:
+
+- Canonical PR #9: https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9
+- Completion-run starting main: `3d6c895048c6fca246786829fc2c3677fc57a44b`.
+- Final PR head: `c2e8c44661767fad93c5a770a9ed88dc70553209`.
+- Exact PR-head AIR validation #73 / 37139935369: PostgreSQL 16 and 17 each
+  **534 passed, 0 failed, 0 skipped** in the product/database suite.
+- Merge commit and verified resulting main: `7dae128983f4718f7c2bd660b800e7711844bf1b`.
+- Merged-main AIR validation #74 / 37140043267: PostgreSQL 16 and 17 each
+  **534 passed, 0 failed, 0 skipped**, with real database tests executed.
+  https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37140043267
+- Separate infrastructure guards: 15 passed, one Memory-only test skipped;
+  this is not a skipped PostgreSQL test. Zero database skips remain required.
+- Checkpoint COMPLETE. No remaining sandbox lifecycle step or merge blocker.
+  This documentation receipt records the verified merge SHA; its own containing
+  commit is supplied by Git history and receives normal CI.
+- Next checkpoint: bounded replay/verification — **NOT STARTED**. Stop here.
 
 Next checkpoint after verified merge: bounded declarative replay/verification.
 Smallest first implementation step: specify a versioned, size-limited replay
