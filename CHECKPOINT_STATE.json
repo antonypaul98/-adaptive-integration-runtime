@@ -2,20 +2,78 @@
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "sandbox-evaluation foundation",
   "active_branch": "work/sandbox-evaluation-foundation",
-  "main_sha_at_start": "1a724a8f453a83090f7f0235198d0c5b29daa760",
-  "current_branch_sha": "9bd920aa808076fb1e4ceb849ee102859ebd1c37",
-  "sha_semantics": "Observed pre-stabilization feature head; refresh with git rev-parse HEAD at session start. Never store a self-referential commit SHA.",
-  "branch_remote_status": "Observed present and ahead of main; infrastructure commit receipt is Git history. Refresh before coding.",
-  "local_test_status": "Not run in stabilization; no feature acceptance inferred.",
-  "pr_number": null,
-  "ci_status": "Existing exact-head run 37072179798 failed: 16 missing reviewer fixture setup errors; PostgreSQL containers/install passed. Feature-test repair intentionally deferred.",
-  "merge_status": "Feature branch not merged by stabilization",
+  "main_sha_at_start": "6a7e985d73a04b350eb5c6242ad880a3fd3f4e94",
+  "current_branch_sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+  "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
+  "branch_remote_status": "Present and synchronized at observation; 0 behind origin/main. Refresh live refs on every resume.",
+  "local_test_status": "Product tests not run in this infrastructure-only run.",
+  "pr_number": 9,
+  "ci_status": "Observed push 37100280869 and PR 37100373417 succeeded at 12515b8. PR #9 remains open/unmerged. Previous missing reviewer fixture failure is historical, already repaired before this run.",
+  "merge_status": "Current checkpoint remains unmerged. This run must not merge/complete it.",
   "external_acceptance_required": [],
-  "known_blocker": "Existing exact-head run 37072179798 failed: 16 missing reviewer fixture setup errors; PostgreSQL containers/install passed. Feature-test repair intentionally deferred.",
-  "next_action": "Run scripts/session_preflight.py; inspect recovery archive and current GitHub evidence; resume features only in a separately authorized feature run.",
+  "known_blocker": "Shell git push dry-run fails: could not read Username; gh absent. Connector API preservation remains available.",
+  "next_action": "python scripts/session_preflight.py (use the pinned interpreter; follow its exact branch/auth recovery action). No feature completion or merge authorized by this run.",
   "feature_checkpoint_advanced": false,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
-  ]
+  ],
+  "schema_version": 2,
+  "observed_at_utc": "2026-10-03T15:53:16.648557+00:00",
+  "observed_branch_sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+  "observed_feature_sha": "f1b5a582abf68b421b19a87387751379824aa821",
+  "current_repository_sha": null,
+  "current_repository_sha_command": "git rev-parse HEAD",
+  "prior_local_test_receipt": {
+    "reported_result": "Python 3.12 / PostgreSQL 16: 534 passed; original 001-007 to 008 upgrade and rerun passed.",
+    "reported_sha": "f1b5a582abf68b421b19a87387751379824aa821",
+    "reexecuted_this_run": false
+  },
+  "pr_state": {
+    "number": 9,
+    "state": "open",
+    "head_sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9"
+  },
+  "ci_state": {
+    "observed_runs": [
+      {
+        "id": 37100373417,
+        "sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37100373417"
+      },
+      {
+        "id": 37100280869,
+        "sha": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37100280869"
+      }
+    ],
+    "infrastructure_revision": "not_run_intentional_skip",
+    "required_next_verification": "Next normal commit/PR event must run exact-head CI; historical success is not current-head validation."
+  },
+  "stabilization_scope": "Infrastructure only; flag describes this run, not prior feature work.",
+  "last_session_exit": {
+    "BLOCKED_LAYER": "auth",
+    "BLOCKER": "Shell Git write check failed: could not read Username for HTTPS; gh not installed. API permission and shell transport are separate.",
+    "SAFE_WORK_COMPLETED": "Infrastructure safeguards preserved through the connected GitHub route; no feature source/test changes.",
+    "REMOTE_SHA": "12515b8f17f800b87aeccd64601012bfbc4fd47f",
+    "REMOTE_SHA_semantics": "Observed pre-edit remote SHA; resolve the published revision from the containing Git commit.",
+    "NEXT_ACTION": "python scripts/session_preflight.py; if shell auth is unavailable use AGENTS.md connector preservation path and record its actual remote receipt."
+  },
+  "infrastructure_validation": {
+    "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
+    "passed": 15,
+    "skipped": 1,
+    "skip_reason": "Memory-only source-layout regression is not applicable",
+    "yaml": "All existing workflow YAML parsed",
+    "product_tests": "not_run",
+    "physical_camera": "not_run",
+    "new_head_CI": "intentionally_not_run"
+  }
 }
