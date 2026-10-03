@@ -1,0 +1,21 @@
+{
+  "repository": "antonypaul98/-adaptive-integration-runtime",
+  "current_checkpoint": "sandbox-evaluation foundation",
+  "active_branch": "work/sandbox-evaluation-foundation",
+  "main_sha_at_start": "1a724a8f453a83090f7f0235198d0c5b29daa760",
+  "current_branch_sha": "9bd920aa808076fb1e4ceb849ee102859ebd1c37",
+  "sha_semantics": "Observed pre-stabilization feature head; refresh with git rev-parse HEAD at session start. Never store a self-referential commit SHA.",
+  "branch_remote_status": "Observed present and ahead of main; infrastructure commit receipt is Git history. Refresh before coding.",
+  "local_test_status": "Not run in stabilization; no feature acceptance inferred.",
+  "pr_number": null,
+  "ci_status": "Existing exact-head run 37072179798 failed: 16 missing reviewer fixture setup errors; PostgreSQL containers/install passed. Feature-test repair intentionally deferred.",
+  "merge_status": "Feature branch not merged by stabilization",
+  "external_acceptance_required": [],
+  "known_blocker": "Existing exact-head run 37072179798 failed: 16 missing reviewer fixture setup errors; PostgreSQL containers/install passed. Feature-test repair intentionally deferred.",
+  "next_action": "Run scripts/session_preflight.py; inspect recovery archive and current GitHub evidence; resume features only in a separately authorized feature run.",
+  "feature_checkpoint_advanced": false,
+  "diagnostic_import": "air",
+  "diagnostic_postgres_variables": [
+    "AIR_TEST_DATABASE_URL"
+  ]
+}
