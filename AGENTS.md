@@ -41,3 +41,36 @@ and evidence before trusting recorded SHAs, test counts, PRs or CI conclusions.
 The 2026-10-03 stabilization preserves unapplied historical recovery patches in
 `docs/recovery/`. Do not apply them blindly or treat archived acceptance claims
 as verified. Future feature work needs its own scope and validation.
+
+## Resume and exit guardrails (2026-10-03 follow-up)
+
+- On main, preflight prints the exact existing branch and safe switch command.
+  It checks remote branch existence first and never switches over dirty files.
+  If a branch is checked out elsewhere, resume the reported worktree.
+- API authorization and actual Git push dry-run are independent; test both,
+  including when gh is absent. Do not call a successful public fetch a write test.
+  Connector recovery is preservation, not proof of shell authentication.
+- Before low capacity: STOP new implementation, preserve coherent work, commit,
+  synchronize, update CHECKPOINT_STATE with the remote SHA/tested SHA/PR/event,
+  synchronize that state commit, record one executable next action, then exit.
+  Do not start a slice unless there is time to preserve it.
+- On failure preflight emits BLOCKED_LAYER, BLOCKER, SAFE_WORK_COMPLETED,
+  REMOTE_SHA and NEXT_ACTION and writes a local Git-metadata receipt. Transfer
+  the receipt into CHECKPOINT_STATE.last_session_exit and preserve it remotely
+  through the connector if needed. A .git receipt alone is NOT durable storage.
+- Normal commit messages must not contain CI skip directives. Use
+  `python scripts/check_commit_message.py MESSAGE_FILE --paths <changed-files>`
+  before API writes. For local commits, inspect `git config --get core.hooksPath`;
+  if unset, enable `git config --local core.hooksPath .githooks`. If another hook
+  system exists, integrate this validator into it; never overwrite it blindly.
+  Hooks are opt-in, can be bypassed, and do not govern connector writes.
+- Explicit infrastructure-only skip exceptions need the message trailer
+  `Infrastructure-Only: true` AND only allowed infrastructure paths. No feature
+  skip exception. Do not amend old skip commits or reuse their messages.
+- When feature work is separately authorized and ready for handoff, find/reuse
+  the canonical PR before creating one; record its number and exact-head CI.
+  No PR for the active branch means PR-event CI is absent, not failed. This
+  stabilization does not create feature PRs or authorize checkpoint completion.
+- A skipped infrastructure update to an existing PR makes the NEW head
+  unvalidated. Retain old success only at its exact SHA; require a later normal
+  CI event before any separately authorized merge. Never relabel it green.
