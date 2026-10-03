@@ -297,3 +297,23 @@ unsupported-case rejection before adding persistence. Recheck current approval,
 revision, impact/change evidence and tenant on every consequential transition.
 Preserve RLS, append-only provenance, bounded resources and capability isolation.
 No next-checkpoint implementation is included in this run.
+
+## Bounded replay/verification — started 2026-10-03
+
+Canonical existing branch: `work/replay-verification-foundation`, based on
+accepted main `b314d5b0ac522b13bc2d4d53b330305fc83cfd0f`. Sandbox is complete
+and unchanged. The new foundation replays bounded object-key projections of
+approved declarative state against explicit expected JSON values. No adapter
+code, endpoint, production writes or deployment are executed.
+
+Versioned fixtures have 1–32 uniquely identified cases, a 64 KiB encoded bound,
+4,096 nodes and depth 16. Paths are object keys only, never code or URLs. Cases
+are sorted, exact canonical JSON is hashed (1 and 1.0 remain distinct), and
+mismatches produce immutable FAIL evidence. Unsupported inputs fail closed.
+Every replay rechecks exact current human approval, proposal revision, impact
+and sandbox hash. Historical reload verifies evidence but grants no permission.
+Forward migration 009 inherits RLS/immutability and recomputes every result in
+SQL, enforces tenant/evidence links and uses the proposal supersession lock.
+
+Local Python 3.12.14: 24 new unit cases passed. PostgreSQL 16/17 acceptance is
+pending and required before checkpoint completion. No later checkpoint started.
