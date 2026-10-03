@@ -1,27 +1,27 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
-  "current_checkpoint": "sandbox-evaluation foundation",
-  "active_branch": "main",
-  "main_sha_at_start": "3d6c895048c6fca246786829fc2c3677fc57a44b",
-  "current_branch_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+  "current_checkpoint": "bounded replay/verification",
+  "active_branch": "work/replay-verification-foundation",
+  "main_sha_at_start": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
+  "current_branch_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "PR #9 merged; resulting main verified at 7dae128983f4718f7c2bd660b800e7711844bf1b",
-  "local_test_status": "Product tests not run in this infrastructure-only run.",
-  "pr_number": 9,
-  "ci_status": "Merged-main AIR validation #74 / 37140043267: PostgreSQL 16 and 17 each 534 passed, zero product/database skips.",
-  "merge_status": "MERGED AND VERIFIED",
+  "branch_remote_status": "Initial replay foundation published; canonical PR #10 open",
+  "local_test_status": "Python 3.12.14: 348 passed, 236 PostgreSQL tests deselected; 24 replay unit tests included. Additional 15 DB boundary/rollback/JSON parity tests await CI.",
+  "pr_number": 10,
+  "ci_status": "Exact initial replay head 6f5c639 passed PostgreSQL 16/17 PR CI 37156001134; require fresh exact-head CI for this acceptance/test revision.",
+  "merge_status": "Replay not merged",
   "external_acceptance_required": [],
   "known_blocker": null,
-  "next_action": "STOP. Sandbox checkpoint COMPLETE. Bounded replay/verification is next and NOT STARTED; no further implementation authorized in this run.",
+  "next_action": "Require final exact-head PostgreSQL 16/17 CI, merge only if accepted, verify merged main. Stop at bounded replay/verification.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-03T15:53:16.648557+00:00",
-  "observed_branch_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
-  "observed_feature_sha": "f1b5a582abf68b421b19a87387751379824aa821",
+  "observed_at_utc": "2026-10-03T21:45:34.354815+00:00",
+  "observed_branch_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+  "observed_feature_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
@@ -30,48 +30,30 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 9,
-    "state": "merged",
-    "head_sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9",
-    "merge_commit_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b"
+    "number": 10,
+    "state": "open",
+    "head_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/10"
   },
   "ci_state": {
-    "pr_run": {
-      "id": 37139935369,
-      "number": 73,
-      "sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
-      "event": "pull_request",
-      "conclusion": "success"
-    },
-    "merged_main_run": {
-      "id": 37140043267,
-      "number": 74,
-      "sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
-      "event": "push",
-      "conclusion": "success"
-    },
-    "postgres_16": {
-      "passed": 534,
-      "failed": 0,
-      "skipped": 0
-    },
-    "postgres_17": {
-      "passed": 534,
-      "failed": 0,
-      "skipped": 0
-    },
-    "database_tests_executed": true,
-    "zero_database_skips_required": true,
-    "separate_infrastructure_suite": "15 passed, 1 Memory-only test skipped; not a database skip"
+    "observed_runs": [
+      {
+        "id": 37156001134,
+        "sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "required_next_verification": "Final head must pass PostgreSQL 16 and 17 with zero database skips."
   },
-  "stabilization_scope": "Infrastructure only; flag describes this run, not prior feature work.",
+  "stabilization_scope": "Bounded replay/verification only; sandbox not redone",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "PR #9 merged; exact PR-head and merged-main PostgreSQL 16/17 validated. Replay NOT STARTED. Completion receipt only follows.",
-    "REMOTE_SHA": "7dae128983f4718f7c2bd660b800e7711844bf1b",
-    "NEXT_ACTION": "STOP; bounded replay/verification requires a separate run."
+    "SAFE_WORK_COMPLETED": "Replay foundation published as PR #10; initial exact-head PostgreSQL 16/17 green. Added direct SQL fixture-bound/rollback regressions.",
+    "REMOTE_SHA": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+    "NEXT_ACTION": "Require final exact-head PostgreSQL 16/17 CI, merge only if accepted, verify merged main. Stop at bounded replay/verification."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -84,10 +66,51 @@
     "new_head_CI": "intentionally_not_run"
   },
   "next_checkpoint": "bounded replay/verification",
-  "replay_started": false,
-  "checkpoint_status": "COMPLETE",
+  "replay_started": true,
+  "checkpoint_status": "IN_PROGRESS",
   "merge_commit_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
   "verified_main_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
   "final_pr_head": "c2e8c44661767fad93c5a770a9ed88dc70553209",
-  "shell_transport_limitation": "gh absent and shell Git push authentication unavailable; authorized connected GitHub API publication and merge succeeded."
+  "shell_transport_limitation": "Shell Git push unavailable; connected GitHub write path authorized.",
+  "previous_checkpoint_receipt": {
+    "current_checkpoint": "sandbox-evaluation foundation",
+    "checkpoint_status": "COMPLETE",
+    "pr_state": {
+      "number": 9,
+      "state": "merged",
+      "head_sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
+      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/9",
+      "merge_commit_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b"
+    },
+    "ci_state": {
+      "pr_run": {
+        "id": 37139935369,
+        "number": 73,
+        "sha": "c2e8c44661767fad93c5a770a9ed88dc70553209",
+        "event": "pull_request",
+        "conclusion": "success"
+      },
+      "merged_main_run": {
+        "id": 37140043267,
+        "number": 74,
+        "sha": "7dae128983f4718f7c2bd660b800e7711844bf1b",
+        "event": "push",
+        "conclusion": "success"
+      },
+      "postgres_16": {
+        "passed": 534,
+        "failed": 0,
+        "skipped": 0
+      },
+      "postgres_17": {
+        "passed": 534,
+        "failed": 0,
+        "skipped": 0
+      },
+      "database_tests_executed": true,
+      "zero_database_skips_required": true,
+      "separate_infrastructure_suite": "15 passed, 1 Memory-only test skipped; not a database skip"
+    },
+    "verified_main_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b"
+  }
 }
