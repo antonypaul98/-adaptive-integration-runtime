@@ -1,0 +1,140 @@
+diff --git a/air/sandbox.py b/air/sandbox.py
+new file mode 100644
+index 0000000..e787c44
+--- /dev/null
++++ b/air/sandbox.py
+@@ -0,0 +1,134 @@
++"""Bounded declarative state-overlay evaluation; no executable code or deployment.
++
++This is a fixture sandbox, not an OS/container isolation service. It evaluates a
++proposal's top-level state overlay against explicitly registered expected state.
++Results are evidence for later replay; even PASS cannot authorize deployment.
++"""
++import json
++import time
++
++from . import repair_proposal as rp
++from .postgres import canonical_json
++
++VERSION = 'air-state-overlay-v1'
++MAX_BYTES = 65536
++MAX_NODES = 4096
++MAX_DEPTH = 16
++MAX_SECONDS = 1.0
++
++
++class SandboxError(ValueError):
++    pass
++
++
++def bounded(value):
++    """Validate before serialization; cap traversal, depth, strings and deadline."""
++    deadline = time.monotonic() + MAX_SECONDS
++    stack = [(value, 0)]
++    count = size = 0
++    while stack:
++        if time.monotonic() > deadline:
++            raise SandboxError('time_limit')
++        item, depth = stack.pop()
++        count += 1
++        if count > MAX_NODES or depth > MAX_DEPTH:
++            raise SandboxError('complexity_limit')
++        if type(item) is dict:
++            if len(item) > MAX_NODES:
++                raise SandboxError('complexity_limit')
++            for key, child in item.items():
++                if type(key) is not str:
++                    raise SandboxError('invalid_json')
++                stack.extend(((key, depth + 1), (child, depth + 1)))
++        elif type(item) is list:
++            if len(item) > MAX_NODES:
++                raise SandboxError('complexity_limit')
++            stack.extend((child, depth + 1) for child in item)
++        elif type(item) is str:
++            size += len(item)
++        elif item is None or type(item) is bool:
++            pass
++        elif type(item) is int:
++            if item.bit_length() > 256:
++                raise SandboxError('invalid_number')
++        elif type(item) is float:
++            raise SandboxError('floating_point_not_supported')
++        else:
++            raise SandboxError('invalid_json')
++        if size > MAX_BYTES:
++            raise SandboxError('byte_limit')
++    encoded = canonical_json(value)
++    if len(encoded.encode()) > MAX_BYTES:
++        raise SandboxError('byte_limit')
++    return json.loads(encoded)
++
++
++def simulate(base, expected, proposed):
++    for value in (base, expected, proposed):
++        if type(value) is not dict:
++            raise SandboxError('state_must_be_object')
++    base, expected, proposed = (bounded(v) for v in (base, expected, proposed))
++    output = bounded({**base, **proposed})
++    passed = canonical_json(output) == canonical_json(expected)
++    return {'output': output,
++            'verification': {'method': 'exact-json', 'passed': passed},
++            'execution_result': 'PASS' if passed else 'FAIL',
++            'failure_reason': None if passed else 'expected_state_mismatch',
++            'deployment_authorized': False}
++
++
++def register_input(tx, base, expected):
++    if type(base) is not dict or type(expected) is not dict:
++        raise SandboxError('state_must_be_object')
++    payload = {'tenant_id': str(tx.tenant_id), 'sandbox_version': VERSION,
++               'base': bounded(base), 'expected': bounded(expected)}
++    bounded(payload)
++    return tx.put('sandbox_input', rp.digest(payload), payload)
++
++
++def _input(tx, identity):
++    record = rp._get(tx, identity, 'sandbox_input')
++    p = bounded(json.loads(record['payload']))
++    if (set(p) != {'tenant_id', 'sandbox_version', 'base', 'expected'} or
++            p['tenant_id'] != str(tx.tenant_id) or p['sandbox_version'] != VERSION or
++            type(p['base']) is not dict or type(p['expected']) is not dict or
++            rp.digest(p) != record['idempotency_key']):
++        raise SandboxError('invalid_input')
++    return record, p
++
++
++def _payload(tx, proposal_id, input_id, *, proposal_hash, revision, current_impact_id):
++    decision = rp.authorization(tx, proposal_id, proposal_hash=proposal_hash,
++                                revision=revision, current_impact_id=current_impact_id)
++    proposal = rp.load_proposal(tx, proposal_id)
++    p = json.loads(proposal['payload'])
++    fixture, f = _input(tx, input_id)
++    result = simulate(f['base'], f['expected'], p['description']['proposed_state'])
++    payload = {'tenant_id': str(tx.tenant_id), 'sandbox_version': VERSION,
++               'environment': {'identity': 'pure-json-state-overlay', 'version': '1'},
++               'proposal': rp.reference(proposal), 'revision': revision,
++               'approval': rp.reference(decision), 'input': rp.reference(fixture),
++               'impact': p['impact'], 'result': result}
++    bounded(payload)
++    return payload
++
++
++def evaluate(tx, proposal_id, input_id, *, proposal_hash, revision, current_impact_id):
++    payload = _payload(tx, proposal_id, input_id, proposal_hash=proposal_hash,
++                       revision=revision, current_impact_id=current_impact_id)
++    return tx.put('sandbox_result', rp.digest(payload), payload)
++
++
++def load_result(tx, identity):
++    """Recompute all evidence and recheck current revision; never a deploy token."""
++    try:
++        record = rp._get(tx, identity, 'sandbox_result')
++        p = bounded(json.loads(record['payload']))
++        expected = _payload(tx, p['proposal']['artifact_id'], p['input']['artifact_id'],
++                            proposal_hash=p['proposal']['artifact_hash'], revision=p['revision'],
++                            current_impact_id=p['impact']['artifact_id'])
++        if canonical_json(expected) != record['payload'] or rp.digest(expected) != record['idempotency_key']:
++            raise SandboxError('invalid_result')
++        return record
++    except (KeyError, TypeError, json.JSONDecodeError, RecursionError):
++        raise SandboxError('malformed_result') from None

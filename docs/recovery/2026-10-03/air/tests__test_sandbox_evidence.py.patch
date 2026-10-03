@@ -1,0 +1,99 @@
+diff --git a/tests/test_sandbox_evidence.py b/tests/test_sandbox_evidence.py
+new file mode 100644
+index 0000000..ac145de
+--- /dev/null
++++ b/tests/test_sandbox_evidence.py
+@@ -0,0 +1,93 @@
++from concurrent.futures import ThreadPoolExecutor
++import json
++from uuid import uuid4
++
++import psycopg
++import pytest
++
++from air import sandbox as sb
++from air import repair_proposal as rp
++from test_workflow_evidence import saved
++from test_repair_evidence import reviewer, proposal, create
++from test_repair_proposal import decide, description
++from test_sandbox import run
++
++pytestmark=pytest.mark.postgres
++
++
++@pytest.fixture
++def setup(database,reviewer,proposal,saved):
++    with reviewer.transaction(database['tenants'][0]) as tx:
++        decide(tx,proposal)
++        fixture=sb.register_input(tx,{},description()['proposed_state'])
++    return proposal,fixture,saved['impact']
++
++
++def test_roundtrip_idempotent_audit(database,repos,setup):
++    with repos[0].transaction(database['tenants'][0]) as tx:
++        result=run(tx,*setup)
++        assert result==run(tx,*setup)==sb.load_result(tx,result['artifact_id'])
++        assert json.loads(result['payload'])['result']['execution_result']=='PASS'
++        assert len([a for a in tx.audit() if a['artifact_id']==result['artifact_id']])==1
++
++
++def test_failed_verification_is_evidence_not_permission(database,repos,setup):
++    with repos[0].transaction(database['tenants'][0]) as tx:
++        p,_,impact=setup;fixture=sb.register_input(tx,{}, {'wrong':True})
++        result=run(tx,p,fixture,impact);body=json.loads(result['payload'])['result']
++        assert body['execution_result']=='FAIL' and body['deployment_authorized'] is False
++        assert sb.load_result(tx,result['artifact_id'])==result
++
++
++def test_cross_tenant_inputs_reads(database,repos,setup):
++    with repos[0].transaction(database['tenants'][0]) as tx: result=run(tx,*setup)
++    with repos[1].transaction(database['tenants'][1]) as tx:
++        for action in (lambda:run(tx,*setup),lambda:sb.load_result(tx,result['artifact_id'])):
++            with pytest.raises(ValueError): action()
++        assert tx.get_by_id(result['artifact_id'],kind='sandbox_result') is None
++
++
++def test_stale_revision(database,repos,setup,saved):
++    with repos[0].transaction(database['tenants'][0]) as tx:
++        result=run(tx,*setup);create(tx,saved,supersedes=setup[0]['artifact_id'])
++        with pytest.raises(rp.ProposalError): run(tx,*setup)
++        with pytest.raises(rp.ProposalError): sb.load_result(tx,result['artifact_id'])
++
++
++@pytest.mark.parametrize('field',['proposal','input','approval','revision','environment','impact','tenant_id','result','extra','hash'])
++def test_raw_forged_evidence_rejected(database,repos,setup,field):
++    with repos[0].transaction(database['tenants'][0]) as tx: result=run(tx,*setup)
++    body=json.loads(result['payload'])
++    if field in ('proposal','input','approval'): body[field]['artifact_hash']='0'*64
++    elif field=='revision': body[field]=2
++    elif field=='result': body[field]['deployment_authorized']=True
++    elif field=='hash': pass
++    else: body[field]=str(uuid4())
++    with pytest.raises(psycopg.Error):
++        with repos[0].transaction(database['tenants'][0]) as tx:
++            tx.put('sandbox_result','0'*64 if field=='hash' else rp.digest(body),body)
++
++
++@pytest.mark.parametrize('operation',['UPDATE','DELETE'])
++def test_immutable(database,repos,setup,operation):
++    with repos[0].transaction(database['tenants'][0]) as tx: result=run(tx,*setup)
++    with pytest.raises(psycopg.Error):
++        with repos[0].transaction(database['tenants'][0]) as tx:
++            query="UPDATE air.artifacts SET payload=payload WHERE artifact_id=%s" if operation=='UPDATE' else 'DELETE FROM air.artifacts WHERE artifact_id=%s'
++            tx._connection.execute(query,(result['artifact_id'],))
++
++
++def test_rollback(database,repos,setup):
++    identity=None
++    with pytest.raises(RuntimeError):
++        with repos[0].transaction(database['tenants'][0]) as tx:
++            identity=run(tx,*setup)['artifact_id'];raise RuntimeError()
++    with repos[0].transaction(database['tenants'][0]) as tx:
++        assert tx.get_by_id(identity,kind='sandbox_result') is None
++
++
++def test_concurrent_idempotency(database,repos,setup):
++    def work(_):
++        with repos[0].transaction(database['tenants'][0]) as tx:return run(tx,*setup)['artifact_id']
++    with ThreadPoolExecutor(max_workers=4) as pool: results=list(pool.map(work,range(4)))
++    assert len(set(results))==1

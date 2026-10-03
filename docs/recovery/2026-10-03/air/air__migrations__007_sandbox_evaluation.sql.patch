@@ -1,0 +1,77 @@
+diff --git a/air/migrations/007_sandbox_evaluation.sql b/air/migrations/007_sandbox_evaluation.sql
+new file mode 100644
+index 0000000..fad81f2
+--- /dev/null
++++ b/air/migrations/007_sandbox_evaluation.sql
+@@ -0,0 +1,71 @@
++-- Declarative sandbox evidence reuses tenant RLS, immutable artifacts and audit.
++CREATE FUNCTION air.validate_sandbox_links() RETURNS trigger
++LANGUAGE plpgsql SET search_path = pg_catalog, air AS $$
++DECLARE p JSONB; proposal JSONB; fixture JSONB; approval JSONB;
++    h TEXT; ref UUID; output JSONB; passed BOOLEAN; expected_keys TEXT[];
++BEGIN
++    IF NEW.kind NOT IN ('sandbox_input','sandbox_result') THEN RETURN NEW; END IF;
++    p := NEW.payload::jsonb;
++    IF NEW.tenant_id <> air.current_tenant() OR
++       p->>'tenant_id' IS DISTINCT FROM NEW.tenant_id::text OR
++       p->>'sandbox_version' IS DISTINCT FROM 'air-state-overlay-v1' OR
++       NEW.idempotency_key IS DISTINCT FROM NEW.content_hash OR
++       octet_length(NEW.payload) > 65536 THEN
++        RAISE EXCEPTION 'invalid sandbox evidence' USING ERRCODE='23514';
++    END IF;
++    IF NEW.kind='sandbox_input' THEN
++        expected_keys := ARRAY['tenant_id','sandbox_version','base','expected'];
++        IF NOT p ?& expected_keys OR p - expected_keys <> '{}'::jsonb OR
++           jsonb_typeof(p->'base') IS DISTINCT FROM 'object' OR
++           jsonb_typeof(p->'expected') IS DISTINCT FROM 'object' THEN
++            RAISE EXCEPTION 'invalid sandbox input' USING ERRCODE='23514';
++        END IF;
++        RETURN NEW;
++    END IF;
++    expected_keys := ARRAY['tenant_id','sandbox_version','environment','proposal','revision','approval','input','impact','result'];
++    ref := (p#>>'{proposal,artifact_id}')::uuid;
++    PERFORM pg_advisory_xact_lock(hashtextextended(NEW.tenant_id::text || ':' || ref::text,714208316));
++    SELECT payload::jsonb,content_hash INTO proposal,h FROM air.artifacts
++        WHERE tenant_id=NEW.tenant_id AND kind='repair_proposal' AND artifact_id=ref;
++    IF proposal IS NULL OR NOT p ?& expected_keys OR p - expected_keys <> '{}'::jsonb OR
++       p->'proposal' IS DISTINCT FROM jsonb_build_object('artifact_id',ref::text,'artifact_hash',h) OR
++       p->'revision' IS DISTINCT FROM proposal->'revision' OR
++       p->'impact' IS DISTINCT FROM proposal->'impact' OR
++       p->'environment' IS DISTINCT FROM '{"identity":"pure-json-state-overlay","version":"1"}'::jsonb OR
++       EXISTS(SELECT 1 FROM air.artifacts WHERE tenant_id=NEW.tenant_id AND kind='repair_proposal'
++           AND payload::jsonb#>>'{supersedes,artifact_id}'=ref::text) THEN
++        RAISE EXCEPTION 'invalid or stale sandbox proposal' USING ERRCODE='23514';
++    END IF;
++    SELECT payload::jsonb,content_hash INTO approval,h FROM air.artifacts
++        WHERE tenant_id=NEW.tenant_id AND kind='repair_decision'
++        AND artifact_id=(p#>>'{approval,artifact_id}')::uuid;
++    IF approval IS NULL OR approval->>'decision' IS DISTINCT FROM 'APPROVED' OR
++       approval->'proposal' IS DISTINCT FROM p->'proposal' OR
++       approval->'revision' IS DISTINCT FROM p->'revision' OR
++       p->'approval' IS DISTINCT FROM jsonb_build_object('artifact_id',p#>>'{approval,artifact_id}','artifact_hash',h) THEN
++        RAISE EXCEPTION 'invalid sandbox approval' USING ERRCODE='23514';
++    END IF;
++    SELECT payload::jsonb,content_hash INTO fixture,h FROM air.artifacts
++        WHERE tenant_id=NEW.tenant_id AND kind='sandbox_input'
++        AND artifact_id=(p#>>'{input,artifact_id}')::uuid;
++    IF fixture IS NULL OR p->'input' IS DISTINCT FROM jsonb_build_object('artifact_id',p#>>'{input,artifact_id}','artifact_hash',h) THEN
++        RAISE EXCEPTION 'invalid sandbox input link' USING ERRCODE='23514';
++    END IF;
++    output := (fixture->'base') || (proposal#>'{description,proposed_state}');
++    passed := output = fixture->'expected';
++    IF p->'result' - ARRAY['output','verification','execution_result','failure_reason','deployment_authorized'] <> '{}'::jsonb OR
++       NOT (p->'result') ?& ARRAY['output','verification','execution_result','failure_reason','deployment_authorized'] OR
++       p#>'{result,output}' IS DISTINCT FROM output OR
++       p#>'{result,verification}' IS DISTINCT FROM jsonb_build_object('method','exact-json','passed',passed) OR
++       p#>>'{result,execution_result}' IS DISTINCT FROM CASE WHEN passed THEN 'PASS' ELSE 'FAIL' END OR
++       p#>'{result,failure_reason}' IS DISTINCT FROM CASE WHEN passed THEN 'null'::jsonb ELSE '"expected_state_mismatch"'::jsonb END OR
++       p#>'{result,deployment_authorized}' IS DISTINCT FROM 'false'::jsonb THEN
++        RAISE EXCEPTION 'invalid sandbox result' USING ERRCODE='23514';
++    END IF;
++    RETURN NEW;
++EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range THEN
++    RAISE EXCEPTION 'invalid sandbox reference' USING ERRCODE='23514';
++END $$;
++REVOKE ALL ON FUNCTION air.validate_sandbox_links() FROM PUBLIC;
++CREATE TRIGGER sandbox_evidence_links BEFORE INSERT ON air.artifacts
++    FOR EACH ROW EXECUTE FUNCTION air.validate_sandbox_links();
