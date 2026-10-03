@@ -1,6 +1,7 @@
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 import json
+from hashlib import sha256
 from uuid import uuid4
 
 import psycopg
@@ -11,6 +12,7 @@ from test_sandbox_evaluation_postgres import approved, evaluate
 from test_repair_evidence import create, reviewer
 from test_workflow_evidence import saved
 from test_replay_verification import fixture, run
+from test_repair_proposal import description, decide
 
 pytestmark = pytest.mark.postgres
 
@@ -92,3 +94,61 @@ def test_concurrent_idempotent_replay(database, repos, approved, sandbox):
         with repos[0].transaction(database["tenants"][0]) as tx: return run(tx, approved, sandbox)
     with ThreadPoolExecutor(max_workers=2) as pool: records = list(pool.map(task, range(2)))
     assert records[0] == records[1]
+
+
+@pytest.mark.parametrize("bound", ["empty", "cases", "depth", "nodes", "bytes", "unordered", "path_type"])
+def test_database_enforces_fixture_bounds_independently(database, repos, approved, sandbox, bound):
+    tenant = database["tenants"][0]
+    with repos[0].transaction(tenant) as tx: record = run(tx, approved, sandbox)
+    p = json.loads(record["payload"])
+    f = p["fixture"]
+    if bound == "empty": f["cases"] = []
+    elif bound == "cases": f["cases"] *= 33
+    elif bound == "depth":
+        v = {}
+        for _ in range(17): v = {"x": v}
+        f["cases"][0]["expected"] = v
+    elif bound == "nodes": f["cases"][0]["expected"] = list(range(4096))
+    elif bound == "bytes": f["cases"][0]["expected"] = "x" * 65536
+    elif bound == "unordered":
+        f["cases"].append({"case_id": "a", "input": {"path": ["field"]}, "expected": "new_name"})
+    elif bound == "path_type": f["cases"][0]["input"]["path"] = [0]
+    # Bypass Python replay validation deliberately; exercise real DB enforcement.
+    p["fixture_hash"] = sha256(rp.canonical_json(f).encode()).hexdigest()
+    errors = {"empty": "replay case bound", "cases": "replay case bound",
+              "depth": "replay structural bound", "nodes": "replay structural bound",
+              "bytes": "invalid replay fixture", "unordered": "invalid or unordered replay case",
+              "path_type": "unsupported or missing replay path"}
+    with pytest.raises(psycopg.errors.CheckViolation, match=errors[bound]):
+        with repos[0].transaction(tenant) as tx: tx.put("replay_verification", rp.digest(p), p)
+
+
+def test_rollback_leaves_no_replay_evidence(database, repos, approved, sandbox):
+    tenant = database["tenants"][0]
+    with pytest.raises(RuntimeError):
+        with repos[0].transaction(tenant) as tx:
+            record = run(tx, approved, sandbox)
+            raise RuntimeError("rollback")
+    with repos[0].transaction(tenant) as tx:
+        assert tx.get_by_id(record["artifact_id"], kind="replay_verification") is None
+        assert not [a for a in tx.audit() if a["artifact_id"] == record["artifact_id"]]
+
+
+@pytest.mark.parametrize("actual,expected,status", [
+    (None, None, "PASS"), (True, True, "PASS"), (1, 1.0, "FAIL"),
+    (1.5, 1.5, "PASS"), ("é", "é", "PASS"),
+    ([1, 2], [1, 2], "PASS"), ({"z": 1, "a": 2}, {"a": 2, "z": 1}, "PASS"),
+])
+def test_database_and_python_compare_the_same_canonical_json(database, repos, reviewer, saved, actual, expected, status):
+    tenant = database["tenants"][0]
+    desc = description(); desc["proposed_state"] = {"field": actual}
+    item = json.loads(saved["impact"]["payload"])["analysis"]["impacts"][0]["impact_id"]
+    with repos[0].transaction(tenant) as tx:
+        proposal = rp.create_proposal(tx, saved["impact"]["artifact_id"], item, desc)
+    with reviewer.transaction(tenant) as tx: decide(tx, proposal)
+    with repos[0].transaction(tenant) as tx:
+        sandbox = evaluate(tx, proposal, saved)
+        record = run(tx, proposal, sandbox, fixture(expected))
+    with repos[0].transaction(tenant) as tx:
+        assert rv.load_verification(tx, record["artifact_id"]) == record
+        assert json.loads(record["payload"])["result"]["status"] == status

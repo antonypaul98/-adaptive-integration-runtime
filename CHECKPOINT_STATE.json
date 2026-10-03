@@ -3,25 +3,25 @@
   "current_checkpoint": "bounded replay/verification",
   "active_branch": "work/replay-verification-foundation",
   "main_sha_at_start": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
-  "current_branch_sha": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
+  "current_branch_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Existing canonical replay branch starts at accepted main b314d5b; implementation publication pending",
-  "local_test_status": "Python 3.12.14: 24 replay unit tests passed; PostgreSQL integration not yet run for replay.",
-  "pr_number": null,
-  "ci_status": "Replay implementation not yet validated; sandbox CI retained only as historical evidence.",
+  "branch_remote_status": "Initial replay foundation published; canonical PR #10 open",
+  "local_test_status": "Python 3.12.14: 348 passed, 236 PostgreSQL tests deselected; 24 replay unit tests included. Additional 15 DB boundary/rollback/JSON parity tests await CI.",
+  "pr_number": 10,
+  "ci_status": "Exact initial replay head 6f5c639 passed PostgreSQL 16/17 PR CI 37156001134; require fresh exact-head CI for this acceptance/test revision.",
   "merge_status": "Replay not merged",
   "external_acceptance_required": [],
   "known_blocker": null,
-  "next_action": "Open canonical replay PR and require PostgreSQL 16/17 exact-head CI; repair actual failures. No later lifecycle work.",
+  "next_action": "Require final exact-head PostgreSQL 16/17 CI, merge only if accepted, verify merged main. Stop at bounded replay/verification.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-03T21:40:32.240352+00:00",
-  "observed_branch_sha": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
-  "observed_feature_sha": "f1b5a582abf68b421b19a87387751379824aa821",
+  "observed_at_utc": "2026-10-03T21:45:34.354815+00:00",
+  "observed_branch_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+  "observed_feature_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
@@ -30,16 +30,30 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "state": "absent"
+    "number": 10,
+    "state": "open",
+    "head_sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/10"
   },
-  "ci_state": {},
+  "ci_state": {
+    "observed_runs": [
+      {
+        "id": 37156001134,
+        "sha": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "required_next_verification": "Final head must pass PostgreSQL 16 and 17 with zero database skips."
+  },
   "stabilization_scope": "Bounded replay/verification only; sandbox not redone",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "Bounded state-projection replay implementation, immutable evidence loader, forward migration 009 and real PostgreSQL regression tests; 24 unit tests passed. PostgreSQL results pending.",
-    "REMOTE_SHA": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
-    "NEXT_ACTION": "Open canonical replay PR and require PostgreSQL 16/17 exact-head CI; repair actual failures. No later lifecycle work."
+    "SAFE_WORK_COMPLETED": "Replay foundation published as PR #10; initial exact-head PostgreSQL 16/17 green. Added direct SQL fixture-bound/rollback regressions.",
+    "REMOTE_SHA": "6f5c63918b666fb2e7862358e17664e7060bd99f",
+    "NEXT_ACTION": "Require final exact-head PostgreSQL 16/17 CI, merge only if accepted, verify merged main. Stop at bounded replay/verification."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
