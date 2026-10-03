@@ -6,6 +6,7 @@ CREATE UNIQUE INDEX sandbox_one_evaluation ON air.artifacts
 CREATE FUNCTION air.validate_sandbox_evaluation_links() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, air AS $$
 DECLARE p JSONB; proposal JSONB; proposal_hash TEXT; ref UUID; expected_keys TEXT[];
+    state_text TEXT; state JSONB; node_count INTEGER; deepest INTEGER;
 BEGIN
     IF NEW.kind <> 'sandbox_evaluation' THEN RETURN NEW; END IF;
     IF NEW.tenant_id <> air.current_tenant() THEN
@@ -33,8 +34,10 @@ BEGIN
     END IF;
 
     ref := (p#>>'{proposal,artifact_id}')::uuid;
-    PERFORM pg_advisory_xact_lock(hashtextextended(NEW.tenant_id::text || ':' || ref::text,714208317));
-    SELECT payload::jsonb, content_hash INTO proposal, proposal_hash
+    -- Serialize with proposal supersession and human approval (migration 006).
+    PERFORM pg_advisory_xact_lock(hashtextextended(NEW.tenant_id::text || ':' || ref::text,714208316));
+    SELECT payload::jsonb, content_hash, (payload::json#>'{description,proposed_state}')::text
+      INTO proposal, proposal_hash, state_text
       FROM air.artifacts
      WHERE tenant_id=NEW.tenant_id AND kind='repair_proposal' AND artifact_id=ref;
 
@@ -47,6 +50,37 @@ BEGIN
                WHERE tenant_id=NEW.tenant_id AND kind='repair_proposal'
                  AND payload::jsonb#>>'{supersedes,artifact_id}'=ref::text) THEN
         RAISE EXCEPTION 'invalid or stale sandbox evidence' USING ERRCODE='23514';
+    END IF;
+    IF NOT EXISTS(SELECT 1 FROM air.artifacts
+        WHERE tenant_id=NEW.tenant_id AND kind='repair_decision'
+          AND payload::jsonb->>'decision'='APPROVED'
+          AND payload::jsonb->'proposal'=p->'proposal'
+          AND payload::jsonb->'revision'=p->'revision'
+          AND payload::jsonb->'impact'=p->'impact'
+          AND payload::jsonb->'change_evidence'=p->'change_evidence') THEN
+        RAISE EXCEPTION 'sandbox proposal is not approved' USING ERRCODE='23514';
+    END IF;
+    state := proposal#>'{description,proposed_state}';
+    -- JSON extraction preserves the canonical bytes stored in the proposal.
+    IF octet_length(state_text) > 65536 OR
+       p#>>'{result,state_hash}' IS DISTINCT FROM
+         encode(sha256(convert_to(state_text,'UTF8')),'hex') THEN
+        RAISE EXCEPTION 'invalid sandbox state hash or size' USING ERRCODE='23514';
+    END IF;
+    WITH RECURSIVE walk(value,depth) AS (
+        SELECT state,0
+        UNION ALL
+        SELECT child.value,walk.depth+1 FROM walk CROSS JOIN LATERAL (
+            SELECT value FROM jsonb_each(CASE WHEN jsonb_typeof(walk.value)='object'
+                THEN walk.value ELSE '{}'::jsonb END)
+            UNION ALL
+            SELECT value FROM jsonb_array_elements(CASE WHEN jsonb_typeof(walk.value)='array'
+                THEN walk.value ELSE '[]'::jsonb END)
+        ) child WHERE walk.depth <= 16
+    ) SELECT count(*),max(depth) INTO node_count,deepest
+        FROM (SELECT depth FROM walk LIMIT 4097) bounded;
+    IF node_count > 4096 OR deepest > 16 THEN
+        RAISE EXCEPTION 'sandbox structural bounds exceeded' USING ERRCODE='23514';
     END IF;
     RETURN NEW;
 EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range THEN

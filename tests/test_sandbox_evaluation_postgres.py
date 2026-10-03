@@ -41,6 +41,7 @@ def test_postgres_evaluation_persists_and_reloads(database, repos, approved, sav
         first = evaluate(tx, approved, saved)
         second = evaluate(tx, approved, saved)
         assert first == second
+    with repos[0].transaction(tenant) as tx:
         assert se.load_evaluation(tx, first["artifact_id"]) == first
         assert len([a for a in tx.audit() if a["artifact_id"] == first["artifact_id"]]) == 1
 
@@ -129,3 +130,71 @@ def test_stale_superseded_proposal_cannot_gain_sandbox_evidence(
                  AND payload::jsonb#>>'{proposal,artifact_id}'=%s""",
             (str(approved["artifact_id"]),),
         ).fetchone()["n"] == 0
+
+
+def raw_payload(tenant, proposal):
+    body = json.loads(proposal["payload"])
+    return {
+        "tenant_id": str(tenant), "sandbox_version": se.VERSION,
+        "proposal": rp.reference(proposal), "revision": body["revision"],
+        "impact": body["impact"], "change_evidence": body["change_evidence"],
+        "result": {"status": "PASS",
+                   "state_hash": se._digest(body["description"]["proposed_state"]),
+                   "checks": ["canonical_state", "bounded_structure", "declarative_only"]},
+    }
+
+
+@pytest.mark.parametrize("decision", [None, "REJECTED"])
+def test_raw_insert_requires_exact_approved_proposal(database, repos, reviewer, saved, decision):
+    tenant = database["tenants"][0]
+    with repos[0].transaction(tenant) as tx:
+        proposal = create(tx, saved)
+    if decision:
+        with reviewer.transaction(tenant) as tx:
+            decide(tx, proposal, decision)
+    payload = raw_payload(tenant, proposal)
+    with pytest.raises(psycopg.errors.CheckViolation):
+        with repos[0].transaction(tenant) as tx:
+            tx.put("sandbox_evaluation", se._digest(payload), payload)
+
+
+def test_raw_insert_rejects_wrong_well_formed_state_hash(database, repos, approved):
+    tenant = database["tenants"][0]
+    payload = raw_payload(tenant, approved)
+    payload["result"]["state_hash"] = "0" * 64
+    with pytest.raises(psycopg.errors.CheckViolation):
+        with repos[0].transaction(tenant) as tx:
+            tx.put("sandbox_evaluation", se._digest(payload), payload)
+
+
+def test_raw_insert_rejects_superseded_proposal(database, repos, approved, saved):
+    tenant = database["tenants"][0]
+    payload = raw_payload(tenant, approved)
+    with repos[0].transaction(tenant) as tx:
+        create(tx, saved, supersedes=approved["artifact_id"])
+    with pytest.raises(psycopg.errors.CheckViolation):
+        with repos[0].transaction(tenant) as tx:
+            tx.put("sandbox_evaluation", se._digest(payload), payload)
+
+
+@pytest.mark.parametrize("bound", ["depth", "nodes"])
+def test_raw_insert_enforces_structural_bounds(database, repos, reviewer, saved, bound):
+    from test_repair_proposal import description
+    tenant = database["tenants"][0]
+    desc = description()
+    state = {"x": list(range(se.MAX_NODES))}
+    if bound == "depth":
+        state = {"x": 1}
+        for _ in range(se.MAX_DEPTH + 1):
+            state = {"x": state}
+    desc["proposed_state"] = state
+    impact = json.loads(saved["impact"]["payload"])
+    with repos[0].transaction(tenant) as tx:
+        proposal = rp.create_proposal(tx, saved["impact"]["artifact_id"],
+                                     impact["analysis"]["impacts"][0]["impact_id"], desc)
+    with reviewer.transaction(tenant) as tx:
+        decide(tx, proposal)
+    payload = raw_payload(tenant, proposal)
+    with pytest.raises(psycopg.errors.CheckViolation):
+        with repos[0].transaction(tenant) as tx:
+            tx.put("sandbox_evaluation", se._digest(payload), payload)
