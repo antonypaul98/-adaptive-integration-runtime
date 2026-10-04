@@ -334,3 +334,25 @@ sandbox and passing replay references, explicitly bound to the selected fixture
 and current impact. It must fail closed on stale/mismatched evidence, remain
 tenant-scoped and grant no deployment authority. Persisted final decisions,
 target-bound deployment authorization and execution remain later work.
+
+## Post-verification review — read-only first slice
+
+`air.approval_review.prepare_review` assembles immutable canonical presentation
+data from the exact proposal, prior proposal decision, sandbox and verified PASS
+replay. The caller must bind the expected replay hash and fixture hash; a different
+passing fixture cannot silently replace the selected test. Proposal supersession,
+current impact and tenant boundaries are rechecked through existing verified
+loaders and the shared proposal lock. No evidence records are inserted.
+
+This is the first slice of the approval boundary, not completion of final approval.
+The review digest is not a credential. Its `REVIEW_ONLY_NO_DEPLOYMENT_AUTHORITY`
+purpose is explicit; future final approval must be separately persisted by an
+authenticated human and bind target/scope, then be rechecked at execution.
+Fixtures remain caller-selected and do not prove comprehensive behavior coverage.
+The existing READ COMMITTED transaction and supersession lock apply; returned
+presentation data can become stale after transaction end.
+
+Acceptance: deterministic repeated review and no audit writes; strict exact
+proposal/replay/fixture/impact binding; failed replay, cross-tenant evidence,
+supersession and passing-fixture substitution rejected in unit and real database
+tests. PostgreSQL 16/17 exact-head CI is mandatory before merge.

@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
-  "current_checkpoint": "bounded replay/verification",
-  "active_branch": "main",
-  "main_sha_at_start": "b314d5b0ac522b13bc2d4d53b330305fc83cfd0f",
-  "current_branch_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
+  "current_checkpoint": "post-verification approval review \u2014 read-only first slice",
+  "active_branch": "work/post-verification-review",
+  "main_sha_at_start": "aa8eb2fa2fbd636dd60d98d06744a14bdb22ec04",
+  "current_branch_sha": "aa8eb2fa2fbd636dd60d98d06744a14bdb22ec04",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "PR #10 merged; exact final head and merged main verified live.",
-  "local_test_status": "Python 3.12.14: 348 passed, 236 PostgreSQL tests deselected; 24 replay unit tests included. Additional 15 DB boundary/rollback/JSON parity tests await CI.",
-  "pr_number": 10,
-  "ci_status": "Final PR-head run 37156337063 and merged-main run 37156481430 succeeded: PostgreSQL 16 and 17 each 599 passed, zero product/database skips.",
-  "merge_status": "MERGED AND VERIFIED",
+  "branch_remote_status": "Read-only review slice being published; replay is already complete.",
+  "local_test_status": "Python 3.12.14: 29 targeted approval-review tests passed; full non-PostgreSQL 377 passed, 262 database tests deselected (await CI).",
+  "pr_number": null,
+  "ci_status": "Exact-head PostgreSQL 16/17 and merged-main CI required for new slice.",
+  "merge_status": "NOT_MERGED",
   "external_acceptance_required": [],
   "known_blocker": null,
-  "next_action": "Specify and implement a bounded read-only exact-evidence review package before adding final approval or deployment execution.",
+  "next_action": "Validate exact-head PostgreSQL 16/17 CI, merge bounded review slice if green and verify main; final approval persistence and target-bound deployment remain unimplemented.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
@@ -29,46 +29,17 @@
     "reported_sha": "f1b5a582abf68b421b19a87387751379824aa821",
     "reexecuted_this_run": false
   },
-  "pr_state": {
-    "number": 10,
-    "state": "merged",
-    "head_sha": "70e5b07ba905bd0576e30a8159ba14b50f0632fb",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/10",
-    "merge_commit_sha": "c0c3c15f9a239610e451aa011582a53db5fed322"
-  },
+  "pr_state": null,
   "ci_state": {
-    "pr_run": {
-      "id": 37156337063,
-      "sha": "70e5b07ba905bd0576e30a8159ba14b50f0632fb",
-      "event": "pull_request",
-      "conclusion": "success"
-    },
-    "merged_main_run": {
-      "id": 37156481430,
-      "sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
-      "event": "push",
-      "conclusion": "success"
-    },
-    "postgres_16": {
-      "passed": 599,
-      "failed": 0,
-      "skipped": 0
-    },
-    "postgres_17": {
-      "passed": 599,
-      "failed": 0,
-      "skipped": 0
-    },
-    "separate_infrastructure_suite": "15 passed, one Memory-only test skipped; not a database skip",
-    "reverified_this_run": true
+    "status": "pending"
   },
-  "stabilization_scope": "Bounded replay/verification only; sandbox not redone",
+  "stabilization_scope": "Post-verification read-only review package only; no deployment or new decision persistence",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "Reconciled PR #10 against live merged status, exact-head and merged-main CI and both database job logs. No repeated validation needed.",
-    "REMOTE_SHA": "c0c3c15f9a239610e451aa011582a53db5fed322",
-    "NEXT_ACTION": "Specify and implement a bounded read-only exact-evidence review package before adding final approval or deployment execution."
+    "SAFE_WORK_COMPLETED": "Read-only exact-evidence review package implemented with fixture substitution, tenant and stale evidence regression tests; acceptance pending.",
+    "REMOTE_SHA": "aa8eb2fa2fbd636dd60d98d06744a14bdb22ec04",
+    "NEXT_ACTION": "Validate exact-head PostgreSQL 16/17 CI, merge bounded review slice if green and verify main; final approval persistence and target-bound deployment remain unimplemented."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -80,12 +51,12 @@
     "physical_camera": "not_run",
     "new_head_CI": "intentionally_not_run"
   },
-  "next_checkpoint": "post-verification approval boundary",
+  "next_checkpoint": "persisted target-bound final approval (not started)",
   "replay_started": true,
-  "checkpoint_status": "COMPLETE",
-  "merge_commit_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
-  "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
-  "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb",
+  "checkpoint_status": "IN_PROGRESS",
+  "merge_commit_sha": null,
+  "verified_main_sha": "aa8eb2fa2fbd636dd60d98d06744a14bdb22ec04",
+  "final_pr_head": null,
   "shell_transport_limitation": "Shell Git push unavailable; connected GitHub write path authorized.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -128,5 +99,45 @@
     },
     "verified_main_sha": "7dae128983f4718f7c2bd660b800e7711844bf1b"
   },
-  "checkpoint_branch": "work/replay-verification-foundation"
+  "checkpoint_branch": "work/post-verification-review",
+  "completed_replay_receipt": {
+    "current_checkpoint": "bounded replay/verification",
+    "checkpoint_status": "COMPLETE",
+    "pr_state": {
+      "number": 10,
+      "state": "merged",
+      "head_sha": "70e5b07ba905bd0576e30a8159ba14b50f0632fb",
+      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/10",
+      "merge_commit_sha": "c0c3c15f9a239610e451aa011582a53db5fed322"
+    },
+    "ci_state": {
+      "pr_run": {
+        "id": 37156337063,
+        "sha": "70e5b07ba905bd0576e30a8159ba14b50f0632fb",
+        "event": "pull_request",
+        "conclusion": "success"
+      },
+      "merged_main_run": {
+        "id": 37156481430,
+        "sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
+        "event": "push",
+        "conclusion": "success"
+      },
+      "postgres_16": {
+        "passed": 599,
+        "failed": 0,
+        "skipped": 0
+      },
+      "postgres_17": {
+        "passed": 599,
+        "failed": 0,
+        "skipped": 0
+      },
+      "separate_infrastructure_suite": "15 passed, one Memory-only test skipped; not a database skip",
+      "reverified_this_run": true
+    },
+    "merge_commit_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
+    "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
+    "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
+  }
 }
