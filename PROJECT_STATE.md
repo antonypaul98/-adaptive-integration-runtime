@@ -317,3 +317,20 @@ SQL, enforces tenant/evidence links and uses the proposal supersession lock.
 
 Local Python 3.12.14: 24 new unit cases passed. PostgreSQL 16/17 acceptance is
 pending and required before checkpoint completion. No later checkpoint started.
+
+## Replay acceptance reconciled — 2026-10-04
+
+PR #10 is COMPLETE. Final head `70e5b07ba905bd0576e30a8159ba14b50f0632fb`
+passed exact-head run `37156337063`. Merge/main
+`c0c3c15f9a239610e451aa011582a53db5fed322` passed run `37156481430`.
+All four product/database jobs (PostgreSQL 16 and 17, PR and main) report
+599 passed, zero skips. The separate infrastructure suite skips one
+Memory-only case. These receipts were verified from live GitHub and job logs;
+no historical suites were repeated. Earlier pending text is historical.
+
+Next lifecycle boundary is post-verification approval. First bounded slice:
+produce a deterministic, read-only review package of exact approved proposal,
+sandbox and passing replay references, explicitly bound to the selected fixture
+and current impact. It must fail closed on stale/mismatched evidence, remain
+tenant-scoped and grant no deployment authority. Persisted final decisions,
+target-bound deployment authorization and execution remain later work.
