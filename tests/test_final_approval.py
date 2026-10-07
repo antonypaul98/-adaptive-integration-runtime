@@ -3,6 +3,7 @@ import pytest
 
 from air.final_approval import approve, load_final_approval, FinalApprovalError
 from test_approval_review import evidence, review
+from test_repair_proposal import context
 
 
 def call(tx, p, v, **changes):
