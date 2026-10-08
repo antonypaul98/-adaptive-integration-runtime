@@ -125,7 +125,7 @@ BEGIN
        length(btrim(p#>>'{target,environment}')) NOT BETWEEN 1 AND 128 OR
        (p#>>'{target,environment}') ~ '[[:cntrl:]]' OR
        jsonb_typeof(p#>'{target,scope}') IS DISTINCT FROM 'object' OR
-       jsonb_object_length(p#>'{target,scope}') NOT BETWEEN 1 AND 32 OR
+       (SELECT count(*) FROM jsonb_object_keys(p#>'{target,scope}')) NOT BETWEEN 1 AND 32 OR
        octet_length((p#>'{target,scope}')::text) > 16384 THEN
         RAISE EXCEPTION 'invalid final approval target' USING ERRCODE='23514';
     END IF;
