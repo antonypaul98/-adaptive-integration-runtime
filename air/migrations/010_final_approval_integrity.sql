@@ -116,7 +116,7 @@ BEGIN
         RAISE EXCEPTION 'review material differs from immutable evidence' USING ERRCODE='23514';
     END IF;
     IF jsonb_typeof(p->'target') IS DISTINCT FROM 'object' OR
-       p->'target' - target_keys <> '{}'::jsonb OR NOT p->'target' ?& target_keys OR
+       (p->'target') - target_keys <> '{}'::jsonb OR NOT (p->'target' ?& target_keys) OR
        p#>>'{target,integration_id}' IS DISTINCT FROM
            proposal#>>'{impact_item,dependency,integration_id}' OR
        p#>>'{target,mapping_id}' IS DISTINCT FROM
