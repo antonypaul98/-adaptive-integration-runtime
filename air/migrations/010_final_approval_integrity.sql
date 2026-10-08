@@ -143,8 +143,6 @@ BEGIN
         END IF;
     END LOOP;
     RETURN NEW;
-EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range OR invalid_parameter_value THEN
-    RAISE EXCEPTION 'invalid final approval reference: %', SQLERRM USING ERRCODE='23514';
 END $$;
 REVOKE ALL ON FUNCTION air.validate_final_approval_links() FROM PUBLIC;
 CREATE TRIGGER final_approval_links BEFORE INSERT ON air.artifacts
