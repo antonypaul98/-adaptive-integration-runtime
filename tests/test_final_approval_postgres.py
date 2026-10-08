@@ -19,6 +19,11 @@ from test_workflow_evidence import saved
 pytestmark = pytest.mark.postgres
 
 
+def pg_call(tx, proposal, verification):
+    integration_id = json.loads(proposal['payload'])['impact_item']['dependency']['integration_id']
+    return call(tx, proposal, verification, integration_id=str(integration_id))
+
+
 @pytest.fixture
 def approval_inputs(database, repos, approved, sandbox):
     tenant = database["tenants"][0]
@@ -30,8 +35,8 @@ def approval_inputs(database, repos, approved, sandbox):
 def test_authenticated_persistence_reload_idempotency_and_audit(database, reviewer, approval_inputs):
     tenant, proposal, verification = approval_inputs
     with reviewer.transaction(tenant) as tx:
-        record = call(tx, proposal, verification)
-        assert call(tx, proposal, verification) == record
+        record = pg_call(tx, proposal, verification)
+        assert pg_call(tx, proposal, verification) == record
         assert load_final_approval(tx, record["artifact_id"]) == record
         payload = json.loads(record["payload"])
         assert payload["reviewer"].startswith("human:reviewer_")
@@ -50,7 +55,7 @@ def test_authenticated_persistence_reload_idempotency_and_audit(database, review
 def test_database_rejects_raw_insert_forgery(database, reviewer, approval_inputs, mutation):
     tenant, proposal, verification = approval_inputs
     with reviewer.transaction(tenant) as tx:
-        valid = call(tx, proposal, verification)
+        valid = pg_call(tx, proposal, verification)
     p = deepcopy(json.loads(valid["payload"]))
     if mutation == "reviewer": p["reviewer"] = "human:impostor"
     elif mutation == "confirmed": p["confirmed"] = False
@@ -72,7 +77,7 @@ def test_database_rejects_raw_insert_forgery(database, reviewer, approval_inputs
     elif mutation == "revision": p["revision"] += 1
     elif mutation == "impact": p["impact"]["artifact_id"] = str(uuid4())
     elif mutation == "change": p["change_evidence"]["artifact_id"] = str(uuid4())
-    elif mutation == "target_integration": p["target"]["integration_id"] = "billing"
+    elif mutation == "target_integration": p["target"]["integration_id"] = "forged-" + uuid4().hex
     elif mutation == "target_mapping": p["target"]["mapping_id"] = "wrong"
     elif mutation == "target_scope": p["target"]["scope"] = {"region": []}
     elif mutation == "target_environment": p["target"]["environment"] = ""
@@ -87,7 +92,7 @@ def test_database_rejects_raw_insert_forgery(database, reviewer, approval_inputs
 def test_non_reviewer_cannot_insert_or_read_other_tenant(database, repos, reviewer, approval_inputs):
     tenant, proposal, verification = approval_inputs
     with reviewer.transaction(tenant) as tx:
-        valid = call(tx, proposal, verification)
+        valid = pg_call(tx, proposal, verification)
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         with repos[0].transaction(tenant) as tx:
             tx.put("final_approval", sha256(valid["payload"].encode()).hexdigest(),
@@ -103,7 +108,7 @@ def test_non_reviewer_cannot_insert_or_read_other_tenant(database, repos, review
 def test_supersession_rejects_raw_final_approval(database, reviewer, approval_inputs, saved):
     tenant, proposal, verification = approval_inputs
     with reviewer.transaction(tenant) as tx:
-        valid = call(tx, proposal, verification)
+        valid = pg_call(tx, proposal, verification)
     with reviewer.transaction(tenant) as tx:
         create(tx, saved, supersedes=proposal["artifact_id"])
     with pytest.raises(psycopg.errors.CheckViolation):
@@ -119,7 +124,7 @@ def test_supersession_rejects_raw_final_approval(database, reviewer, approval_in
 def test_final_approval_is_immutable(database, reviewer, approval_inputs, verb):
     tenant, proposal, verification = approval_inputs
     with reviewer.transaction(tenant) as tx:
-        valid = call(tx, proposal, verification)
+        valid = pg_call(tx, proposal, verification)
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         with reviewer.transaction(tenant) as tx:
             tx._connection.execute(verb+" WHERE artifact_id=%s", (valid["artifact_id"],))
