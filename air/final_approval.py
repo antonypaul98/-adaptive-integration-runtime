@@ -78,6 +78,8 @@ def approve(tx, proposal_id, *, proposal_hash, revision, current_impact_id,
         "verification": body["verification"],
         "fixture_hash": fixture_hash,
         "review_hash": review_hash,
+        "review_payload": review.payload,
+        "confirmed": True,
         "target": {
             "environment": _bounded_text(environment, "environment", 128),
             "integration_id": str(impact_target["integration_id"]),
