@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "persisted target-bound final approval",
-  "active_branch": "work/target-bound-final-approval",
+  "active_branch": null,
   "main_sha_at_start": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
-  "current_branch_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
+  "current_branch_sha": "6f5e09574139230a4589780d2a153ccc633bba14",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "PR #12 open, clean, mergeable at exact validated source head",
+  "branch_remote_status": "PR #12 merged; next checkpoint branch not yet created",
   "local_test_status": "No local checkout; preflight and local tests not run. PostgreSQL 16/17 CI executed.",
   "pr_number": 12,
-  "ci_status": "Exact source head passed CI #108 (run 37713549026), PG16/17 each 676 passed, 0 failed, 0 skipped.",
-  "merge_status": "NOT_MERGED",
+  "ci_status": "Merged-main push CI #37853470492 SUCCESS; PostgreSQL 16 and 17 each 676 passed, 0 failed, 0 skipped.",
+  "merge_status": "MERGED",
   "external_acceptance_required": [],
-  "known_blocker": "Protected merge rejected by execution safety layer before reaching GitHub; human merge needed if no authorized write path succeeds.",
-  "next_action": "After exact-head validation on the latest PR head, merge PR #12; verify merged-main PostgreSQL 16/17 CI with zero database skips; synchronize state on main before starting a later lifecycle checkpoint.",
+  "known_blocker": null,
+  "next_action": "Start the deployment execution authorization boundary from merged main 2471ce67 after a safe branch/preflight. Independently revalidate final human approval, tenant, target, exact evidence and freshness before any consequential execution; begin with fail-closed authorization only.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
@@ -22,7 +22,7 @@
   "observed_at_utc": "2026-10-08T04:14:49+00:00",
   "observed_branch_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
   "observed_feature_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
-  "current_repository_sha": null,
+  "current_repository_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
     "reported_result": "Python 3.12 / PostgreSQL 16: 534 passed; original 001-007 to 008 upgrade and rerun passed.",
@@ -31,21 +31,30 @@
   },
   "pr_state": {
     "number": 12,
-    "state": "open",
+    "state": "closed",
+    "merged": true,
     "mergeable": true,
     "base_sha": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
-    "head_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
+    "head_sha": "6f5e09574139230a4589780d2a153ccc633bba14",
+    "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
     "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/12"
   },
   "ci_state": {
     "status": "success",
     "pr_run": {
-      "id": 37713549026,
-      "number": 108,
-      "sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
+      "id": 37726646962,
+      "number": 110,
+      "sha": "6f5e09574139230a4589780d2a153ccc633bba14",
       "event": "pull_request",
       "conclusion": "success",
-      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37713549026"
+      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37726646962"
+    },
+    "merged_main_run": {
+      "id": 37853470492,
+      "sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+      "event": "push",
+      "conclusion": "success",
+      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37853470492"
     },
     "postgres_16": {
       "passed": 676,
@@ -57,15 +66,15 @@
       "failed": 0,
       "skipped": 0
     },
-    "separate_infrastructure_suite": "One unrelated diagnostic skipped; database pytest 0 skipped."
+    "separate_infrastructure_suite": "One unrelated diagnostic skipped in each matrix; database pytest zero skipped."
   },
   "stabilization_scope": "Persisted target-bound final approval, migration 010 database-side guard and PostgreSQL regression coverage; no deployment executor.",
   "last_session_exit": {
-    "BLOCKED_LAYER": "execution_safety_merge_write",
-    "BLOCKER": "Exact-head merge tool call rejected before reaching GitHub.",
-    "SAFE_WORK_COMPLETED": "Confirmed PR #12 open/clean at 7184532a and CI #108 success on PG16/17, 676 pytest passes per matrix with no pytest skips; checkpoint record reconciled on branch if this update succeeds.",
-    "REMOTE_SHA": "7184532a5d5b00fa563280d45d6f41888254d7b7",
-    "NEXT_ACTION": "Await exact-head CI on any new state-only commit, then merge PR #12 and verify merged-main CI."
+    "BLOCKED_LAYER": null,
+    "BLOCKER": null,
+    "SAFE_WORK_COMPLETED": "PR #12 merged at 2471ce67; exact merged-main CI 37853470492 green on PostgreSQL 16 and 17 (676 passed each, zero pytest skips).",
+    "REMOTE_SHA": "2471ce67ea3ce45476271798fb88ab2a40311654",
+    "NEXT_ACTION": "Start the deployment execution authorization boundary from merged main 2471ce67 after a safe branch/preflight. Independently revalidate final human approval, tenant, target, exact evidence and freshness before any consequential execution; begin with fail-closed authorization only."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -77,13 +86,13 @@
     "physical_camera": "not_run",
     "new_head_CI": "intentionally_not_run"
   },
-  "next_checkpoint": "deployment execution boundary (not started)",
+  "next_checkpoint": "deployment execution authorization boundary (not started)",
   "replay_started": true,
-  "checkpoint_status": "READY_FOR_MERGE",
-  "merge_commit_sha": null,
-  "verified_main_sha": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
-  "final_pr_head": "7184532a5d5b00fa563280d45d6f41888254d7b7",
-  "shell_transport_limitation": "No checkout; shell GitHub DNS resolution unavailable. Connected GitHub reads work; merge write blocked by execution safety layer.",
+  "checkpoint_status": "COMPLETE",
+  "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+  "verified_main_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+  "final_pr_head": "6f5e09574139230a4589780d2a153ccc633bba14",
+  "shell_transport_limitation": "No local checkout or shell GitHub DNS; connected GitHub reads verified. New checkpoint preflight not run.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
     "checkpoint_status": "COMPLETE",
@@ -165,5 +174,6 @@
     "merge_commit_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
-  }
+  },
+  "recorded_at_utc": "2026-10-09T00:16:00Z"
 }
