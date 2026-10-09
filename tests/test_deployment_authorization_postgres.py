@@ -4,6 +4,8 @@ from air.deployment_authorization import ExecutionBoundaryError
 from test_deployment_authorization import check
 from test_final_approval_postgres import approval_inputs, pg_call
 from test_repair_evidence import reviewer
+from test_sandbox_evaluation_postgres import approved
+from test_replay_verification_postgres import sandbox
 
 pytestmark = pytest.mark.postgres
 
