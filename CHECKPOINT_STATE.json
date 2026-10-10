@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
-  "current_checkpoint": "persisted target-bound final approval",
-  "active_branch": null,
-  "main_sha_at_start": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
-  "current_branch_sha": "6f5e09574139230a4589780d2a153ccc633bba14",
+  "current_checkpoint": "deployment execution authorization boundary",
+  "active_branch": "work/deployment-authorization-boundary",
+  "main_sha_at_start": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
+  "current_branch_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "PR #12 merged; next checkpoint branch not yet created",
-  "local_test_status": "No local checkout; preflight and local tests not run. PostgreSQL 16/17 CI executed.",
-  "pr_number": 12,
-  "ci_status": "Merged-main push CI #37853470492 SUCCESS; PostgreSQL 16 and 17 each 676 passed, 0 failed, 0 skipped.",
-  "merge_status": "MERGED",
+  "branch_remote_status": "Existing branch; initial read-only implementation source staged in Git object tree, CI pending",
+  "local_test_status": "Not run on this new source commit; local checkout unavailable; PostgreSQL CI pending",
+  "pr_number": null,
+  "ci_status": "NOT_RUN on new source head; PostgreSQL 16/17 CI required",
+  "merge_status": "NOT_MERGED",
   "external_acceptance_required": [],
   "known_blocker": null,
-  "next_action": "Start the deployment execution authorization boundary from merged main 2471ce67 after a safe branch/preflight. Independently revalidate final human approval, tenant, target, exact evidence and freshness before any consequential execution; begin with fail-closed authorization only.",
+  "next_action": "Verify exact-head PostgreSQL 16/17 CI with zero skipped DB tests; repair failures and open checkpoint PR only after validation.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
@@ -20,53 +20,22 @@
   ],
   "schema_version": 2,
   "observed_at_utc": "2026-10-08T04:14:49+00:00",
-  "observed_branch_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
-  "observed_feature_sha": "7184532a5d5b00fa563280d45d6f41888254d7b7",
-  "current_repository_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+  "observed_branch_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
+  "observed_feature_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
+  "current_repository_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
     "reported_result": "Python 3.12 / PostgreSQL 16: 534 passed; original 001-007 to 008 upgrade and rerun passed.",
     "reported_sha": "f1b5a582abf68b421b19a87387751379824aa821",
     "reexecuted_this_run": false
   },
-  "pr_state": {
-    "number": 12,
-    "state": "closed",
-    "merged": true,
-    "mergeable": true,
-    "base_sha": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
-    "head_sha": "6f5e09574139230a4589780d2a153ccc633bba14",
-    "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/12"
-  },
+  "pr_state": null,
   "ci_state": {
-    "status": "success",
-    "pr_run": {
-      "id": 37726646962,
-      "number": 110,
-      "sha": "6f5e09574139230a4589780d2a153ccc633bba14",
-      "event": "pull_request",
-      "conclusion": "success",
-      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37726646962"
-    },
-    "merged_main_run": {
-      "id": 37853470492,
-      "sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
-      "event": "push",
-      "conclusion": "success",
-      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37853470492"
-    },
-    "postgres_16": {
-      "passed": 676,
-      "failed": 0,
-      "skipped": 0
-    },
-    "postgres_17": {
-      "passed": 676,
-      "failed": 0,
-      "skipped": 0
-    },
-    "separate_infrastructure_suite": "One unrelated diagnostic skipped in each matrix; database pytest zero skipped."
+    "status": "not_run",
+    "baseline_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
+    "baseline_run_id": 37864037940,
+    "postgres_16": "not_run",
+    "postgres_17": "not_run"
   },
   "stabilization_scope": "Persisted target-bound final approval, migration 010 database-side guard and PostgreSQL regression coverage; no deployment executor.",
   "last_session_exit": {
@@ -86,11 +55,11 @@
     "physical_camera": "not_run",
     "new_head_CI": "intentionally_not_run"
   },
-  "next_checkpoint": "deployment execution authorization boundary (not started)",
+  "next_checkpoint": "deployment execution authorization boundary (in progress)",
   "replay_started": true,
-  "checkpoint_status": "COMPLETE",
+  "checkpoint_status": "IN_PROGRESS",
   "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
-  "verified_main_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+  "verified_main_sha": "74a2c6cecd49dac745b4db83cdd75f4af3ab6427",
   "final_pr_head": "6f5e09574139230a4589780d2a153ccc633bba14",
   "shell_transport_limitation": "No local checkout or shell GitHub DNS; connected GitHub reads verified. New checkpoint preflight not run.",
   "previous_checkpoint_receipt": {
@@ -175,5 +144,50 @@
     "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
   },
-  "recorded_at_utc": "2026-10-09T00:16:00Z"
+  "recorded_at_utc": "2026-10-09T00:16:00Z",
+  "previous_final_approval_receipt": {
+    "current_checkpoint": "persisted target-bound final approval",
+    "checkpoint_status": "COMPLETE",
+    "pr_state": {
+      "number": 12,
+      "state": "closed",
+      "merged": true,
+      "mergeable": true,
+      "base_sha": "5c13f6cf8be478f7ad1702c37b058e8919b5f4a3",
+      "head_sha": "6f5e09574139230a4589780d2a153ccc633bba14",
+      "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+      "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/12"
+    },
+    "ci_state": {
+      "status": "success",
+      "pr_run": {
+        "id": 37726646962,
+        "number": 110,
+        "sha": "6f5e09574139230a4589780d2a153ccc633bba14",
+        "event": "pull_request",
+        "conclusion": "success",
+        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37726646962"
+      },
+      "merged_main_run": {
+        "id": 37853470492,
+        "sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+        "event": "push",
+        "conclusion": "success",
+        "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/actions/runs/37853470492"
+      },
+      "postgres_16": {
+        "passed": 676,
+        "failed": 0,
+        "skipped": 0
+      },
+      "postgres_17": {
+        "passed": 676,
+        "failed": 0,
+        "skipped": 0
+      },
+      "separate_infrastructure_suite": "One unrelated diagnostic skipped in each matrix; database pytest zero skipped."
+    },
+    "merge_commit_sha": "2471ce67ea3ce45476271798fb88ab2a40311654",
+    "verified_main_sha": "2471ce67ea3ce45476271798fb88ab2a40311654"
+  }
 }
