@@ -11,7 +11,7 @@ and evidence before trusting recorded SHAs, test counts, PRs or CI conclusions.
 2. Run `python scripts/session_preflight.py` with the pinned interpreter. It
    checks canonical URLs, main/branch merge-base, ahead/behind, GitHub API write
    permission and a non-mutating Git push dry-run. Never create dummy commits.
-3. Resume `work/post-verification-review` for the recorded checkpoint. Do not create another
+3. Resume the existing `active_branch` in the freshly reconciled `CHECKPOINT_STATE.json`. Do not create another
    checkpoint branch to avoid drift or failed authentication. Inventory and
    preserve local work first; reconcile stale refs before significant edits.
    Never reset, discard, force-push or automatically rebase legitimate work.

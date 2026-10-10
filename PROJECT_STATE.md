@@ -356,3 +356,12 @@ Acceptance: deterministic repeated review and no audit writes; strict exact
 proposal/replay/fixture/impact binding; failed replay, cross-tenant evidence,
 supersession and passing-fixture substitution rejected in unit and real database
 tests. PostgreSQL 16/17 exact-head CI is mandatory before merge.
+
+
+## Deployment authorization boundary accepted — 2026-10-10T20:00:24.680Z
+
+Repair mission reused existing branch `work/deployment-authorization-boundary` at `a129ce3a6b4497bde5c5c534fb08f79b8f45beed`; implementation and all tests were preserved. Missing PR #13 was created through the authorized GitHub connector. Exact PR-event AIR validation `38081762832` succeeded on PostgreSQL 16 and 17: 691 product tests each, zero failures or skips. The expected-head guarded merge produced `d3ea0c2b389fa8592f891de86fc8257a0ff8c2ad`. Exact merged-main AIR validation `38081872737` also passed 691 tests per version with zero skips. Pinned local infrastructure suite: 15 passed, one unrelated Memory-only diagnostic skipped. No local PostgreSQL pass is claimed.
+
+The receipt revalidates exact persisted human approval, proposal, revision, replay, fixture, review, tenant, current impact and target without writes; it grants no deployment authority. No feature source changed in this repair, no production endpoint/deployment was used, and only synthetic data was tested. Earlier pending/current-branch observations are historical. The old dirty worktree was left untouched.
+
+Canonical checkpoint records now mark this boundary COMPLETE. AIR-REPAIR-20261010 holds the enabled hourly task read-only until the final records PR and its exact merged-main CI pass and the explicit owner release is published. Then resume the next bounded deployment-execution safeguard automatically; do not redo accepted checkpoints. Shell Git write authentication remains unavailable; the repository-approved connector path worked.
