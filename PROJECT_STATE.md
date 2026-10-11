@@ -411,3 +411,30 @@ callback, transport, production endpoint or deployment executor, and it grants
 no execution authority. Tests use synthetic fixtures; no deployment or private
 data was used. Reassess the next smallest roadmap-critical execution safeguard
 after this canonical records change passes its own exact CI and is released.
+
+## Pre-execution single-use claim evidence — accepted 2026-10-11
+
+PR #19 added an immutable claim keyed by the exact execution-plan hash. An
+external executor must create the claim only after independently revalidating
+the accepted plan and authoritative target state and before any consequential
+action. The claim binds tenant, authorization boundary, approved proposal,
+verification, revision, target, freshly observed target-state hash, executor
+identity hash and a bounded nonce hash. Byte-identical retries return the
+original evidence; a different claimant or nonce fails closed. Claims never
+expire or transfer.
+
+Final source head `b8098cf08dfe6f8f300a2cfff43ad4145d7bd290`
+passed exact PR-event run `38135265920`: PostgreSQL 16 and 17 each reported
+719 passed, zero failed and zero product skips. Guarded merge commit
+`26d356307586244f9513486220453c5cbc82eb10` passed exact merged-main run
+`38146952311` with the same 719/0/0 result on both database versions. Pinned
+Python 3.12.14 focused validation reported 24 passed; the complete local
+non-PostgreSQL suite reported 422 passed with 297 PostgreSQL cases deselected.
+Dependency checks, compilation and whitespace validation passed.
+
+This is permanent fail-closed claim evidence, not a time-based lease or an
+execution credential. It adds no command, URL, credential, callback, transport,
+executor, production endpoint or deployment capability. Tests use synthetic
+fixtures; no deployment or private data was used. Reassess the next smallest
+roadmap-critical safeguard only after this records change passes exact PR and
+merged-main PostgreSQL 16/17 CI and the bounded writer slice is released.
