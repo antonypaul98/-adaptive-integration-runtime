@@ -387,3 +387,27 @@ fixtures only; no deployment or private data was used.
 
 Next bounded safeguard: append-only single-use execution outcome evidence. It
 must remain capability-isolated and must not add a production deployment path.
+
+## Single-use execution outcome evidence — accepted 2026-10-11
+
+PR #17 added an append-only outcome record keyed by the exact deterministic
+execution-plan hash. It permits byte-identical retry, rejects conflicting reuse,
+and binds tenant, authorization boundary, approved proposal, verification,
+target revision, review hash and freshly observed target-state hash. Status,
+reason code and evidence hashes are explicitly bounded. Verified loading detects
+payload tampering and cross-tenant access is denied by the existing RLS boundary.
+
+Final source head `71d9fc6a9f358e039be34dee8a0796ca911f3266`
+passed exact PR-event run `38128080938`: PostgreSQL 16 and 17 each reported
+709 passed, zero failed and zero product skips. Guarded merge commit
+`01b99e141bd772810da2073f23a86c588f9ffc5c` passed exact merged-main run
+`38131815376` with the same 709/0/0 result on both database versions. Pinned
+Python 3.12.14 focused validation reported 29 passed; the complete local
+non-PostgreSQL suite reported 414 passed with 295 PostgreSQL cases deselected.
+Compilation and whitespace checks passed.
+
+This safeguard records evidence only. It adds no command, URL, credential,
+callback, transport, production endpoint or deployment executor, and it grants
+no execution authority. Tests use synthetic fixtures; no deployment or private
+data was used. Reassess the next smallest roadmap-critical execution safeguard
+after this canonical records change passes its own exact CI and is released.
