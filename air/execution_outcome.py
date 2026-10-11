@@ -1,13 +1,17 @@
 """Append-only single-use execution outcome evidence; never an executor.
 
 This module records a bounded caller-supplied result after an external executor
-has independently revalidated an accepted plan and target state. It contains no
+has independently revalidated an accepted plan and target state. Recording an
+outcome requires the exact persisted pre-execution claim, closing the sequence
+without turning either artifact into execution authority. It contains no
 transport, command, callback, credentials, or ability to perform deployment.
 """
 from hashlib import sha256
 import json
 import re
+from uuid import UUID
 
+from .execution_claim import ExecutionClaimError, load_execution_claim
 from .execution_plan import (
     ExecutionPlan,
     PURPOSE as PLAN_PURPOSE,
@@ -32,8 +36,9 @@ def _hash(value, name):
     return value
 
 
-def record_execution_outcome(tx, plan, *, plan_hash, observed_target_state_hash,
-                             status, outcome_hash, reason_code):
+def record_execution_outcome(tx, plan, *, claim_id, plan_hash,
+                             observed_target_state_hash, status, outcome_hash,
+                             reason_code):
     """Persist exactly one immutable result per plan, with safe idempotent retry.
 
     A repeated byte-identical outcome returns the existing evidence. Any attempt
@@ -49,6 +54,8 @@ def record_execution_outcome(tx, plan, *, plan_hash, observed_target_state_hash,
         outcome_hash = _hash(outcome_hash, "outcome_hash")
         if plan.content_hash != plan_hash:
             raise ExecutionOutcomeError("plan_hash_mismatch")
+        claim = load_execution_claim(tx, claim_id)
+        claim_body = json.loads(claim["payload"])
         if type(status) is not str or status not in STATUSES:
             raise ExecutionOutcomeError("invalid_status")
         if type(reason_code) is not str or _REASON.fullmatch(reason_code) is None:
@@ -72,6 +79,17 @@ def record_execution_outcome(tx, plan, *, plan_hash, observed_target_state_hash,
         for name in ("approval", "proposal", "verification", "target"):
             if not isinstance(body.get(name), dict) or not body[name]:
                 raise ExecutionOutcomeError("invalid_plan")
+        if (claim_body.get("plan_hash") != plan_hash
+                or claim_body.get("boundary_hash") != body["boundary_hash"]
+                or claim_body.get("observed_target_state_hash")
+                != observed_target_state_hash
+                or claim_body.get("approval") != body["approval"]
+                or claim_body.get("proposal") != body["proposal"]
+                or claim_body.get("revision") != body["revision"]
+                or claim_body.get("verification") != body["verification"]
+                or claim_body.get("review_hash") != body.get("review_hash")
+                or claim_body.get("target") != body["target"]):
+            raise ExecutionOutcomeError("claim_plan_mismatch")
         payload = {
             "version": VERSION,
             "purpose": PURPOSE,
@@ -85,6 +103,12 @@ def record_execution_outcome(tx, plan, *, plan_hash, observed_target_state_hash,
             "verification": body["verification"],
             "review_hash": body.get("review_hash"),
             "target": body["target"],
+            "claim": {
+                "artifact_id": str(claim["artifact_id"]),
+                "artifact_hash": claim["content_hash"],
+                "executor_identity_hash": claim_body["executor_identity_hash"],
+                "claim_nonce_hash": claim_body["claim_nonce_hash"],
+            },
             "status": status,
             "outcome_hash": outcome_hash,
             "reason_code": reason_code,
@@ -92,6 +116,8 @@ def record_execution_outcome(tx, plan, *, plan_hash, observed_target_state_hash,
         return tx.put("execution_outcome", plan_hash, payload)
     except IdempotencyConflict as exc:
         raise ExecutionOutcomeError("plan_already_consumed") from exc
+    except ExecutionClaimError as exc:
+        raise ExecutionOutcomeError("claim_not_found_or_invalid") from exc
     except (KeyError, TypeError, ValueError, AttributeError, json.JSONDecodeError) as exc:
         if isinstance(exc, ExecutionOutcomeError):
             raise
@@ -117,4 +143,12 @@ def load_execution_outcome(tx, identity):
             or sha256(record["payload"].encode("utf-8")).hexdigest()
             != record["content_hash"]):
         raise ExecutionOutcomeError("integrity_failure")
+    claim = payload.get("claim")
+    try:
+        UUID(claim["artifact_id"])
+    except (KeyError, TypeError, ValueError):
+        raise ExecutionOutcomeError("integrity_failure") from None
+    for name in ("artifact_hash", "executor_identity_hash", "claim_nonce_hash"):
+        if type(claim.get(name)) is not str or _HASH.fullmatch(claim[name]) is None:
+            raise ExecutionOutcomeError("integrity_failure")
     return record
