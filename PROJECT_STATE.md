@@ -365,3 +365,25 @@ Repair mission reused existing branch `work/deployment-authorization-boundary` a
 The receipt revalidates exact persisted human approval, proposal, revision, replay, fixture, review, tenant, current impact and target without writes; it grants no deployment authority. No feature source changed in this repair, no production endpoint/deployment was used, and only synthetic data was tested. Earlier pending/current-branch observations are historical. The old dirty worktree was left untouched.
 
 Canonical checkpoint records now mark this boundary COMPLETE. AIR-REPAIR-20261010 holds the enabled hourly task read-only until the final records PR and its exact merged-main CI pass and the explicit owner release is published. Then resume the next bounded deployment-execution safeguard automatically; do not redo accepted checkpoints. Shell Git write authentication remains unavailable; the repository-approved connector path worked.
+
+
+## Target-state-bound execution plan safeguard — accepted 2026-10-11
+
+PR #15 added a deterministic read-only execution-plan envelope. It binds the
+freshly revalidated deployment-authorization boundary to an exact authoritative
+target-state hash and carries only canonical approval, proposal, verification,
+target and revision references. The envelope requires downstream boundary and
+target-state revalidation, single-use handling and append-only outcome evidence.
+It contains no command, URL, credential, callback, transport or deployment
+mechanism and grants no execution authority.
+
+Final source head \`f7f65fdf1ecef46803405cd2bce326b78a25f676\` passed exact
+PR-event run \`38111504931\`: PostgreSQL 16 and 17 each reported 698 passed,
+zero failed and zero product skips. Merge commit
+\`7a7c6aa6b82a1a9976573a9e4e05276a5fd635c6\` passed exact merged-main run
+\`38111609947\` with the same 698/0/0 result on both database versions.
+Pinned Python 3.12.14 focused validation: 7 passed; compilation passed. Synthetic
+fixtures only; no deployment or private data was used.
+
+Next bounded safeguard: append-only single-use execution outcome evidence. It
+must remain capability-isolated and must not add a production deployment path.
