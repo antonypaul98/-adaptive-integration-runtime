@@ -8,6 +8,12 @@ Lifecycle: observe → detect → propose → sandbox → replay → verify → 
 Human approval is mandatory for consequential changes. There is no deployment
 executor and no LLM call in this implementation.
 
+The current evidence/control-plane roadmap is complete through deterministic,
+tenant-scoped pre-execution claims and claim-bound append-only outcome evidence.
+That completion does not authorize production execution: any executor,
+transport, credential use or production endpoint is separate future scope and
+requires explicit authorization before implementation.
+
 ## Install and test
 
 ```sh

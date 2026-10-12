@@ -463,3 +463,27 @@ or deployment authority was added. Tests use synthetic fixtures only; no
 deployment or private data was used. Reassess remaining roadmap acceptance only
 after this records change passes exact PR and merged-main PostgreSQL 16/17 CI
 and the bounded writer slice is explicitly released.
+
+## Current evidence/control-plane roadmap complete — 2026-10-12
+
+Canonical records PR #22 accepted the claim-bound outcome checkpoint at head
+`4c63e40f04ca60d808acd65eb69703a89fe67d56`. Exact PR-event run
+`38195851041` and exact merged-main run `38195962720` each passed 720 product
+tests on PostgreSQL 16 and 17 with zero failures and zero product skips. The
+records merge produced current accepted main
+`50b4461f5dbb291eb36f7095f37420b430264390`, and the bounded writer release was
+recorded on PR #22.
+
+The scoped AIR evidence/control-plane roadmap is therefore complete: tenant
+isolation and RLS, append-only evidence, deterministic proposal/sandbox/replay
+and verification, exact target/revision/evidence binding, explicit persisted
+human approval, target-state-bound execution planning, permanent single-use
+pre-execution claims and claim-bound outcome evidence are all accepted. This
+final review adds no runtime behavior and does not claim that a deployment was
+performed.
+
+AIR still intentionally contains no deployment executor, command, URL,
+credential, callback, transport or production endpoint. Such capability is not
+an incomplete item in this scoped roadmap; it is separately authorized future
+scope that must begin with a new explicit safety and ownership decision. Until
+then, no production execution is authorized.

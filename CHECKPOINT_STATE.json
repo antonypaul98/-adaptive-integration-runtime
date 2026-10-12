@@ -1,26 +1,26 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
-  "current_checkpoint": "pre-execution claim-bound outcome evidence",
-  "active_branch": "work/deployment-authorization-boundary",
-  "main_sha_at_start": "11c276a573e412f96cd12ca2f87a9e9861500ef4",
-  "current_branch_sha": "3c0514a6874748de865758425649a69e79f06a42",
+  "current_checkpoint": "AIR evidence/control-plane roadmap final acceptance",
+  "active_branch": "main",
+  "main_sha_at_start": "50b4461f5dbb291eb36f7095f37420b430264390",
+  "current_branch_sha": "50b4461f5dbb291eb36f7095f37420b430264390",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Source head 3c0514a6 is merged through PR #21. Exact PR-event and merged-main PostgreSQL 16/17 CI each passed 720 product tests with zero database skips. Canonical acceptance records are the only pending write.",
-  "local_test_status": "Pinned Python 3.12.14: 25 focused execution plan/claim/outcome tests passed; complete non-PostgreSQL suite 423 passed with 297 PostgreSQL tests deselected; dependency check, compilation and whitespace validation passed. Records preflight preserved all worktrees and stopped as designed because the active branch is checked out elsewhere.",
-  "pr_number": 21,
+  "branch_remote_status": "Claim-bound outcome source PR #21 and canonical records PR #22 are merged. Exact PR-event and merged-main PostgreSQL 16/17 CI passed 720 product tests with zero database skips. No open source PR or authorized deployment executor exists; this records-only final acceptance review is pending its own exact CI.",
+  "local_test_status": "Pinned Python 3.12.14: complete non-PostgreSQL suite 423 passed with 297 PostgreSQL tests deselected; JSON, compilation, dependency and whitespace validation passed. Final-review preflight preserved all worktrees and stopped as designed because the historical active branch is checked out elsewhere.",
+  "pr_number": 22,
   "ci_status": "success",
-  "merge_status": "MERGED_AND_VERIFIED_RECORDS_PENDING",
+  "merge_status": "SCOPED_ROADMAP_ACCEPTED_FINAL_RECORD_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish this canonical records update, require exact records PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, then release the bounded writer slice and reassess remaining roadmap acceptance without adding deployment authority.",
+  "next_action": "Publish this records-only final acceptance review, require exact PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, and release the bounded writer slice. Do not implement a deployment executor without separate explicit authorization.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-12T02:25:00Z",
-  "observed_branch_sha": "3c0514a6874748de865758425649a69e79f06a42",
+  "observed_at_utc": "2026-10-12T04:21:44Z",
+  "observed_branch_sha": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
   "observed_feature_sha": "3c0514a6874748de865758425649a69e79f06a42",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
@@ -30,12 +30,12 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 21,
+    "number": 22,
     "state": "closed",
     "merged": true,
-    "head_sha": "3c0514a6874748de865758425649a69e79f06a42",
-    "merge_commit_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/21"
+    "head_sha": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
+    "merge_commit_sha": "50b4461f5dbb291eb36f7095f37420b430264390",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/22"
   },
   "ci_state": {
     "status": "success",
@@ -106,15 +106,39 @@
     "database_tests_executed": true,
     "zero_database_skips_required": true,
     "separate_infrastructure_suite": "15 passed; one unrelated Memory-only diagnostic skipped, not a database test",
-    "records_ci": "pending"
+    "records_ci": {
+      "status": "success",
+      "pr_run": {
+        "id": 38195851041,
+        "sha": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
+        "event": "pull_request",
+        "conclusion": "success"
+      },
+      "merged_main_run": {
+        "id": 38195962720,
+        "sha": "50b4461f5dbb291eb36f7095f37420b430264390",
+        "event": "push",
+        "conclusion": "success"
+      },
+      "postgres_16": {
+        "passed": 720,
+        "failed": 0,
+        "skipped": 0
+      },
+      "postgres_17": {
+        "passed": 720,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
   },
   "stabilization_scope": "Append-only outcome evidence now requires the exact persisted tenant-scoped pre-execution claim and binds its artifact/content hash, executor identity hash and nonce hash to the plan, target state, approval, proposal, verification, revision and target. No command, URL, credential, callback, transport, production endpoint or deployment execution was added.",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "PR #21 merged after exact PR-event and merged-main PostgreSQL 16/17 validation; 720 product tests per matrix with zero product skips. Pinned local focused and non-PostgreSQL validation passed. Canonical records await their own CI.",
-    "REMOTE_SHA": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
-    "NEXT_ACTION": "Publish this canonical records update, require exact records PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, then release the bounded writer slice."
+    "SAFE_WORK_COMPLETED": "PR #21 source and PR #22 canonical records merged after exact PR-event and merged-main PostgreSQL 16/17 validation; 720 product tests per matrix with zero product skips. The current evidence/control-plane roadmap is fully accepted without adding deployment authority.",
+    "REMOTE_SHA": "50b4461f5dbb291eb36f7095f37420b430264390",
+    "NEXT_ACTION": "Publish and validate this records-only final acceptance review, then release the writer slice. Any deployment executor requires separate explicit authorization."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -126,12 +150,12 @@
     "physical_camera": "not_run",
     "new_head_CI": "intentionally_not_run"
   },
-  "next_checkpoint": "remaining deployment-execution acceptance review (reassess after records acceptance)",
+  "next_checkpoint": "separately authorized future roadmap only; no deployment executor is currently authorized",
   "replay_started": true,
   "checkpoint_status": "COMPLETE",
-  "merge_commit_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
-  "verified_main_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
-  "final_pr_head": "3c0514a6874748de865758425649a69e79f06a42",
+  "merge_commit_sha": "50b4461f5dbb291eb36f7095f37420b430264390",
+  "verified_main_sha": "50b4461f5dbb291eb36f7095f37420b430264390",
+  "final_pr_head": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -215,7 +239,7 @@
     "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
   },
-  "recorded_at_utc": "2026-10-12T02:25:00Z",
+  "recorded_at_utc": "2026-10-12T04:21:44Z",
   "previous_final_approval_receipt": {
     "current_checkpoint": "persisted target-bound final approval",
     "checkpoint_status": "COMPLETE",
@@ -282,17 +306,42 @@
   },
   "writer_handoff": {
     "owner": "AIR Hourly Build",
-    "ownership_id": "AIR-HOURLY-CLAIM-BOUND-OUTCOME-20261011",
-    "status": "release_after_records_ci",
-    "source_writing_stopped": false,
+    "ownership_id": "AIR-HOURLY-FINAL-SCOPED-ACCEPTANCE-20261012",
+    "status": "release_after_final_acceptance_ci",
+    "source_writing_stopped": true,
     "next_owner": "AIR Hourly Build",
-    "source_head": "3c0514a6874748de865758425649a69e79f06a42",
-    "merge_commit": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
-    "pr": 21,
-    "release_condition": "Canonical records PR merged and exact records merged-main PostgreSQL 16/17 CI green.",
+    "source_head": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
+    "merge_commit": "50b4461f5dbb291eb36f7095f37420b430264390",
+    "pr": 22,
+    "release_condition": "Final records-only acceptance PR merged and exact merged-main PostgreSQL 16/17 CI green.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,
-    "recorded_at": "2026-10-12T02:25:00Z"
+    "recorded_at": "2026-10-12T04:21:44Z"
+  },
+  "claim_bound_outcome_receipt": {
+    "status": "COMPLETE",
+    "source_sha": "3c0514a6874748de865758425649a69e79f06a42",
+    "source_pr": 21,
+    "source_merge_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
+    "source_pr_ci_run": 38179947015,
+    "source_merged_main_ci_run": 38195586739,
+    "records_sha": "4c63e40f04ca60d808acd65eb69703a89fe67d56",
+    "records_pr": 22,
+    "records_merge_sha": "50b4461f5dbb291eb36f7095f37420b430264390",
+    "records_pr_ci_run": 38195851041,
+    "records_merged_main_ci_run": 38195962720,
+    "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/22#issuecomment-6116688162",
+    "postgres_16": {
+      "passed": 720,
+      "failed": 0,
+      "skipped": 0
+    },
+    "postgres_17": {
+      "passed": 720,
+      "failed": 0,
+      "skipped": 0
+    },
+    "scope": "Exact tenant-scoped pre-execution claim required before append-only outcome evidence; no executor or deployment authority."
   },
   "previous_execution_outcome_receipt": {
     "checkpoint": "append-only single-use execution outcome evidence",
@@ -380,7 +429,7 @@
     }
   },
   "pre_execution_claim_receipt": {
-    "status": "SOURCE_ACCEPTED_RECORDS_PENDING",
+    "status": "COMPLETE",
     "source_sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
     "source_tree_sha": "8dda7ba8830f1da166efa38d58065090515f786d",
     "pr": 19,
