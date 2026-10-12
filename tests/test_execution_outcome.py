@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 
+from air.execution_claim import claim_execution
 from air.execution_outcome import (
     ExecutionOutcomeError,
     load_execution_outcome,
@@ -67,8 +68,19 @@ def plan(tenant=TENANT):
     }))
 
 
-def record(tx, source, **overrides):
+def claim(tx, source):
+    return claim_execution(
+        tx, source, plan_hash=source.content_hash,
+        observed_target_state_hash="2" * 64,
+        executor_identity_hash="8" * 64,
+        claim_nonce_hash="9" * 64)
+
+
+def record(tx, source, *, saved_claim=None, **overrides):
+    if saved_claim is None:
+        saved_claim = claim(tx, source)
     args = {
+        "claim_id": saved_claim["artifact_id"],
         "plan_hash": source.content_hash,
         "observed_target_state_hash": "2" * 64,
         "status": "succeeded",
@@ -84,10 +96,18 @@ def test_outcome_is_append_only_single_use_and_idempotent():
     source = plan()
     saved = record(tx, source)
     assert record(tx, source) == saved
-    assert len(tx.records) == 1
+    assert len(tx.records) == 2
     body = json.loads(saved["payload"])
     assert body["purpose"] == "APPEND_ONLY_OUTCOME_EVIDENCE_NO_DEPLOYMENT_EXECUTION"
     assert body["plan_hash"] == source.content_hash
+    assert body["claim"] == {
+        "artifact_id": str(next(record for (kind, _), record in tx.records.items()
+                           if kind == "execution_claim")["artifact_id"]),
+        "artifact_hash": next(record for (kind, _), record in tx.records.items()
+                              if kind == "execution_claim")["content_hash"],
+        "executor_identity_hash": "8" * 64,
+        "claim_nonce_hash": "9" * 64,
+    }
     assert load_execution_outcome(tx, saved["artifact_id"]) == saved
     with pytest.raises(ExecutionOutcomeError, match="plan_already_consumed"):
         record(tx, source, status="failed", outcome_hash="8" * 64,
@@ -104,15 +124,28 @@ def test_outcome_is_append_only_single_use_and_idempotent():
 ])
 def test_mismatched_or_unbounded_outcome_fails_closed(overrides):
     tx = Tx()
+    source = plan()
+    saved_claim = claim(tx, source)
     with pytest.raises(ExecutionOutcomeError):
-        record(tx, plan(), **overrides)
+        record(tx, source, saved_claim=saved_claim, **overrides)
+    assert not any(kind == "execution_outcome" for kind, _ in tx.records)
+
+
+def test_outcome_requires_exact_persisted_claim():
+    tx = Tx()
+    source = plan()
+    with pytest.raises(ExecutionOutcomeError, match="claim_not_found_or_invalid"):
+        record_execution_outcome(
+            tx, source, claim_id=uuid4(), plan_hash=source.content_hash,
+            observed_target_state_hash="2" * 64, status="succeeded",
+            outcome_hash="7" * 64, reason_code="verified_completion")
     assert tx.records == {}
 
 
 def test_cross_tenant_plan_fails_closed():
     tx = Tx(UUID("00000000-0000-0000-0000-000000000002"))
     with pytest.raises(ExecutionOutcomeError):
-        record(tx, plan())
+        record(tx, plan(), saved_claim={"artifact_id": uuid4()})
     assert tx.records == {}
 
 

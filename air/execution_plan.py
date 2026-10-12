@@ -3,8 +3,9 @@
 The plan binds a freshly revalidated execution-boundary receipt to an exact
 caller-observed target-state hash. It deliberately contains no command, URL,
 credential, callback, transport, or mutable execution state. A future executor
-must independently re-read the target, reproduce ``target_state_hash``, consume
-the plan once, and record append-only outcome evidence before taking any action.
+must independently re-read the target, reproduce ``target_state_hash``, claim
+the plan once before taking any consequential action, and record append-only
+outcome evidence afterward.
 """
 from dataclasses import dataclass
 from hashlib import sha256
