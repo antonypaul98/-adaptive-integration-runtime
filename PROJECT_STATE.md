@@ -438,3 +438,28 @@ executor, production endpoint or deployment capability. Tests use synthetic
 fixtures; no deployment or private data was used. Reassess the next smallest
 roadmap-critical safeguard only after this records change passes exact PR and
 merged-main PostgreSQL 16/17 CI and the bounded writer slice is released.
+
+## Pre-execution claim-bound outcome evidence — accepted 2026-10-11
+
+PR #21 closes the evidence sequence by requiring the exact persisted,
+tenant-scoped pre-execution claim before an execution outcome can be recorded.
+The outcome binds the claim artifact and content hashes, executor-identity hash
+and nonce hash to the exact execution plan, observed target state, approval,
+proposal, verification, revision and target. Missing, invalid, cross-tenant or
+plan-mismatched claims fail before any outcome audit write.
+
+Final source head `3c0514a6874748de865758425649a69e79f06a42`
+passed exact PR-event run `38179947015`: PostgreSQL 16 and 17 each reported
+720 passed, zero failed and zero product skips. Guarded merge commit
+`c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2` passed exact merged-main run
+`38195586739` with the same 720/0/0 result on both database versions. Pinned
+Python 3.12.14 focused validation reported 25 passed; the complete local
+non-PostgreSQL suite reported 423 passed with 297 PostgreSQL cases deselected.
+Compilation, dependency and whitespace checks passed.
+
+The claim and outcome remain evidence artifacts, not execution credentials.
+No executor, command, URL, credential, callback, transport, production endpoint
+or deployment authority was added. Tests use synthetic fixtures only; no
+deployment or private data was used. Reassess remaining roadmap acceptance only
+after this records change passes exact PR and merged-main PostgreSQL 16/17 CI
+and the bounded writer slice is explicitly released.

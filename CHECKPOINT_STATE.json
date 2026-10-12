@@ -1,27 +1,27 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
-  "current_checkpoint": "pre-execution single-use claim evidence",
+  "current_checkpoint": "pre-execution claim-bound outcome evidence",
   "active_branch": "work/deployment-authorization-boundary",
-  "main_sha_at_start": "779ae8b955f04c64d2bee89f782253bbacb2188b",
-  "current_branch_sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
+  "main_sha_at_start": "11c276a573e412f96cd12ca2f87a9e9861500ef4",
+  "current_branch_sha": "3c0514a6874748de865758425649a69e79f06a42",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Source head b8098cf0 is merged through PR #19. Exact PR-event and merged-main PostgreSQL 16/17 CI each passed 719 product tests with zero database skips. Canonical acceptance records are the only pending write.",
-  "local_test_status": "Pinned Python 3.12.14: 24 focused execution claim/plan/outcome tests passed; complete non-PostgreSQL suite 422 passed with 297 PostgreSQL tests deselected; dependency check, compilation and whitespace validation passed. Current records preflight preserved a clean checkout and reported only the expected one local merge commit relative to the feature ref.",
-  "pr_number": 19,
+  "branch_remote_status": "Source head 3c0514a6 is merged through PR #21. Exact PR-event and merged-main PostgreSQL 16/17 CI each passed 720 product tests with zero database skips. Canonical acceptance records are the only pending write.",
+  "local_test_status": "Pinned Python 3.12.14: 25 focused execution plan/claim/outcome tests passed; complete non-PostgreSQL suite 423 passed with 297 PostgreSQL tests deselected; dependency check, compilation and whitespace validation passed. Records preflight preserved all worktrees and stopped as designed because the active branch is checked out elsewhere.",
+  "pr_number": 21,
   "ci_status": "success",
   "merge_status": "MERGED_AND_VERIFIED_RECORDS_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish this canonical records update, require exact records PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, then release the bounded writer slice.",
+  "next_action": "Publish this canonical records update, require exact records PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, then release the bounded writer slice and reassess remaining roadmap acceptance without adding deployment authority.",
   "feature_checkpoint_advanced": true,
   "diagnostic_import": "air",
   "diagnostic_postgres_variables": [
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-11T15:24:00Z",
-  "observed_branch_sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
-  "observed_feature_sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
+  "observed_at_utc": "2026-10-12T02:25:00Z",
+  "observed_branch_sha": "3c0514a6874748de865758425649a69e79f06a42",
+  "observed_feature_sha": "3c0514a6874748de865758425649a69e79f06a42",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
@@ -30,46 +30,46 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 19,
+    "number": 21,
     "state": "closed",
     "merged": true,
-    "head_sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
-    "merge_commit_sha": "26d356307586244f9513486220453c5cbc82eb10",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/19"
+    "head_sha": "3c0514a6874748de865758425649a69e79f06a42",
+    "merge_commit_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/21"
   },
   "ci_state": {
     "status": "success",
     "source_push_run": {
-      "id": 38135255687,
-      "sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
+      "id": 38179945150,
+      "sha": "3c0514a6874748de865758425649a69e79f06a42",
       "event": "push",
       "conclusion": "success"
     },
     "pr_run": {
-      "id": 38135265920,
-      "sha": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
+      "id": 38179947015,
+      "sha": "3c0514a6874748de865758425649a69e79f06a42",
       "event": "pull_request",
       "conclusion": "success"
     },
     "merged_main_run": {
-      "id": 38146952311,
-      "sha": "26d356307586244f9513486220453c5cbc82eb10",
+      "id": 38195586739,
+      "sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
       "event": "push",
       "conclusion": "success"
     },
     "pr_jobs": [
       {
-        "job": 114457730243,
+        "job": 114590188185,
         "name": "postgres (16)",
-        "passed": 719,
+        "passed": 720,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 114457730120,
+        "job": 114590188059,
         "name": "postgres (17)",
-        "passed": 719,
+        "passed": 720,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
@@ -77,29 +77,29 @@
     ],
     "merged_main_jobs": [
       {
-        "job": 114492214528,
+        "job": 114637369196,
         "name": "postgres (16)",
-        "passed": 719,
+        "passed": 720,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 114492214321,
+        "job": 114637369007,
         "name": "postgres (17)",
-        "passed": 719,
+        "passed": 720,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       }
     ],
     "postgres_16": {
-      "passed": 719,
+      "passed": 720,
       "failed": 0,
       "skipped": 0
     },
     "postgres_17": {
-      "passed": 719,
+      "passed": 720,
       "failed": 0,
       "skipped": 0
     },
@@ -108,12 +108,12 @@
     "separate_infrastructure_suite": "15 passed; one unrelated Memory-only diagnostic skipped, not a database test",
     "records_ci": "pending"
   },
-  "stabilization_scope": "Append-only outcome evidence consumes an exact execution plan once, permits byte-identical retries, and binds tenant, authorization boundary, approval, verification, target revision and observed target state. No command, URL, credential, callback, transport, production endpoint or deployment execution was added.",
+  "stabilization_scope": "Append-only outcome evidence now requires the exact persisted tenant-scoped pre-execution claim and binds its artifact/content hash, executor identity hash and nonce hash to the plan, target state, approval, proposal, verification, revision and target. No command, URL, credential, callback, transport, production endpoint or deployment execution was added.",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "PR #19 merged after exact PR-event and merged-main PostgreSQL 16/17 validation; 719 product tests per matrix with zero product skips. Pinned local focused and non-PostgreSQL validation passed. Canonical records await their own CI.",
-    "REMOTE_SHA": "26d356307586244f9513486220453c5cbc82eb10",
+    "SAFE_WORK_COMPLETED": "PR #21 merged after exact PR-event and merged-main PostgreSQL 16/17 validation; 720 product tests per matrix with zero product skips. Pinned local focused and non-PostgreSQL validation passed. Canonical records await their own CI.",
+    "REMOTE_SHA": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
     "NEXT_ACTION": "Publish this canonical records update, require exact records PR-event PostgreSQL 16/17 CI, merge with the expected head, verify exact merged-main CI, then release the bounded writer slice."
   },
   "infrastructure_validation": {
@@ -126,12 +126,12 @@
     "physical_camera": "not_run",
     "new_head_CI": "intentionally_not_run"
   },
-  "next_checkpoint": "next bounded deployment-execution safeguard (reassess after records acceptance)",
+  "next_checkpoint": "remaining deployment-execution acceptance review (reassess after records acceptance)",
   "replay_started": true,
   "checkpoint_status": "COMPLETE",
-  "merge_commit_sha": "26d356307586244f9513486220453c5cbc82eb10",
-  "verified_main_sha": "26d356307586244f9513486220453c5cbc82eb10",
-  "final_pr_head": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
+  "merge_commit_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
+  "verified_main_sha": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
+  "final_pr_head": "3c0514a6874748de865758425649a69e79f06a42",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -215,7 +215,7 @@
     "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
   },
-  "recorded_at_utc": "2026-10-11T15:24:00Z",
+  "recorded_at_utc": "2026-10-12T02:25:00Z",
   "previous_final_approval_receipt": {
     "current_checkpoint": "persisted target-bound final approval",
     "checkpoint_status": "COMPLETE",
@@ -282,17 +282,17 @@
   },
   "writer_handoff": {
     "owner": "AIR Hourly Build",
-    "ownership_id": "AIR-HOURLY-EXECUTION-CLAIM-20261011",
+    "ownership_id": "AIR-HOURLY-CLAIM-BOUND-OUTCOME-20261011",
     "status": "release_after_records_ci",
     "source_writing_stopped": false,
     "next_owner": "AIR Hourly Build",
-    "source_head": "b8098cf08dfe6f8f300a2cfff43ad4145d7bd290",
-    "merge_commit": "26d356307586244f9513486220453c5cbc82eb10",
-    "pr": 19,
+    "source_head": "3c0514a6874748de865758425649a69e79f06a42",
+    "merge_commit": "c0e6aded42dc7c6c31a43c9ae70fbbddcb4832b2",
+    "pr": 21,
     "release_condition": "Canonical records PR merged and exact records merged-main PostgreSQL 16/17 CI green.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,
-    "recorded_at": "2026-10-11T15:24:00Z"
+    "recorded_at": "2026-10-12T02:25:00Z"
   },
   "previous_execution_outcome_receipt": {
     "checkpoint": "append-only single-use execution outcome evidence",
