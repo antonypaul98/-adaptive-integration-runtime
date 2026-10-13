@@ -496,3 +496,9 @@ competitive roadmap. The durable sequence and acceptance criteria are in
 accepted. AIR-23 starts with a deterministic, privacy-conscious explanation of
 bounded replay mismatches. It is diagnostic-only and does not infer proven root
 cause, execute repairs, access production payloads, or grant deployment authority.
+
+The first AIR-23 source slice was merged through PR #24. Exact PR-event run
+`38351555551` and exact merged-main run `38351716887` each passed 730 tests on
+PostgreSQL 16 and 17 with zero failures and zero skips. AIR-23 remains in
+progress: candidate-cause correlation across lifecycle evidence and persisted
+tenant-scoped investigation evidence are not yet implemented or accepted.
