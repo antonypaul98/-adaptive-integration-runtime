@@ -487,3 +487,12 @@ credential, callback, transport or production endpoint. Such capability is not
 an incomplete item in this scoped roadmap; it is separately authorized future
 scope that must begin with a new explicit safety and ownership decision. Until
 then, no production execution is authorized.
+
+## Competitive roadmap authorized — 2026-10-13
+
+AIR-23 through AIR-34 are separately authorized as an offline/read-only
+competitive roadmap. The durable sequence and acceptance criteria are in
+`docs/COMPETITIVE_ROADMAP.md`; the earlier evidence/control-plane roadmap stays
+accepted. AIR-23 starts with a deterministic, privacy-conscious explanation of
+bounded replay mismatches. It is diagnostic-only and does not infer proven root
+cause, execute repairs, access production payloads, or grant deployment authority.
