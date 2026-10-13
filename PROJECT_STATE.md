@@ -503,10 +503,13 @@ PostgreSQL 16 and 17 with zero failures and zero skips. AIR-23 remains in
 progress: candidate-cause correlation across lifecycle evidence and persisted
 tenant-scoped investigation evidence are not yet implemented or accepted.
 
-The next bounded source slice adds caller-declared replay-case to dependency-
+The second bounded source slice adds caller-declared replay-case to dependency-
 impact correlation. It fails closed on noncanonical or mismatched evidence,
 binds exact investigation/change/impact hashes, emits no contract locations or
 dependency names, and labels every candidate as correlation rather than causal
-proof. This remains offline and diagnostic-only. Exact PR-head PostgreSQL 16/17
-CI, merge verification, canonical records, tenant-scoped persistence and wider
-cross-evidence correlation remain pending.
+proof. Source head `8f75c1dda0e8bc55dcb4f30b305d598e3ec1b448`
+passed exact PR-event run `38383623654`, and merge
+`34bf72d59c9a6203efe41028f916dfc1c93b1f90` passed exact merged-main run
+`38383837836`; PostgreSQL 16/17 each reported 740 passed, zero failures and zero
+skips in both runs. This remains offline and diagnostic-only. Canonical records,
+tenant-scoped persistence and wider cross-evidence correlation remain pending.
