@@ -9,6 +9,7 @@ import pytest
 
 from air import failure_investigation as fi
 from air.postgres import canonical_json
+from test_repair_evidence import reviewer
 from test_replay_verification import fixture, run
 from test_replay_verification_postgres import approved, sandbox
 from test_workflow_evidence import saved
