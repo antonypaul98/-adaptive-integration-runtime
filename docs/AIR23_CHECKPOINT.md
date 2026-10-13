@@ -35,6 +35,21 @@ and diagnostic-only authority remain explicit. This is still an offline,
 read-only source slice: persistence, tenant-scoped retrieval, sandbox/replay
 cross-evidence correlation, and AIR-23 acceptance remain future work.
 
+## Candidate correlation source slice verified — 2026-10-13
+
+Source head `8f75c1dda0e8bc55dcb4f30b305d598e3ec1b448` passed exact
+PR-event run `38383623654`; PostgreSQL 16 and 17 each reported 740 passed,
+zero failed and zero skipped. Guarded PR #26 merge
+`34bf72d59c9a6203efe41028f916dfc1c93b1f90` passed exact merged-main
+run `38383837836` with the same 740/0/0 result on both versions.
+
+Pinned local Python 3.12.14 validation: 70 focused tests passed; the complete
+non-PostgreSQL suite passed 443 tests with 297 database tests explicitly
+deselected for CI. Infrastructure passed 15 tests with one established
+Memory-only skip. Dependency, diagnostics, compilation, JSON and whitespace
+checks passed. This receipt verifies the second source slice, not AIR-23
+completion.
+
 ## First source slice verified — 2026-10-13
 
 Source head `249245f95e3078c3115520101384c98d37c9200e` passed exact
