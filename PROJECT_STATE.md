@@ -502,3 +502,11 @@ The first AIR-23 source slice was merged through PR #24. Exact PR-event run
 PostgreSQL 16 and 17 with zero failures and zero skips. AIR-23 remains in
 progress: candidate-cause correlation across lifecycle evidence and persisted
 tenant-scoped investigation evidence are not yet implemented or accepted.
+
+The next bounded source slice adds caller-declared replay-case to dependency-
+impact correlation. It fails closed on noncanonical or mismatched evidence,
+binds exact investigation/change/impact hashes, emits no contract locations or
+dependency names, and labels every candidate as correlation rather than causal
+proof. This remains offline and diagnostic-only. Exact PR-head PostgreSQL 16/17
+CI, merge verification, canonical records, tenant-scoped persistence and wider
+cross-evidence correlation remain pending.
