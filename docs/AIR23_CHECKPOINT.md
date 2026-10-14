@@ -36,6 +36,21 @@ This persistence slice performs no replay, repair, external call, approval,
 deployment, or production action. Candidate-correlation persistence and wider
 sandbox/replay lifecycle correlation remain future AIR-23 work.
 
+## Tenant-scoped persistence source slice verified — 2026-10-14
+
+Source head `a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a` passed exact
+PR-event run `38533849307`; PostgreSQL 16 and 17 each reported 760 passed,
+zero failed and zero skipped. Guarded PR #28 merge
+`44eba7b512d026d3d06f09bbab78d4318bc5202c` passed exact merged-main
+run `38534116977` with the same 760/0/0 result on both versions.
+
+Pinned local Python 3.12.14 validation: 22 focused tests passed; the complete
+non-PostgreSQL suite passed 445 tests with 315 database tests explicitly
+deselected for CI. Infrastructure passed 15 tests with one established
+Memory-only skip. Dependency, diagnostics, migration-resource and whitespace
+checks passed. This receipt verifies the third source slice, not AIR-23
+completion; roadmap acceptance remains 0/12.
+
 ## Candidate correlation source slice
 
 `air.failure_investigation.correlate_candidates` accepts only explicit,
