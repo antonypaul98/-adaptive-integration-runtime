@@ -18,6 +18,24 @@ artifacts; preserve tenant isolation for persisted investigations; expose
 unsupported evidence and ambiguity; and pass exact PostgreSQL 16/17 CI. No
 candidate may be presented as causal proof without direct evidence.
 
+## Tenant-scoped investigation evidence
+
+`persist_investigation` derives a redacted report only from an exact immutable
+`replay_verification` artifact and stores it through the existing tenant RLS,
+append-only artifact, content-hash, and audit boundaries. The record binds the
+replay artifact identity and hash to canonical report bytes; `load_investigation`
+recomputes the report from replay evidence before returning it.
+
+Migration 011 independently checks the same-tenant replay link, report hash,
+fixed schema, exact replay status and case hashes, finding identities, coverage,
+uncertainty, and diagnostic-only authority even for direct SQL inserts. Raw
+fixture values and paths are not copied into investigation evidence. Cross-tenant
+reads and forged links fail closed, and byte-identical retries remain idempotent.
+
+This persistence slice performs no replay, repair, external call, approval,
+deployment, or production action. Candidate-correlation persistence and wider
+sandbox/replay lifecycle correlation remain future AIR-23 work.
+
 ## Candidate correlation source slice
 
 `air.failure_investigation.correlate_candidates` accepts only explicit,

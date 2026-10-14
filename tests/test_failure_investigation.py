@@ -6,8 +6,10 @@ import pytest
 from air.change_intelligence import compare_openapi
 from air.dependency_impact import Dependency, ImpactReport, analyze_changes
 from air import failure_investigation as fi
+from air import sandbox_evaluation as se
 from air import replay_verification as replay
 from air.postgres import canonical_json
+from test_repair_proposal import context, decide, make
 
 
 def fixture(expected="expected"):
@@ -238,3 +240,39 @@ def test_candidate_link_bound_is_fail_closed(monkeypatch):
     with pytest.raises(fi.InvestigationError, match="candidate_link_limit"):
         fi.correlate_candidates(investigation, changes, report,
                                 [fi.CandidateLink("field", impact_id)] * 2)
+
+
+def test_persisted_investigation_is_exactly_replay_bound_and_redacted(context):
+    tx, impact, _ = context
+    proposal = make(context)
+    decide(tx, proposal)
+    sandbox = se.evaluate(
+        tx, proposal["artifact_id"], proposal_hash=proposal["content_hash"],
+        revision=1, current_impact_id=impact["artifact_id"],
+    )
+    verification = replay.replay(
+        tx, proposal["artifact_id"], proposal_hash=proposal["content_hash"],
+        revision=1, current_impact_id=impact["artifact_id"],
+        sandbox_id=sandbox["artifact_id"], sandbox_hash=sandbox["content_hash"],
+        fixture=fixture("synthetic-private-expected"),
+    )
+
+    first = fi.persist_investigation(tx, verification["artifact_id"])
+    second = fi.persist_investigation(tx, verification["artifact_id"])
+    assert first == second
+    assert fi.load_investigation(tx, first["artifact_id"]) == first
+    payload = json.loads(first["payload"])
+    report = json.loads(payload["report_payload"])
+    assert payload["verification"] == {
+        "artifact_id": str(verification["artifact_id"]),
+        "artifact_hash": verification["content_hash"],
+    }
+    assert report["source"]["status"] == "FAIL"
+    assert "synthetic-private-expected" not in first["payload"]
+    assert "path" not in report
+
+
+def test_persistence_rejects_unknown_verification(context):
+    tx, _, _ = context
+    with pytest.raises(fi.InvestigationError, match="verification_not_found_or_invalid"):
+        fi.persist_investigation(tx, "00000000-0000-0000-0000-000000000001")

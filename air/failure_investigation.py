@@ -17,6 +17,7 @@ from .postgres import canonical_json
 
 
 VERSION = "air-failure-investigation-v1"
+RECORD_VERSION = "air-failure-investigation-record-v1"
 CORRELATION_VERSION = "air-failure-correlation-v1"
 MAX_CANDIDATE_LINKS = 128
 _HASH = re.compile(r"[0-9a-f]{64}")
@@ -72,19 +73,29 @@ class CandidateCorrelation:
         return sha256(self.payload_json.encode("utf-8")).hexdigest()
 
 
-def investigate_replay(state: object, fixture: object) -> FailureInvestigation:
-    """Explain exact recorded projection mismatches without exposing values.
-
-    Validation and resource limits are inherited from the accepted replay
-    boundary.  Findings contain only case identifiers and already-produced
-    hashes; raw state, paths, expected values, and exception details are absent.
-    """
-
-    normalized = replay.normalize_fixture(fixture)
-    result = replay.compare(state, normalized)
-    fixture_hash = replay.digest(normalized)
+def _investigate_result(fixture_hash: object, result: object) -> FailureInvestigation:
+    """Build a redacted report from validated replay-result evidence."""
+    if not isinstance(fixture_hash, str) or not _HASH.fullmatch(fixture_hash):
+        raise InvestigationError("invalid_fixture_hash")
+    if (not isinstance(result, dict) or set(result) != {"status", "cases"}
+            or result["status"] not in {"PASS", "FAIL"}
+            or not isinstance(result["cases"], list)
+            or not 1 <= len(result["cases"]) <= replay.MAX_CASES):
+        raise InvestigationError("invalid_replay_result")
+    seen = set()
     findings = []
     for case in result["cases"]:
+        if (not isinstance(case, dict)
+                or set(case) != {"case_id", "actual_hash", "expected_hash", "matches"}
+                or not isinstance(case["case_id"], str)
+                or not re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", case["case_id"])
+                or case["case_id"] in seen
+                or any(not isinstance(case[name], str) or not _HASH.fullmatch(case[name])
+                       for name in ("actual_hash", "expected_hash"))
+                or type(case["matches"]) is not bool
+                or case["matches"] != (case["actual_hash"] == case["expected_hash"])):
+            raise InvestigationError("invalid_replay_case")
+        seen.add(case["case_id"])
         if case["matches"]:
             continue
         evidence = {
@@ -109,6 +120,8 @@ def investigate_replay(state: object, fixture: object) -> FailureInvestigation:
         })
 
     findings.sort(key=lambda finding: (finding["case_id"], finding["finding_id"]))
+    if (result["status"] == "FAIL") != bool(findings):
+        raise InvestigationError("inconsistent_replay_result")
     payload = {
         "investigation_version": VERSION,
         "source": {
@@ -132,6 +145,84 @@ def investigate_replay(state: object, fixture: object) -> FailureInvestigation:
         "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_OR_EXECUTION_AUTHORITY",
     }
     return FailureInvestigation(canonical_json(payload))
+
+
+def investigate_replay(state: object, fixture: object) -> FailureInvestigation:
+    """Explain exact recorded projection mismatches without exposing values.
+
+    Validation and resource limits are inherited from the accepted replay
+    boundary.  Findings contain only case identifiers and already-produced
+    hashes; raw state, paths, expected values, and exception details are absent.
+    """
+
+    normalized = replay.normalize_fixture(fixture)
+    return _investigate_result(replay.digest(normalized), replay.compare(state, normalized))
+
+
+def persist_investigation(tx, verification_id: object) -> dict:
+    """Persist a redacted report bound to exact immutable replay evidence.
+
+    Historical replay evidence is diagnostic input only.  This function does
+    not re-run a proposal, authorize a repair, or grant deployment authority.
+    """
+    try:
+        verification = replay.load_verification(tx, verification_id)
+        source = json.loads(verification["payload"])
+        report = _investigate_result(source["fixture_hash"], source["result"])
+        payload = {
+            "tenant_id": str(tx.tenant_id),
+            "investigation_record_version": RECORD_VERSION,
+            "verification": {
+                "artifact_id": str(verification["artifact_id"]),
+                "artifact_hash": verification["content_hash"],
+            },
+            "report_hash": report.content_hash,
+            "report_payload": report.payload_json,
+        }
+        key = _digest(payload)
+        return tx.put("failure_investigation", key, payload)
+    except replay.ReplayError as exc:
+        raise InvestigationError("verification_not_found_or_invalid") from exc
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        if isinstance(exc, InvestigationError):
+            raise
+        raise InvestigationError("investigation_persistence_rejected") from exc
+
+
+def load_investigation(tx, identity: object) -> dict:
+    """Reload and revalidate tenant-bound immutable investigation evidence."""
+    try:
+        record = tx.get_by_id(identity, kind="failure_investigation")
+    except (TypeError, ValueError):
+        record = None
+    if record is None or record["tenant_id"] != tx.tenant_id:
+        raise InvestigationError("not_found_or_not_authorized")
+    try:
+        payload = json.loads(record["payload"])
+        verification = replay.load_verification(
+            tx, payload["verification"]["artifact_id"])
+        source = json.loads(verification["payload"])
+        report = _investigate_result(source["fixture_hash"], source["result"])
+        expected = {
+            "tenant_id": str(tx.tenant_id),
+            "investigation_record_version": RECORD_VERSION,
+            "verification": {
+                "artifact_id": str(verification["artifact_id"]),
+                "artifact_hash": verification["content_hash"],
+            },
+            "report_hash": report.content_hash,
+            "report_payload": report.payload_json,
+        }
+        expected_json = canonical_json(expected)
+        if (record["payload"] != expected_json
+                or record["idempotency_key"] != _digest(expected)
+                or record["content_hash"] != _digest(expected)):
+            raise InvestigationError("invalid_persisted_investigation")
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError, replay.ReplayError) as exc:
+        if isinstance(exc, InvestigationError):
+            raise
+        raise InvestigationError("invalid_persisted_investigation") from exc
+    return record
 
 
 def _digest(value: object) -> str:
