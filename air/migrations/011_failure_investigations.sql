@@ -104,8 +104,8 @@ BEGIN
         expected_finding_id := encode(sha256(convert_to(
             '{"case_id":' || to_json(finding->>'case_id')::text ||
             ',"code":"RECORDED_VALUE_MISMATCH","evidence":{"actual_hash":"' ||
-            replay_case->>'actual_hash' || '","expected_hash":"' ||
-            replay_case->>'expected_hash' || '"},"fixture_hash":"' || fixture_hash || '"}',
+            (replay_case->>'actual_hash') || '","expected_hash":"' ||
+            (replay_case->>'expected_hash') || '"},"fixture_hash":"' || fixture_hash || '"}',
             'UTF8')),'hex');
         IF finding->>'finding_id' IS DISTINCT FROM expected_finding_id THEN
             RAISE EXCEPTION 'invalid failure investigation finding identity' USING ERRCODE='23514';
