@@ -8,11 +8,13 @@ import psycopg
 import pytest
 
 from air import failure_investigation as fi
+from air.dependency_impact import analyze_and_persist, register_dependencies
 from air.postgres import canonical_json
 from test_repair_evidence import reviewer
 from test_replay_verification import fixture, run
 from test_replay_verification_postgres import approved, sandbox
-from test_workflow_evidence import saved
+from test_workflow_evidence import graph, saved, setup
+from test_workflow_impact import dependencies
 
 
 pytestmark = pytest.mark.postgres
@@ -259,3 +261,45 @@ def test_candidate_correlation_rollback_is_atomic(
     with repos[0].transaction(tenant) as tx:
         assert tx.get_by_id(record["artifact_id"], kind="failure_candidate_correlation") is None
         assert not [event for event in tx.audit() if event["artifact_id"] == record["artifact_id"]]
+
+
+def _equivalent_but_distinct_impact(tx):
+    previous, changes = setup(tx)
+    deps = dependencies()
+    registry = register_dependencies(
+        tx, previous["artifact_id"], deps, workflow_edges=graph(deps))
+    return analyze_and_persist(tx, changes["artifact_id"], registry["artifact_id"])
+
+
+def test_candidate_requires_exact_replay_bound_impact_not_equivalent_analysis(
+        database, repos, failed_verification, saved):
+    tenant = database["tenants"][0]
+    with repos[0].transaction(tenant) as tx:
+        alternate = _equivalent_but_distinct_impact(tx)
+        assert alternate["artifact_id"] != saved["impact"]["artifact_id"]
+        assert (json.loads(alternate["payload"])["impact_hash"]
+                == json.loads(saved["impact"]["payload"])["impact_hash"])
+        investigation = fi.persist_investigation(tx, failed_verification["artifact_id"])
+        impact_id = json.loads(alternate["payload"])["analysis"]["impacts"][0]["impact_id"]
+        with pytest.raises(fi.InvestigationError, match="lifecycle_binding_mismatch"):
+            fi.persist_candidate_correlation(
+                tx, investigation["artifact_id"], alternate["artifact_id"],
+                [fi.CandidateLink("field", impact_id)])
+
+
+def test_database_rejects_equivalent_but_wrong_lifecycle_impact(
+        database, repos, persisted_correlation):
+    tenant = database["tenants"][0]
+    original = persisted_correlation["correlation"]
+    with repos[0].transaction(tenant) as tx:
+        alternate = _equivalent_but_distinct_impact(tx)
+        assert (json.loads(alternate["payload"])["impact_hash"]
+                == json.loads(persisted_correlation["impact"]["payload"])["impact_hash"])
+        payload = json.loads(original["payload"])
+        payload["impact"] = {
+            "artifact_id": str(alternate["artifact_id"]),
+            "artifact_hash": alternate["content_hash"],
+        }
+        with pytest.raises(psycopg.errors.CheckViolation,
+                           match="unbound failure candidate lifecycle"):
+            tx.put("failure_candidate_correlation", fi._digest(payload), payload)
