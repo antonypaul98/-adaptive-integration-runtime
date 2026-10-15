@@ -5,14 +5,14 @@
   "main_sha_at_start": "c328ee55f88fe9ffca5c988b9ddece7feda687a6",
   "current_branch_sha": "a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-23 tenant-scoped persistence source head a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a passed exact PR-event PostgreSQL 16/17 CI and merged through PR #28 as 44eba7b512d026d3d06f09bbab78d4318bc5202c. Exact merged-main CI also passed; canonical receipt publication is pending.",
-  "local_test_status": "Pinned Python 3.12.14: failure-investigation persistence validation passed 22 tests; complete non-PostgreSQL suite passed 445 tests with 315 PostgreSQL tests deselected. Infrastructure passed 15 with one established Memory-only skip. Dependency, diagnostics, migration-resource and whitespace validation passed. Exact-head PostgreSQL 16/17 CI passed 760 product tests per matrix with zero product skips.",
-  "pr_number": 28,
-  "ci_status": "success",
-  "merge_status": "THIRD_SOURCE_SLICE_MERGED_AND_VERIFIED_RECORDS_PENDING",
+  "branch_remote_status": "AIR-23 candidate-correlation persistence is locally validated from exact main 1fb059c47fe99e43423d5e8e147c2374bbced8ac; publication and exact-head PostgreSQL 16/17 PR CI are pending.",
+  "local_test_status": "Pinned Python 3.12.14: 22 focused failure-investigation tests and 445 complete non-PostgreSQL tests passed; 330 PostgreSQL cases were explicitly deselected for exact CI. Infrastructure passed 15 with one established Memory-only skip. Dependency, diagnostics, 12 migration resources, compilation and whitespace validation passed.",
+  "pr_number": null,
+  "ci_status": "pending",
+  "merge_status": "FOURTH_SOURCE_SLICE_LOCAL_VALIDATED_PUBLICATION_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish this third bounded source-slice receipt through exact PostgreSQL 16/17 records CI, then continue AIR-23 with candidate-correlation persistence and wider exact lifecycle-evidence correlation.",
+  "next_action": "Publish the bounded candidate-correlation persistence slice, require exact-head PostgreSQL 16/17 PR CI with zero product skips, then guarded merge and merged-main verification.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -59,6 +59,13 @@
       "postgres_16": {"passed": 760, "failed": 0, "skipped": 0},
       "postgres_17": {"passed": 760, "failed": 0, "skipped": 0},
       "scope": "Deterministic redacted reports persisted from exact replay-verification evidence through tenant RLS, append-only artifacts, content hashes and audit boundaries; diagnostic-only with no execution, repair or approval authority."
+    },
+    "candidate_correlation_persistence_slice": {
+      "status": "LOCAL_VALIDATED_PUBLICATION_PENDING",
+      "base_main_sha": "1fb059c47fe99e43423d5e8e147c2374bbced8ac",
+      "postgres_16": {"passed": null, "failed": null, "skipped": null},
+      "postgres_17": {"passed": null, "failed": null, "skipped": null},
+      "scope": "Tenant-scoped append-only persistence and recomputation of caller-declared candidate correlations bound to exact investigation and dependency-impact evidence; explicit uncertainty and diagnostic-only authority; no causal-proof, repair, execution, deployment or approval authority."
     }
   },
   "diagnostic_import": "air",

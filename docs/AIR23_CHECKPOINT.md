@@ -33,8 +33,27 @@ fixture values and paths are not copied into investigation evidence. Cross-tenan
 reads and forged links fail closed, and byte-identical retries remain idempotent.
 
 This persistence slice performs no replay, repair, external call, approval,
-deployment, or production action. Candidate-correlation persistence and wider
-sandbox/replay lifecycle correlation remain future AIR-23 work.
+deployment, or production action. Wider sandbox/replay lifecycle correlation
+remains future AIR-23 work.
+
+## Tenant-scoped candidate-correlation evidence
+
+`persist_candidate_correlation` stores a caller-declared correlation only after
+reloading and revalidating the exact immutable investigation and dependency-
+impact artifacts in the current tenant. The canonical record binds both
+artifact IDs and hashes, normalized declared links, correlation bytes, and the
+correlation content hash. `load_candidate_correlation` recomputes the candidate
+report from those exact upstream artifacts and fails closed on drift.
+
+Migration 012 independently enforces same-tenant references, bounded and sorted
+links, exact candidate identities, complete unmatched-case coverage, explicit
+uncertainty, and diagnostic-only authority for direct database inserts. The
+record remains append-only and audited. It contains no raw replay value,
+contract path, dependency name, credential, payload, or production secret.
+
+This bounded slice does not infer causality, execute a replay or repair, access
+an external system, deploy a change, or grant approval. AIR-23 remains in
+progress pending wider exact lifecycle-evidence correlation and closure review.
 
 ## Tenant-scoped persistence source slice verified — 2026-10-14
 
