@@ -3,16 +3,16 @@
   "current_checkpoint": "AIR-23 explainable failure investigation",
   "active_branch": "work/air23-explainable-failure-investigation",
   "main_sha_at_start": "c328ee55f88fe9ffca5c988b9ddece7feda687a6",
-  "current_branch_sha": "a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a",
+  "current_branch_sha": "3e7ebb977c746540f430a1f37f5bf3de51c00798",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-23 candidate-correlation persistence is locally validated from exact main 1fb059c47fe99e43423d5e8e147c2374bbced8ac; publication and exact-head PostgreSQL 16/17 PR CI are pending.",
-  "local_test_status": "Pinned Python 3.12.14: 22 focused failure-investigation tests and 445 complete non-PostgreSQL tests passed; 330 PostgreSQL cases were explicitly deselected for exact CI. Infrastructure passed 15 with one established Memory-only skip. Dependency, diagnostics, 12 migration resources, compilation and whitespace validation passed.",
-  "pr_number": null,
-  "ci_status": "pending",
-  "merge_status": "FOURTH_SOURCE_SLICE_LOCAL_VALIDATED_PUBLICATION_PENDING",
+  "branch_remote_status": "AIR-23 candidate-correlation persistence source head 3e7ebb977c746540f430a1f37f5bf3de51c00798 passed exact PR-event PostgreSQL 16/17 CI and merged through PR #30 as 45dd2f821b422c71897f8d93d6346c8c2a9ddcf9. Exact merged-main CI also passed; this canonical receipt is pending publication.",
+  "local_test_status": "Pinned Python 3.12.14: 22 focused failure-investigation tests and 445 complete non-PostgreSQL tests passed; 330 PostgreSQL cases were explicitly deselected for exact CI. Infrastructure passed 15 with one established Memory-only skip. Dependency, diagnostics, 12 migration resources, compilation and whitespace validation passed. Exact-head and merged-main PostgreSQL 16/17 CI each passed 775 product tests per matrix with zero product skips.",
+  "pr_number": 30,
+  "ci_status": "success",
+  "merge_status": "FOURTH_SOURCE_SLICE_MERGED_AND_VERIFIED_RECORDS_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish the bounded candidate-correlation persistence slice, require exact-head PostgreSQL 16/17 PR CI with zero product skips, then guarded merge and merged-main verification.",
+  "next_action": "Publish and verify this fourth bounded AIR-23 source-slice receipt, explicitly release the writer, then review the smallest remaining wider lifecycle-evidence correlation gap.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -26,7 +26,7 @@
     "status": "IN_PROGRESS",
     "accepted_checkpoints": 0,
     "total_checkpoints": 12,
-    "completed_source_slices": 3,
+    "completed_source_slices": 4,
     "source_sha": "249245f95e3078c3115520101384c98d37c9200e",
     "source_tree_sha": "9c321cb3fe7006839ddda4dc654b9d66e7be3b5d",
     "source_pr": 24,
@@ -61,10 +61,16 @@
       "scope": "Deterministic redacted reports persisted from exact replay-verification evidence through tenant RLS, append-only artifacts, content hashes and audit boundaries; diagnostic-only with no execution, repair or approval authority."
     },
     "candidate_correlation_persistence_slice": {
-      "status": "LOCAL_VALIDATED_PUBLICATION_PENDING",
+      "status": "MERGED_AND_VERIFIED",
       "base_main_sha": "1fb059c47fe99e43423d5e8e147c2374bbced8ac",
-      "postgres_16": {"passed": null, "failed": null, "skipped": null},
-      "postgres_17": {"passed": null, "failed": null, "skipped": null},
+      "source_sha": "3e7ebb977c746540f430a1f37f5bf3de51c00798",
+      "source_tree_sha": "a188a15798fe6d6793a91bd018334cf778673a13",
+      "source_pr": 30,
+      "source_merge_sha": "45dd2f821b422c71897f8d93d6346c8c2a9ddcf9",
+      "source_pr_ci_run": 38726931140,
+      "source_merged_main_ci_run": 38727256501,
+      "postgres_16": {"passed": 775, "failed": 0, "skipped": 0},
+      "postgres_17": {"passed": 775, "failed": 0, "skipped": 0},
       "scope": "Tenant-scoped append-only persistence and recomputation of caller-declared candidate correlations bound to exact investigation and dependency-impact evidence; explicit uncertainty and diagnostic-only authority; no causal-proof, repair, execution, deployment or approval authority."
     }
   },
@@ -84,12 +90,12 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 28,
+    "number": 30,
     "state": "closed",
     "merged": true,
-    "head_sha": "a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a",
-    "merge_commit_sha": "44eba7b512d026d3d06f09bbab78d4318bc5202c",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/28"
+    "head_sha": "3e7ebb977c746540f430a1f37f5bf3de51c00798",
+    "merge_commit_sha": "45dd2f821b422c71897f8d93d6346c8c2a9ddcf9",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/30"
   },
   "ci_state": {
     "status": "success",
@@ -100,30 +106,30 @@
       "conclusion": "success"
     },
     "pr_run": {
-      "id": 38533849307,
-      "sha": "a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a",
+      "id": 38726931140,
+      "sha": "3e7ebb977c746540f430a1f37f5bf3de51c00798",
       "event": "pull_request",
       "conclusion": "success"
     },
     "merged_main_run": {
-      "id": 38534116977,
-      "sha": "44eba7b512d026d3d06f09bbab78d4318bc5202c",
+      "id": 38727256501,
+      "sha": "45dd2f821b422c71897f8d93d6346c8c2a9ddcf9",
       "event": "push",
       "conclusion": "success"
     },
     "pr_jobs": [
       {
-        "job": 115751852927,
+        "job": 116394997663,
         "name": "postgres (16)",
-        "passed": 760,
+        "passed": 775,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 115751853252,
+        "job": 116394998008,
         "name": "postgres (17)",
-        "passed": 760,
+        "passed": 775,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
@@ -131,29 +137,29 @@
     ],
     "merged_main_jobs": [
       {
-        "job": 115752738600,
+        "job": 116396078636,
         "name": "postgres (16)",
-        "passed": 760,
+        "passed": 775,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 115752738235,
+        "job": 116396079109,
         "name": "postgres (17)",
-        "passed": 760,
+        "passed": 775,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       }
     ],
     "postgres_16": {
-      "passed": 760,
+      "passed": 775,
       "failed": 0,
       "skipped": 0
     },
     "postgres_17": {
-      "passed": 760,
+      "passed": 775,
       "failed": 0,
       "skipped": 0
     },
@@ -207,9 +213,9 @@
   "next_checkpoint": "AIR-23 explainable failure investigation",
   "replay_started": true,
   "checkpoint_status": "IN_PROGRESS",
-  "merge_commit_sha": "44eba7b512d026d3d06f09bbab78d4318bc5202c",
-  "verified_main_sha": "44eba7b512d026d3d06f09bbab78d4318bc5202c",
-  "final_pr_head": "a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a",
+  "merge_commit_sha": "45dd2f821b422c71897f8d93d6346c8c2a9ddcf9",
+  "verified_main_sha": "45dd2f821b422c71897f8d93d6346c8c2a9ddcf9",
+  "final_pr_head": "3e7ebb977c746540f430a1f37f5bf3de51c00798",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
