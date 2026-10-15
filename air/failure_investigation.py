@@ -464,6 +464,8 @@ def persist_candidate_correlation(
         investigation_envelope = json.loads(investigation_record["payload"])
         investigation = FailureInvestigation(investigation_envelope["report_payload"])
         impact_envelope = json.loads(impact_record["payload"])
+        _validate_persisted_lifecycle_binding(
+            tx, investigation_envelope, impact_record, impact_envelope)
         impact_payload, impacts = _validated_persisted_impacts(impact_record)
         correlation = _candidate_payload(
             investigation, impact_payload, impact_envelope["impact_hash"], impacts, links
@@ -515,6 +517,8 @@ def load_candidate_correlation(tx, identity: object) -> dict:
         investigation_envelope = json.loads(investigation_record["payload"])
         investigation = FailureInvestigation(investigation_envelope["report_payload"])
         impact_envelope = json.loads(impact_record["payload"])
+        _validate_persisted_lifecycle_binding(
+            tx, investigation_envelope, impact_record, impact_envelope)
         impact_payload, impacts = _validated_persisted_impacts(impact_record)
         links = [CandidateLink(**value) for value in stored["declared_links"]]
         correlation = _candidate_payload(
@@ -548,3 +552,34 @@ def load_candidate_correlation(tx, identity: object) -> dict:
     except (dependency.ImpactError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         raise InvestigationError("invalid_persisted_correlation") from exc
     return record
+
+
+def _validate_persisted_lifecycle_binding(
+    tx,
+    investigation_envelope: dict,
+    impact_record: dict,
+    impact_envelope: dict,
+) -> None:
+    """Require the selected impact to be the replay's exact lifecycle input.
+
+    Loading the verification also recomputes its proposal and sandbox bindings.
+    This check then closes the remaining transitive gap from the persisted
+    investigation through replay/sandbox to the exact impact and change evidence.
+    """
+    try:
+        verification = replay.load_verification(
+            tx, investigation_envelope["verification"]["artifact_id"])
+        verification_payload = json.loads(verification["payload"])
+        impact_reference = {
+            "artifact_id": str(impact_record["artifact_id"]),
+            "artifact_hash": impact_record["content_hash"],
+        }
+        if (verification_payload["impact"] != impact_reference
+                or verification_payload["change_evidence"]
+                != impact_envelope["change_evidence"]):
+            raise InvestigationError("lifecycle_binding_mismatch")
+    except InvestigationError:
+        raise
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError,
+            replay.ReplayError) as exc:
+        raise InvestigationError("invalid_lifecycle_binding") from exc
