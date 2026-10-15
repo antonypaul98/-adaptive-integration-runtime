@@ -55,6 +55,22 @@ This bounded slice does not infer causality, execute a replay or repair, access
 an external system, deploy a change, or grant approval. AIR-23 remains in
 progress pending wider exact lifecycle-evidence correlation and closure review.
 
+## Candidate-correlation persistence verified — 2026-10-15
+
+Source head `3e7ebb977c746540f430a1f37f5bf3de51c00798` and exact tree
+`a188a15798fe6d6793a91bd018334cf778673a13` passed PR-event run
+`38726931140`; PostgreSQL 16 and 17 each reported 775 passed, zero failed and
+zero skipped. Guarded PR #30 merge
+`45dd2f821b422c71897f8d93d6346c8c2a9ddcf9` passed exact merged-main run
+`38727256501` with the same 775/0/0 result on both versions.
+
+Pinned local Python 3.12.14 validation passed 22 focused tests and 445 complete
+non-PostgreSQL tests, with 330 database cases reserved for exact CI.
+Infrastructure passed 15 tests with one established Memory-only skip.
+Dependency, diagnostics, migration-resource, compilation, JSON and whitespace
+checks passed. This verifies the fourth bounded source slice, not AIR-23
+completion; roadmap acceptance remains 0/12.
+
 ## Tenant-scoped persistence source slice verified — 2026-10-14
 
 Source head `a5c4ef49ae9a4e569331dfeb31d88f7a34222b6a` passed exact
