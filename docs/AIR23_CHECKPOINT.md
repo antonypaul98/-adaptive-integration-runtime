@@ -1,6 +1,36 @@
 # AIR-23 — Explainable failure investigation
 
-Status: **IN_PROGRESS**.
+Status: **MERGED_AND_VERIFIED**.
+
+AIR-23 is accepted. Its bounded implementation derives redacted deterministic
+findings from exact replay evidence, persists them with tenant isolation and
+append-only audit, and produces explicitly caller-declared candidate correlations
+with coverage and uncertainty. The final lifecycle gate requires every candidate
+to use the exact dependency-impact and change evidence already bound through the
+proposal, sandbox, replay, and investigation chain; equivalent-but-distinct
+evidence fails closed in both the Python API and PostgreSQL trigger boundary.
+
+This is diagnostic evidence, not causal proof. It contains no production payload,
+credential, command, external action, repair, deployment, or approval authority.
+
+## AIR-23 closure verified — 2026-10-15
+
+Source head `21e469ce6a816d783f8fdee5a1b46214314ba9af` and exact tree
+`33f58663b6adf9756542d33b16a88321a43f6e9b` passed PR-event run
+`38768732743`; PostgreSQL 16 and 17 each reported 777 passed, zero failed and
+zero skipped. Guarded PR #32 merge
+`d56e33ea026f19113e246e1c82b1cbadb15e7f92` passed exact merged-main run
+`38769083094` with the same 777/0/0 result on both versions.
+
+Pinned local Python 3.12.14 validation passed 22 focused non-PostgreSQL tests
+with 35 database cases deselected, and 445 complete non-PostgreSQL tests with
+332 database cases reserved for exact CI. Infrastructure passed 15 tests with
+one established Memory-only skip. Dependency checks, diagnostics, all 13
+migration resources, compilation and whitespace validation passed.
+
+Roadmap acceptance is now 1/12. The next checkpoint is AIR-24 predictive
+breaking-change radar, starting with a bounded offline deterministic risk
+baseline; no production monitoring or external action is authorized.
 
 The first source slice explains exact failures from the accepted bounded replay
 verifier. `air.failure_investigation.investigate_replay` emits deterministic
@@ -12,11 +42,12 @@ states that root-cause coverage is not established and that passing recorded
 cases say nothing about unrecorded behavior. The output is diagnostic only and
 grants no repair, approval, deployment, or execution authority.
 
-Before AIR-23 can be accepted, later bounded slices must add evidence-backed
+AIR-23 acceptance required bounded slices that add evidence-backed
 candidate-cause correlation across existing change, impact, sandbox, and replay
 artifacts; preserve tenant isolation for persisted investigations; expose
 unsupported evidence and ambiguity; and pass exact PostgreSQL 16/17 CI. No
-candidate may be presented as causal proof without direct evidence.
+candidate may be presented as causal proof without direct evidence. The closure
+gate and evidence above satisfy those requirements.
 
 ## Tenant-scoped investigation evidence
 
@@ -33,8 +64,8 @@ fixture values and paths are not copied into investigation evidence. Cross-tenan
 reads and forged links fail closed, and byte-identical retries remain idempotent.
 
 This persistence slice performs no replay, repair, external call, approval,
-deployment, or production action. Wider sandbox/replay lifecycle correlation
-remains future AIR-23 work.
+deployment, or production action. The wider sandbox/replay lifecycle binding
+was added by the closure gate recorded above.
 
 ## Tenant-scoped candidate-correlation evidence
 

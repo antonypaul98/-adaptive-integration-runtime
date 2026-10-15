@@ -1,5 +1,18 @@
 # AIR implementation state
 
+## Competitive roadmap status — 2026-10-15
+
+AIR-23 explainable failure investigation is **MERGED_AND_VERIFIED**. PR #32
+source head `21e469ce6a816d783f8fdee5a1b46214314ba9af` passed exact PostgreSQL
+16/17 PR CI run `38768732743` with 777 tests and zero product skips per matrix.
+Merge `d56e33ea026f19113e246e1c82b1cbadb15e7f92` passed exact merged-main
+run `38769083094` with the same result. Roadmap progress is 1/12 accepted.
+
+AIR-23 remains diagnostic-only: exact-evidence findings and caller-declared
+candidate correlations do not prove causality or grant repair, deployment,
+external execution, credential, or approval authority. Next is AIR-24's bounded
+offline breaking-change risk baseline.
+
 Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation
