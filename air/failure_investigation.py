@@ -19,6 +19,7 @@ from .postgres import canonical_json
 VERSION = "air-failure-investigation-v1"
 RECORD_VERSION = "air-failure-investigation-record-v1"
 CORRELATION_VERSION = "air-failure-correlation-v1"
+CORRELATION_RECORD_VERSION = "air-failure-correlation-record-v1"
 MAX_CANDIDATE_LINKS = 128
 _HASH = re.compile(r"[0-9a-f]{64}")
 
@@ -318,21 +319,51 @@ def _validated_impacts(changes: ChangeSet, report: ImpactReport) -> tuple[dict, 
     return payload, impacts
 
 
-def correlate_candidates(
+def _validated_persisted_impacts(record: dict) -> tuple[dict, dict[str, dict]]:
+    """Validate the redacted impact analysis from already-verified evidence."""
+    try:
+        envelope = json.loads(record["payload"])
+        payload = envelope["analysis"]
+        report = ImpactReport(canonical_json(payload))
+        if (envelope["impact_hash"] != report.content_hash
+                or payload.get("impact_version") not in {IMPACT_VERSION, WORKFLOW_VERSION}
+                or not isinstance(payload.get("change_set_hash"), str)
+                or not _HASH.fullmatch(payload["change_set_hash"])
+                or not isinstance(payload.get("impacts"), list)
+                or not isinstance(payload.get("downstream_impacts", []), list)):
+            raise InvestigationError("invalid_impact_evidence")
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+        raise InvestigationError("invalid_impact_evidence") from None
+    impacts = {}
+    for impact in payload["impacts"] + payload.get("downstream_impacts", []):
+        if (not isinstance(impact, dict)
+                or not isinstance(impact.get("impact_id"), str)
+                or not _HASH.fullmatch(impact["impact_id"])
+                or not isinstance(impact.get("change_id"), str)
+                or not _HASH.fullmatch(impact["change_id"])
+                or impact.get("classification") not in {
+                    "BREAKING", "SECURITY_RELEVANT", "REVIEW_REQUIRED"
+                }
+                or impact.get("match") not in {
+                    "LOCATION_OVERLAP", "SCHEMA_REVIEW", "OPERATION_REVIEW",
+                    "GLOBAL_SECURITY_REVIEW", "TRANSITIVE_REVIEW"
+                }):
+            raise InvestigationError("invalid_impact")
+        identity = {key: value for key, value in impact.items() if key != "impact_id"}
+        if impact["impact_id"] != _digest(identity) or impact["impact_id"] in impacts:
+            raise InvestigationError("invalid_impact_identity")
+        impacts[impact["impact_id"]] = impact
+    return payload, impacts
+
+
+def _candidate_payload(
     investigation: FailureInvestigation,
-    changes: ChangeSet,
-    impact_report: ImpactReport,
+    impact_payload: dict,
+    impact_hash: str,
+    impacts: dict[str, dict],
     links: Iterable[CandidateLink],
 ) -> CandidateCorrelation:
-    """Correlate explicit case/impact links without claiming causal proof.
-
-    The caller must supply every association. AIR validates and binds those
-    associations to exact immutable artifacts; it does not guess from names,
-    paths, payload values, timing, or model output.
-    """
-
     investigation_payload, findings = _validated_findings(investigation)
-    impact_payload, impacts = _validated_impacts(changes, impact_report)
     normalized = {}
     try:
         iterator = iter(links)
@@ -352,8 +383,8 @@ def correlate_candidates(
     source = {
         "investigation_hash": investigation.content_hash,
         "fixture_hash": investigation_payload["source"]["fixture_hash"],
-        "change_set_hash": changes.content_hash,
-        "impact_report_hash": impact_report.content_hash,
+        "change_set_hash": impact_payload["change_set_hash"],
+        "impact_report_hash": impact_hash,
         "impact_version": impact_payload["impact_version"],
     }
     candidates = []
@@ -398,3 +429,122 @@ def correlate_candidates(
         "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_OR_EXECUTION_AUTHORITY",
     }
     return CandidateCorrelation(canonical_json(payload))
+
+
+def correlate_candidates(
+    investigation: FailureInvestigation,
+    changes: ChangeSet,
+    impact_report: ImpactReport,
+    links: Iterable[CandidateLink],
+) -> CandidateCorrelation:
+    """Correlate explicit case/impact links without claiming causal proof.
+
+    The caller must supply every association. AIR validates and binds those
+    associations to exact immutable artifacts; it does not guess from names,
+    paths, payload values, timing, or model output.
+    """
+
+    impact_payload, impacts = _validated_impacts(changes, impact_report)
+    return _candidate_payload(investigation, impact_payload, impact_report.content_hash,
+                              impacts, links)
+
+
+def persist_candidate_correlation(
+    tx,
+    investigation_id: object,
+    impact_id: object,
+    links: Iterable[CandidateLink],
+) -> dict:
+    """Persist caller-declared correlation evidence with exact tenant bindings."""
+    from . import dependency_impact as dependency
+
+    try:
+        investigation_record = load_investigation(tx, investigation_id)
+        impact_record = dependency.load_impact(tx, impact_id)
+        investigation_envelope = json.loads(investigation_record["payload"])
+        investigation = FailureInvestigation(investigation_envelope["report_payload"])
+        impact_envelope = json.loads(impact_record["payload"])
+        impact_payload, impacts = _validated_persisted_impacts(impact_record)
+        correlation = _candidate_payload(
+            investigation, impact_payload, impact_envelope["impact_hash"], impacts, links
+        )
+        declared_links = [
+            {"case_id": candidate["case_id"], "impact_id": candidate["evidence"]["impact_id"],
+             "basis": candidate["basis"]}
+            for candidate in correlation.to_dict()["candidates"]
+        ]
+        payload = {
+            "tenant_id": str(tx.tenant_id),
+            "correlation_record_version": CORRELATION_RECORD_VERSION,
+            "investigation": {
+                "artifact_id": str(investigation_record["artifact_id"]),
+                "artifact_hash": investigation_record["content_hash"],
+            },
+            "impact": {
+                "artifact_id": str(impact_record["artifact_id"]),
+                "artifact_hash": impact_record["content_hash"],
+            },
+            "declared_links": declared_links,
+            "correlation_hash": correlation.content_hash,
+            "correlation_payload": correlation.payload_json,
+        }
+        return tx.put("failure_candidate_correlation", _digest(payload), payload)
+    except InvestigationError:
+        raise
+    except dependency.ImpactError as exc:
+        raise InvestigationError("impact_not_found_or_invalid") from exc
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise InvestigationError("correlation_persistence_rejected") from exc
+
+
+def load_candidate_correlation(tx, identity: object) -> dict:
+    """Reload and recompute immutable candidate-correlation evidence."""
+    from . import dependency_impact as dependency
+
+    try:
+        record = tx.get_by_id(identity, kind="failure_candidate_correlation")
+    except (TypeError, ValueError):
+        record = None
+    if record is None or record["tenant_id"] != tx.tenant_id:
+        raise InvestigationError("not_found_or_not_authorized")
+    try:
+        stored = json.loads(record["payload"])
+        investigation_record = load_investigation(
+            tx, stored["investigation"]["artifact_id"])
+        impact_record = dependency.load_impact(tx, stored["impact"]["artifact_id"])
+        investigation_envelope = json.loads(investigation_record["payload"])
+        investigation = FailureInvestigation(investigation_envelope["report_payload"])
+        impact_envelope = json.loads(impact_record["payload"])
+        impact_payload, impacts = _validated_persisted_impacts(impact_record)
+        links = [CandidateLink(**value) for value in stored["declared_links"]]
+        correlation = _candidate_payload(
+            investigation, impact_payload, impact_envelope["impact_hash"], impacts, links)
+        declared_links = [
+            {"case_id": candidate["case_id"], "impact_id": candidate["evidence"]["impact_id"],
+             "basis": candidate["basis"]}
+            for candidate in correlation.to_dict()["candidates"]
+        ]
+        expected = {
+            "tenant_id": str(tx.tenant_id),
+            "correlation_record_version": CORRELATION_RECORD_VERSION,
+            "investigation": {
+                "artifact_id": str(investigation_record["artifact_id"]),
+                "artifact_hash": investigation_record["content_hash"],
+            },
+            "impact": {
+                "artifact_id": str(impact_record["artifact_id"]),
+                "artifact_hash": impact_record["content_hash"],
+            },
+            "declared_links": declared_links,
+            "correlation_hash": correlation.content_hash,
+            "correlation_payload": correlation.payload_json,
+        }
+        if (record["payload"] != canonical_json(expected)
+                or record["idempotency_key"] != _digest(expected)
+                or record["content_hash"] != _digest(expected)):
+            raise InvestigationError("invalid_persisted_correlation")
+    except InvestigationError:
+        raise
+    except (dependency.ImpactError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise InvestigationError("invalid_persisted_correlation") from exc
+    return record
