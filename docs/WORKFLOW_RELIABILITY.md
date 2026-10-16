@@ -114,3 +114,18 @@ commit/synchronize it, and verify remote SHA. .git/session-preflight.json alone
 is ephemeral. Missing API/shell credentials, Actions service outages, quotas,
 runner availability, the external hourly scheduler and a physical Mac cannot
 be repaired solely by repository code. Report that exact external layer.
+
+## AIR-24 first risk-baseline receipt (2026-10-16)
+
+PR #34 source `93e8e0fed2715aee0a2b3121c844ce0a5eae5c66`, tree
+`1e8430fa7f3344d0598004efd459a346055fab85`, passed exact-head PR CI
+38849674422 on Python 3.12.15 with 785 tests, zero failures and zero skips on
+PostgreSQL 16 and 17. Guarded merge produced main
+`a6aac4f0ad942f4911d18a7541ebc0faa521c13d`; exact push CI 38849847090
+passed the same 785/0/0 result per matrix.
+
+The slice is offline and deterministic, using caller-supplied redacted metadata
+with exact change/impact evidence binding and explicit coverage/uncertainty. It
+performs no production monitoring, external call, repair, deployment, approval
+bypass, credential/payload handling, or executor action. This records change
+must pass its own exact PostgreSQL 16/17 PR and merged-main CI before release.
