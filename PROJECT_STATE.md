@@ -21,6 +21,16 @@ PR CI `38849674422`; merged main `a6aac4f0ad942f4911d18a7541ebc0faa521c13d`
 passed run `38849847090`. Every matrix job reported 785 passed, zero failed and
 zero skipped. This is one verified slice, not AIR-24 checkpoint acceptance.
 
+The next bounded slice compares two strictly ordered, non-overlapping historical
+risk windows without forecasting. PR #36 source
+`8af03a75010730a86b1d0ef8a0971bd44ed029ce`, tree
+`6e0db6c98f3fd4ccc11b54d15265ceca800ef278`, passed exact PostgreSQL 16/17
+PR CI `38915749154`; merged main
+`9a23efb5feefd6e0e6e3974982c2a35e2a7c9109` passed run `38916048257`.
+Every matrix job reported 788 passed, zero failed and zero skipped. AIR-24 remains
+in progress; this comparison is diagnostic-only and does not establish a
+probability, forecast, causal claim, safety claim, repair, or execution authority.
+
 Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation
