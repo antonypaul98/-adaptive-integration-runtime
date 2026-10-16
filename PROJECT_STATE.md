@@ -1,6 +1,6 @@
 # AIR implementation state
 
-## Competitive roadmap status — 2026-10-15
+## Competitive roadmap status — 2026-10-16
 
 AIR-23 explainable failure investigation is **MERGED_AND_VERIFIED**. PR #32
 source head `21e469ce6a816d783f8fdee5a1b46214314ba9af` passed exact PostgreSQL
@@ -12,6 +12,14 @@ AIR-23 remains diagnostic-only: exact-evidence findings and caller-declared
 candidate correlations do not prove causality or grant repair, deployment,
 external execution, credential, or approval authority. Next is AIR-24's bounded
 offline breaking-change risk baseline.
+
+
+AIR-24 is **IN PROGRESS**. Its first bounded offline risk-baseline slice merged
+through PR #34. Source `93e8e0fed2715aee0a2b3121c844ce0a5eae5c66` and tree
+`1e8430fa7f3344d0598004efd459a346055fab85` passed exact PostgreSQL 16/17
+PR CI `38849674422`; merged main `a6aac4f0ad942f4911d18a7541ebc0faa521c13d`
+passed run `38849847090`. Every matrix job reported 785 passed, zero failed and
+zero skipped. This is one verified slice, not AIR-24 checkpoint acceptance.
 
 Updated 2026-09-28. GitHub is the source of truth.
 
