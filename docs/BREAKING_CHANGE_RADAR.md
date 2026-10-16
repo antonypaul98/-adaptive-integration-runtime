@@ -20,3 +20,13 @@ The module performs no monitoring, network access, sleeping, external action,
 repair, deployment, credential use, or production execution. Its outputs grant
 diagnostic authority only and always require human review before consequential
 action.
+
+## Verified bounded-window slice
+
+PR #36 source `8af03a75010730a86b1d0ef8a0971bd44ed029ce`, tree
+`6e0db6c98f3fd4ccc11b54d15265ceca800ef278`, passed exact-head CI run
+38915749154 on Python 3.12.15 with 788 tests and zero product skips on each of
+PostgreSQL 16 and 17. Guarded merge
+`9a23efb5feefd6e0e6e3974982c2a35e2a7c9109` passed exact merged-main run
+38916048257 with the same result. This verifies only the bounded comparison
+slice; AIR-24 remains in progress.

@@ -129,3 +129,20 @@ with exact change/impact evidence binding and explicit coverage/uncertainty. It
 performs no production monitoring, external call, repair, deployment, approval
 bypass, credential/payload handling, or executor action. This records change
 must pass its own exact PostgreSQL 16/17 PR and merged-main CI before release.
+
+## AIR-24 bounded risk-window trend receipt (2026-10-16)
+
+PR #36 source `8af03a75010730a86b1d0ef8a0971bd44ed029ce`, tree
+`6e0db6c98f3fd4ccc11b54d15265ceca800ef278`, passed exact-head PR CI
+38915749154 on Python 3.12.15 with 788 tests, zero failures and zero skips on
+PostgreSQL 16 and 17. Guarded merge produced main
+`9a23efb5feefd6e0e6e3974982c2a35e2a7c9109`; exact push CI 38916048257
+passed the same 788/0/0 result per matrix.
+
+The comparison accepts only separately validated bounded radar windows and
+requires strict ordering without overlap. Reports bind exact canonical radar
+and evidence hashes, expose coverage and uncertainty, and state that score
+deltas are heuristic points rather than probabilities. Missing candidate
+signals are not evidence of safety. No monitoring, network action, repair,
+deployment, approval bypass, credential handling, or production execution was
+added. This records change requires its own exact PR and merged-main CI.
