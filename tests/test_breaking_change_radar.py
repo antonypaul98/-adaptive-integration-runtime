@@ -4,7 +4,12 @@ import json
 
 import pytest
 
-from air.breaking_change_radar import ChangeObservation, RadarError, rank_breaking_risks
+from air.breaking_change_radar import (
+    ChangeObservation,
+    RadarError,
+    compare_risk_windows,
+    rank_breaking_risks,
+)
 from air.change_intelligence import compare_openapi
 
 
@@ -101,3 +106,65 @@ def test_output_contains_no_raw_contract_values_or_change_locations():
     assert "old_value" not in result.payload_json
     assert "new_value" not in result.payload_json
     assert json.dumps(spec(), sort_keys=True) not in result.payload_json
+
+
+def test_window_trends_are_deterministic_exactly_bound_and_uncertain():
+    baseline = [
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z", "nonbreaking"),
+    ]
+    candidate = [
+        observation("2026-02-01T00:00:00Z"),
+        observation("2026-02-02T00:00:00Z"),
+    ]
+    first = compare_risk_windows(baseline, candidate)
+    second = compare_risk_windows(reversed(baseline), reversed(candidate))
+    assert first.payload_json == second.payload_json
+    payload = first.to_dict()
+    assert payload["source"]["baseline_radar_hash"] == rank_breaking_risks(
+        baseline).content_hash
+    assert payload["source"]["candidate_radar_hash"] == rank_breaking_risks(
+        candidate).content_hash
+    assert payload["trends"][0]["direction"] == "RISING_HEURISTIC_POINTS"
+    assert payload["trends"][0]["score_delta"] > 0
+    assert payload["trends"][0]["score_kind"].endswith("NOT_PROBABILITY")
+    assert payload["coverage"]["false_positive_rate"].startswith("NOT_MEASURABLE")
+    assert "do not predict" in payload["uncertainty"][0]
+    assert payload["authority"].startswith("DIAGNOSTIC_ONLY")
+
+
+def test_window_trends_show_new_and_unobserved_signals_without_safety_claims():
+    baseline = [
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z"),
+    ]
+    candidate = [
+        observation("2026-02-01T00:00:00Z", "review"),
+        observation("2026-02-02T00:00:00Z", "review"),
+    ]
+    payload = compare_risk_windows(baseline, candidate).to_dict()
+    assert {item["direction"] for item in payload["trends"]} == {
+        "NEWLY_OBSERVED", "NOT_OBSERVED_IN_CANDIDATE_WINDOW"}
+    assert any("not evidence" in item for item in payload["uncertainty"])
+
+
+def test_window_trends_reject_overlap_and_do_not_leak_contract_values():
+    baseline = [
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-02-01T00:00:00Z"),
+    ]
+    overlapping = [
+        observation("2026-02-01T00:00:00Z", "review"),
+        observation("2026-03-01T00:00:00Z", "review"),
+    ]
+    with pytest.raises(RadarError, match="^risk_windows_not_strictly_ordered$"):
+        compare_risk_windows(baseline, overlapping)
+
+    candidate = [
+        observation("2026-03-01T00:00:00Z"),
+        observation("2026-04-01T00:00:00Z"),
+    ]
+    report = compare_risk_windows(baseline, candidate)
+    assert "/items" not in report.payload_json
+    assert "old_value" not in report.payload_json
+    assert "new_value" not in report.payload_json
