@@ -19,6 +19,7 @@ from .postgres import canonical_json
 
 
 VERSION = "air-breaking-change-radar-v1"
+TREND_VERSION = "air-breaking-change-risk-trend-v1"
 MIN_OBSERVATIONS = 2
 MAX_OBSERVATIONS = 64
 MAX_SIGNALS = 128
@@ -62,6 +63,20 @@ class ChangeObservation:
 @dataclass(frozen=True)
 class RiskRadar:
     """Canonical, content-addressed risk triage output."""
+
+    payload_json: str
+
+    def to_dict(self) -> dict:
+        return json.loads(self.payload_json)
+
+    @property
+    def content_hash(self) -> str:
+        return sha256(self.payload_json.encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True)
+class RiskTrendReport:
+    """Canonical comparison of two non-overlapping offline radar windows."""
 
     payload_json: str
 
@@ -217,3 +232,96 @@ def rank_breaking_risks(observations: Iterable[ChangeObservation]) -> RiskRadar:
         "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_EXECUTION_OR_DEPLOYMENT_AUTHORITY",
     }
     return RiskRadar(canonical_json(payload))
+
+
+def compare_risk_windows(
+    baseline: Iterable[ChangeObservation],
+    candidate: Iterable[ChangeObservation],
+) -> RiskTrendReport:
+    """Compare two bounded historical windows without predicting an outcome.
+
+    Both windows pass the same fail-closed validation as ``rank_breaking_risks``.
+    They must be strictly ordered and non-overlapping so a caller cannot present
+    the same time period as independent trend evidence.
+    """
+
+    baseline_radar = rank_breaking_risks(baseline)
+    candidate_radar = rank_breaking_risks(candidate)
+    baseline_payload = baseline_radar.to_dict()
+    candidate_payload = candidate_radar.to_dict()
+    baseline_source = baseline_payload["source"]
+    candidate_source = candidate_payload["source"]
+    if _time(baseline_source["last_observed_at"]) >= _time(
+        candidate_source["first_observed_at"]
+    ):
+        raise RadarError("risk_windows_not_strictly_ordered")
+
+    baseline_signals = {
+        signal["signal_id"]: signal for signal in baseline_payload["signals"]
+    }
+    candidate_signals = {
+        signal["signal_id"]: signal for signal in candidate_payload["signals"]
+    }
+    trends = []
+    for signal_id in sorted(set(baseline_signals) | set(candidate_signals)):
+        before = baseline_signals.get(signal_id)
+        after = candidate_signals.get(signal_id)
+        before_score = before["risk_score"] if before else 0
+        after_score = after["risk_score"] if after else 0
+        delta = after_score - before_score
+        if before is None:
+            direction = "NEWLY_OBSERVED"
+        elif after is None:
+            direction = "NOT_OBSERVED_IN_CANDIDATE_WINDOW"
+        elif delta > 0:
+            direction = "RISING_HEURISTIC_POINTS"
+        elif delta < 0:
+            direction = "FALLING_HEURISTIC_POINTS"
+        else:
+            direction = "UNCHANGED_HEURISTIC_POINTS"
+        source = after or before
+        trends.append({
+            "signal_id": signal_id,
+            "classification": source["classification"],
+            "change_type": source["change_type"],
+            "context": source["context"],
+            "baseline_score": before_score,
+            "candidate_score": after_score,
+            "score_delta": delta,
+            "direction": direction,
+            "score_kind": "HEURISTIC_POINTS_NOT_PROBABILITY",
+            "candidate_uncertainty": (
+                after["uncertainty"] if after else "NOT_OBSERVED"
+            ),
+        })
+    trends.sort(key=lambda trend: (-abs(trend["score_delta"]), trend["signal_id"]))
+
+    payload = {
+        "trend_version": TREND_VERSION,
+        "radar_version": VERSION,
+        "detector_version": DETECTOR_VERSION,
+        "source": {
+            "kind": "bounded_offline_risk_window_comparison",
+            "baseline_radar_hash": baseline_radar.content_hash,
+            "candidate_radar_hash": candidate_radar.content_hash,
+            "baseline": baseline_source,
+            "candidate": candidate_source,
+        },
+        "trends": trends,
+        "coverage": {
+            "baseline_signal_count": len(baseline_signals),
+            "candidate_signal_count": len(candidate_signals),
+            "compared_signal_count": len(trends),
+            "labeled_outcomes": 0,
+            "false_positive_rate": "NOT_MEASURABLE_WITHOUT_LABELED_OUTCOMES",
+        },
+        "uncertainty": [
+            "Score deltas compare bounded historical windows; they do not predict an outcome.",
+            "Different observation counts and source coverage can change heuristic scores.",
+            "A missing candidate signal is not evidence that the underlying risk is absent.",
+            "No labeled outcomes are available to calibrate false-positive rates.",
+        ],
+        "review_required": bool(trends),
+        "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_EXECUTION_OR_DEPLOYMENT_AUTHORITY",
+    }
+    return RiskTrendReport(canonical_json(payload))
