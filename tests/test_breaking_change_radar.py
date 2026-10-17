@@ -7,6 +7,9 @@ import pytest
 from air.breaking_change_radar import (
     ChangeObservation,
     RadarError,
+    RiskRadar,
+    RiskOutcomeLabel,
+    calibrate_risk_outcomes,
     compare_risk_windows,
     rank_breaking_risks,
 )
@@ -165,6 +168,94 @@ def test_window_trends_reject_overlap_and_do_not_leak_contract_values():
         observation("2026-04-01T00:00:00Z"),
     ]
     report = compare_risk_windows(baseline, candidate)
+    assert "/items" not in report.payload_json
+    assert "old_value" not in report.payload_json
+    assert "new_value" not in report.payload_json
+
+
+def outcome(radar, at, value="IMPACT_CONFIRMED", signal_id=None):
+    return RiskOutcomeLabel(
+        observed_at=at,
+        radar_hash=radar.content_hash,
+        signal_id=signal_id or radar.to_dict()["signals"][0]["signal_id"],
+        outcome=value,
+    )
+
+
+def test_outcome_calibration_is_deterministic_bound_and_descriptive_only():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z"),
+    ])
+    labels = [
+        outcome(radar, "2026-02-01T00:00:00Z", "NO_IMPACT_OBSERVED"),
+        outcome(radar, "2026-02-02T00:00:00Z", "IMPACT_CONFIRMED"),
+        outcome(radar, "2026-02-03T00:00:00Z", "NO_IMPACT_OBSERVED"),
+        outcome(radar, "2026-02-04T00:00:00Z", "IMPACT_CONFIRMED"),
+        outcome(radar, "2026-02-05T00:00:00Z", "NO_IMPACT_OBSERVED"),
+    ]
+    first = calibrate_risk_outcomes(radar, labels)
+    second = calibrate_risk_outcomes(radar, reversed(labels))
+    assert first.payload_json == second.payload_json
+    payload = first.to_dict()
+    assert payload["source"]["radar_hash"] == radar.content_hash
+    assert payload["coverage"]["resolved_label_count"] == 5
+    assert payload["observed_no_impact_rate"]["basis_points"] == 6000
+    assert payload["observed_no_impact_rate"]["kind"].endswith("NOT_PROBABILITY")
+    assert any("not independently verified" in item for item in payload["uncertainty"])
+    assert payload["authority"].startswith("DIAGNOSTIC_ONLY")
+
+
+def test_outcome_calibration_exposes_insufficient_samples_and_coverage():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z", "review"),
+    ])
+    label = outcome(radar, "2026-02-01T00:00:00Z", "INCONCLUSIVE")
+    payload = calibrate_risk_outcomes(radar, [label]).to_dict()
+    assert payload["coverage"]["radar_signal_count"] == 2
+    assert payload["coverage"]["labeled_signal_count"] == 1
+    assert payload["coverage"]["unlabeled_signal_count"] == 1
+    assert payload["observed_no_impact_rate"]["status"] == (
+        "INSUFFICIENT_RESOLVED_LABELS")
+    assert payload["observed_no_impact_rate"]["basis_points"] is None
+
+
+def test_outcome_calibration_bindings_times_and_enums_fail_closed():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z"),
+    ])
+    good = outcome(radar, "2026-02-01T00:00:00Z")
+    cases = [
+        (replace(good, radar_hash="0" * 64), "outcome_radar_hash_mismatch"),
+        (replace(good, signal_id="0" * 64), "outcome_signal_mismatch"),
+        (replace(good, outcome="SAFE"), "invalid_outcome"),
+        (replace(good, observed_at="2026-01-02T00:00:00Z"),
+         "outcome_precedes_radar_window"),
+    ]
+    for label, code in cases:
+        with pytest.raises(RadarError, match=f"^{code}$"):
+            calibrate_risk_outcomes(radar, [label])
+    with pytest.raises(RadarError, match="^duplicate_outcome_label$"):
+        calibrate_risk_outcomes(radar, [good, good])
+    with pytest.raises(RadarError, match="^outcome_label_count_out_of_bounds$"):
+        calibrate_risk_outcomes(radar, [])
+    malformed = replace(good, signal_id=[])  # type: ignore[arg-type]
+    with pytest.raises(RadarError, match="^invalid_outcome_label$"):
+        calibrate_risk_outcomes(radar, [malformed])
+    forged = RiskRadar(json.dumps({"radar_version": "forged"}))
+    with pytest.raises(RadarError, match="^invalid_risk_radar$"):
+        calibrate_risk_outcomes(forged, [good])
+
+
+def test_outcome_calibration_does_not_copy_contract_values():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z"),
+    ])
+    report = calibrate_risk_outcomes(
+        radar, [outcome(radar, "2026-02-01T00:00:00Z")])
     assert "/items" not in report.payload_json
     assert "old_value" not in report.payload_json
     assert "new_value" not in report.payload_json

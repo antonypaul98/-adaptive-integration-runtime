@@ -30,3 +30,21 @@ PostgreSQL 16 and 17. Guarded merge
 `9a23efb5feefd6e0e6e3974982c2a35e2a7c9109` passed exact merged-main run
 38916048257 with the same result. This verifies only the bounded comparison
 slice; AIR-24 remains in progress.
+
+## Bounded offline outcome calibration
+
+Outcome calibration accepts only fixed caller-declared labels bound to the
+exact content hash of a radar and one of its exact signal IDs. Labels must be
+strictly later than the radar window, use a fixed outcome vocabulary, and stay
+within a 256-label bound. Duplicate labels, unknown signals, stale timestamps,
+and mismatched radar hashes fail closed.
+
+The report exposes labeled, unlabeled, resolved, and inconclusive coverage. A
+descriptive observed-no-impact rate is withheld until at least five resolved
+labels exist. Even when available, that integer rate is not a probability,
+forecast, causal estimate, or safety claim. Labels are not independently
+verified, and no-impact does not prove that a change was harmless.
+
+Calibration is offline and performs no observation, network access, production
+data collection, repair, deployment, credential use, or external action. It
+does not change the diagnostic-only authority of the radar.
