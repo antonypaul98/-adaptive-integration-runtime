@@ -31,6 +31,16 @@ Every matrix job reported 788 passed, zero failed and zero skipped. AIR-24 remai
 in progress; this comparison is diagnostic-only and does not establish a
 probability, forecast, causal claim, safety claim, repair, or execution authority.
 
+The third bounded AIR-24 slice adds caller-declared offline outcome calibration.
+PR #38 source `c364c20d66aaf5398383aa781c85fec257794f07`, tree
+`1049af808bcf03bb2128bf7b4331cba6abe6d992`, passed exact PostgreSQL 16/17
+PR CI `39070558604`; merged main
+`0c1e555f437ad17c3321dd7c43abd93352af1120` passed run `39070668492`.
+Every matrix job reported 792 passed, zero failed and zero skipped. Labels bind
+to exact radar and signal hashes, remain explicitly unverified, and cannot grant
+probability, safety, causal, repair, approval, deployment, or execution authority.
+AIR-24 remains in progress and roadmap acceptance remains 1/12.
+
 Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation

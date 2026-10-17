@@ -146,3 +146,20 @@ deltas are heuristic points rather than probabilities. Missing candidate
 signals are not evidence of safety. No monitoring, network action, repair,
 deployment, approval bypass, credential handling, or production execution was
 added. This records change requires its own exact PR and merged-main CI.
+
+## AIR-24 bounded outcome-calibration receipt (2026-10-17)
+
+PR #38 source `c364c20d66aaf5398383aa781c85fec257794f07`, tree
+`1049af808bcf03bb2128bf7b4331cba6abe6d992`, passed exact-head PR CI
+39070558604 on Python 3.12.15 with 792 tests, zero failures and zero skips on
+PostgreSQL 16 and 17. Guarded merge produced main
+`0c1e555f437ad17c3321dd7c43abd93352af1120`; exact push CI 39070668492
+passed the same 792/0/0 result per matrix.
+
+The calibration accepts fixed caller-declared labels only after the radar
+window and binds them to exact radar and signal hashes. It exposes coverage and
+withholds a descriptive no-impact rate below five resolved labels. Labels are
+not independently verified; no-impact is not a safety claim. No production
+observation, network access, credentials, repair, deployment, approval bypass,
+or external execution was added. This records change requires its own exact PR
+and merged-main CI.
