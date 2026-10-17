@@ -20,9 +20,12 @@ from .postgres import canonical_json
 
 VERSION = "air-breaking-change-radar-v1"
 TREND_VERSION = "air-breaking-change-risk-trend-v1"
+CALIBRATION_VERSION = "air-breaking-change-outcome-calibration-v1"
 MIN_OBSERVATIONS = 2
 MAX_OBSERVATIONS = 64
 MAX_SIGNALS = 128
+MAX_OUTCOME_LABELS = 256
+MIN_RESOLVED_LABELS_FOR_RATE = 5
 _UTC = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z")
 _HASH = re.compile(r"[0-9a-f]{64}")
 _CHANGE_TYPES = frozenset({
@@ -46,6 +49,9 @@ _SEVERITY = {
     Classification.SECURITY_RELEVANT: 65,
     Classification.REVIEW_REQUIRED: 35,
 }
+_OUTCOMES = frozenset({
+    "IMPACT_CONFIRMED", "NO_IMPACT_OBSERVED", "INCONCLUSIVE",
+})
 
 
 class RadarError(ValueError):
@@ -77,6 +83,30 @@ class RiskRadar:
 @dataclass(frozen=True)
 class RiskTrendReport:
     """Canonical comparison of two non-overlapping offline radar windows."""
+
+    payload_json: str
+
+    def to_dict(self) -> dict:
+        return json.loads(self.payload_json)
+
+    @property
+    def content_hash(self) -> str:
+        return sha256(self.payload_json.encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True)
+class RiskOutcomeLabel:
+    """Caller-declared offline outcome bound to an exact radar signal."""
+
+    observed_at: str
+    radar_hash: str
+    signal_id: str
+    outcome: str
+
+
+@dataclass(frozen=True)
+class OutcomeCalibrationReport:
+    """Canonical summary of bounded caller-declared outcome evidence."""
 
     payload_json: str
 
@@ -325,3 +355,136 @@ def compare_risk_windows(
         "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_EXECUTION_OR_DEPLOYMENT_AUTHORITY",
     }
     return RiskTrendReport(canonical_json(payload))
+
+
+def calibrate_risk_outcomes(
+    radar: RiskRadar,
+    labels: Iterable[RiskOutcomeLabel],
+) -> OutcomeCalibrationReport:
+    """Summarize bounded outcome labels without treating them as ground truth."""
+
+    if not isinstance(radar, RiskRadar):
+        raise RadarError("invalid_risk_radar")
+    try:
+        radar_payload = radar.to_dict()
+        if (canonical_json(radar_payload) != radar.payload_json
+                or radar_payload["radar_version"] != VERSION
+                or radar_payload["detector_version"] != DETECTOR_VERSION
+                or radar_payload["source"]["kind"] != "bounded_offline_change_evidence"
+                or radar_payload["authority"]
+                != "DIAGNOSTIC_ONLY_NO_REPAIR_EXECUTION_OR_DEPLOYMENT_AUTHORITY"):
+            raise ValueError()
+        last_radar_time = _time(radar_payload["source"]["last_observed_at"])
+        signal_ids = {signal["signal_id"] for signal in radar_payload["signals"]}
+        if (len(signal_ids) != len(radar_payload["signals"])
+                or len(signal_ids) > MAX_SIGNALS
+                or any(not _HASH.fullmatch(value) for value in signal_ids)):
+            raise ValueError()
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+        raise RadarError("invalid_risk_radar") from None
+
+    try:
+        items = tuple(labels)
+    except TypeError:
+        raise RadarError("invalid_outcome_labels") from None
+    if not 1 <= len(items) <= MAX_OUTCOME_LABELS:
+        raise RadarError("outcome_label_count_out_of_bounds")
+
+    validated = []
+    identities = set()
+    for item in items:
+        if not isinstance(item, RiskOutcomeLabel):
+            raise RadarError("invalid_outcome_label")
+        if (not isinstance(item.radar_hash, str)
+                or not isinstance(item.signal_id, str)
+                or not isinstance(item.outcome, str)):
+            raise RadarError("invalid_outcome_label")
+        observed = _time(item.observed_at)
+        if observed <= last_radar_time:
+            raise RadarError("outcome_precedes_radar_window")
+        if item.radar_hash != radar.content_hash:
+            raise RadarError("outcome_radar_hash_mismatch")
+        if item.signal_id not in signal_ids:
+            raise RadarError("outcome_signal_mismatch")
+        if item.outcome not in _OUTCOMES:
+            raise RadarError("invalid_outcome")
+        identity = (item.observed_at, item.signal_id)
+        if identity in identities:
+            raise RadarError("duplicate_outcome_label")
+        identities.add(identity)
+        validated.append(item)
+    validated.sort(key=lambda item: (
+        item.observed_at, item.signal_id, item.outcome,
+    ))
+
+    counts = {
+        signal_id: {outcome: 0 for outcome in sorted(_OUTCOMES)}
+        for signal_id in signal_ids
+    }
+    label_receipts = []
+    for item in validated:
+        counts[item.signal_id][item.outcome] += 1
+        basis = {
+            "observed_at": item.observed_at,
+            "radar_hash": item.radar_hash,
+            "signal_id": item.signal_id,
+            "outcome": item.outcome,
+        }
+        label_receipts.append({
+            "label_id": sha256(canonical_json(basis).encode("utf-8")).hexdigest(),
+            **basis,
+        })
+
+    confirmed = sum(value["IMPACT_CONFIRMED"] for value in counts.values())
+    no_impact = sum(value["NO_IMPACT_OBSERVED"] for value in counts.values())
+    inconclusive = sum(value["INCONCLUSIVE"] for value in counts.values())
+    resolved = confirmed + no_impact
+    rate_available = resolved >= MIN_RESOLVED_LABELS_FOR_RATE
+    summaries = []
+    for signal_id in sorted(signal_ids):
+        value = counts[signal_id]
+        if sum(value.values()):
+            summaries.append({"signal_id": signal_id, **value})
+
+    payload = {
+        "calibration_version": CALIBRATION_VERSION,
+        "radar_version": VERSION,
+        "detector_version": DETECTOR_VERSION,
+        "source": {
+            "kind": "bounded_caller_declared_offline_outcomes",
+            "radar_hash": radar.content_hash,
+            "radar_last_observed_at": radar_payload["source"]["last_observed_at"],
+            "label_set_hash": sha256(
+                canonical_json({"labels": label_receipts}).encode("utf-8")
+            ).hexdigest(),
+        },
+        "labels": label_receipts,
+        "signals": summaries,
+        "coverage": {
+            "radar_signal_count": len(signal_ids),
+            "labeled_signal_count": len(summaries),
+            "unlabeled_signal_count": len(signal_ids) - len(summaries),
+            "label_count": len(validated),
+            "resolved_label_count": resolved,
+            "inconclusive_label_count": inconclusive,
+        },
+        "observed_no_impact_rate": {
+            "status": "AVAILABLE" if rate_available
+            else "INSUFFICIENT_RESOLVED_LABELS",
+            "minimum_resolved_labels": MIN_RESOLVED_LABELS_FOR_RATE,
+            "numerator": no_impact,
+            "denominator": resolved,
+            "basis_points": (no_impact * 10000) // resolved
+            if rate_available else None,
+            "kind": "DESCRIPTIVE_CALLER_LABEL_RATE_NOT_PROBABILITY",
+        },
+        "uncertainty": [
+            "Outcome labels are caller declarations and are not independently verified.",
+            "No-impact labels do not prove that a change was safe or harmless.",
+            "Unlabeled and inconclusive signals are excluded from the descriptive rate.",
+            "The rate is not a forecast, probability, causal estimate, or authorization.",
+        ],
+        "review_required": True,
+        "authority": "DIAGNOSTIC_ONLY_NO_REPAIR_EXECUTION_OR_DEPLOYMENT_AUTHORITY",
+    }
+    return OutcomeCalibrationReport(canonical_json(payload))
