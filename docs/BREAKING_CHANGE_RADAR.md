@@ -41,7 +41,11 @@ and mismatched radar hashes fail closed.
 
 The report exposes labeled, unlabeled, resolved, and inconclusive coverage. A
 descriptive observed-no-impact rate is withheld until at least five resolved
-labels exist. Even when available, that integer rate is not a probability,
+labels exist. The same minimum is applied independently to each signal, so a
+well-labeled signal cannot make a sparsely labeled signal appear calibrated.
+Per-signal sample counts and withheld-rate status remain visible in calibration
+schema v2. Even when
+available, an integer rate is not a probability,
 forecast, causal estimate, or safety claim. Labels are not independently
 verified, and no-impact does not prove that a change was harmless.
 

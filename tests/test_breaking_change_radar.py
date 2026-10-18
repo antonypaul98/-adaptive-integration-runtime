@@ -198,10 +198,16 @@ def test_outcome_calibration_is_deterministic_bound_and_descriptive_only():
     second = calibrate_risk_outcomes(radar, reversed(labels))
     assert first.payload_json == second.payload_json
     payload = first.to_dict()
+    assert payload["calibration_version"] == (
+        "air-breaking-change-outcome-calibration-v2")
     assert payload["source"]["radar_hash"] == radar.content_hash
     assert payload["coverage"]["resolved_label_count"] == 5
     assert payload["observed_no_impact_rate"]["basis_points"] == 6000
     assert payload["observed_no_impact_rate"]["kind"].endswith("NOT_PROBABILITY")
+    signal = payload["signals"][0]
+    assert signal["resolved_label_count"] == 5
+    assert signal["observed_no_impact_rate"]["basis_points"] == 6000
+    assert signal["observed_no_impact_rate"]["kind"].endswith("NOT_PROBABILITY")
     assert any("not independently verified" in item for item in payload["uncertainty"])
     assert payload["authority"].startswith("DIAGNOSTIC_ONLY")
 
@@ -219,6 +225,38 @@ def test_outcome_calibration_exposes_insufficient_samples_and_coverage():
     assert payload["observed_no_impact_rate"]["status"] == (
         "INSUFFICIENT_RESOLVED_LABELS")
     assert payload["observed_no_impact_rate"]["basis_points"] is None
+    assert payload["signals"][0]["resolved_label_count"] == 0
+    assert payload["signals"][0]["observed_no_impact_rate"]["status"] == (
+        "INSUFFICIENT_RESOLVED_LABELS")
+
+
+def test_per_signal_rates_are_independently_gated_and_keep_coverage_visible():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z", "review"),
+    ])
+    signal_ids = [item["signal_id"] for item in radar.to_dict()["signals"]]
+    labels = [
+        outcome(
+            radar,
+            f"2026-02-0{index + 1}T00:00:00Z",
+            "NO_IMPACT_OBSERVED" if index < 3 else "IMPACT_CONFIRMED",
+            signal_ids[0],
+        )
+        for index in range(5)
+    ]
+    labels.append(outcome(
+        radar, "2026-02-06T00:00:00Z", "NO_IMPACT_OBSERVED", signal_ids[1]))
+
+    payload = calibrate_risk_outcomes(radar, reversed(labels)).to_dict()
+    summaries = {item["signal_id"]: item for item in payload["signals"]}
+    assert summaries[signal_ids[0]]["resolved_label_count"] == 5
+    assert summaries[signal_ids[0]]["observed_no_impact_rate"]["basis_points"] == 6000
+    assert summaries[signal_ids[1]]["resolved_label_count"] == 1
+    assert summaries[signal_ids[1]]["observed_no_impact_rate"]["status"] == (
+        "INSUFFICIENT_RESOLVED_LABELS")
+    assert summaries[signal_ids[1]]["observed_no_impact_rate"]["basis_points"] is None
+    assert payload["coverage"]["labeled_signal_count"] == 2
 
 
 def test_outcome_calibration_bindings_times_and_enums_fail_closed():
