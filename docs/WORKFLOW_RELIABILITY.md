@@ -163,3 +163,22 @@ not independently verified; no-impact is not a safety claim. No production
 observation, network access, credentials, repair, deployment, approval bypass,
 or external execution was added. This records change requires its own exact PR
 and merged-main CI.
+
+## AIR-24 per-signal calibration receipt (2026-10-18)
+
+PR #40 source `9b955918f060e78aff8bc71ae5ba43aeef03761f`, tree
+`10196c19d621842bbf98b7a5a2cc2d6a44437d31`, passed exact-head PR CI
+39114728167 on Python 3.12.15 with 793 tests, zero failures and zero skips on
+PostgreSQL 16 and 17. Guarded merge produced main
+`1131281ee213f4fd943f3ca17226d5dc95e3a45e`; exact push CI 39114895773
+passed the same 793/0/0 result per matrix.
+
+Each radar signal independently requires the fixed minimum resolved-label
+sample before exposing a descriptive no-impact rate. Sparse signal coverage
+remains explicit instead of inheriting a global calibration claim. Caller
+labels remain unverified offline metadata; rates are descriptive integer
+summaries, not probabilities, forecasts, causal estimates, safety claims, or
+repair, deployment, approval or execution authority. No production
+observation, network access, credentials, external action or approval bypass
+was added. This records change requires its own exact PR and merged-main CI
+before writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
