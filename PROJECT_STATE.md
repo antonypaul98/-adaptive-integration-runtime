@@ -41,6 +41,18 @@ to exact radar and signal hashes, remain explicitly unverified, and cannot grant
 probability, safety, causal, repair, approval, deployment, or execution authority.
 AIR-24 remains in progress and roadmap acceptance remains 1/12.
 
+The fourth bounded AIR-24 slice adds independently gated descriptive outcome
+rates per radar signal. PR #40 source
+`9b955918f060e78aff8bc71ae5ba43aeef03761f`, tree
+`10196c19d621842bbf98b7a5a2cc2d6a44437d31`, passed exact PostgreSQL
+16/17 PR CI `39114728167`; merged main
+`1131281ee213f4fd943f3ca17226d5dc95e3a45e` passed run `39114895773`.
+Every matrix job reported 793 passed, zero failed and zero skipped. Sparse
+signals remain visibly uncalibrated instead of inheriting a global rate.
+Caller labels remain unverified and the summaries are descriptive only—not
+probabilities, forecasts, causal or safety claims, or execution authority.
+AIR-24 remains in progress and roadmap acceptance remains 1/12.
+
 Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation

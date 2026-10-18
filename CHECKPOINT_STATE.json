@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-24 predictive breaking-change radar",
-  "active_branch": "work/air24-outcome-calibration-records",
-  "main_sha_at_start": "0c1e555f437ad17c3321dd7c43abd93352af1120",
-  "current_branch_sha": "0c1e555f437ad17c3321dd7c43abd93352af1120",
+  "active_branch": "work/air24-per-signal-calibration-records",
+  "main_sha_at_start": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+  "current_branch_sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-24 bounded offline outcome calibration merged through PR #38. Exact pull_request and merged-main push CI passed PostgreSQL 16/17 with 792 tests and zero product skips per matrix. This records-only receipt requires its own exact PR and merged-main CI before release.",
-  "local_test_status": "Pinned local Python 3.12.14: 15 focused AIR-24 tests and 460 non-PostgreSQL tests passed; 332 PostgreSQL tests were reserved for CI. Exact PR and merged-main CI on Python 3.12.15 each passed all 792 tests with zero failures/skips on PostgreSQL 16 and 17.",
-  "pr_number": 38,
-  "ci_status": "SUCCESS on exact AIR-24 outcome-calibration PR and merged-main heads; records CI pending",
-  "merge_status": "AIR24_OUTCOME_CALIBRATION_MERGED_AND_VERIFIED_RECORDS_PENDING",
+  "branch_remote_status": "AIR-24 per-signal descriptive calibration merged through PR #40. Exact pull_request and merged-main push CI passed PostgreSQL 16/17 with 793 tests and zero product skips per matrix. This records-only receipt requires its own exact PR and merged-main CI before release.",
+  "local_test_status": "Pinned local Python 3.12.14 source validation: 16 focused AIR-24 tests and 461 non-PostgreSQL tests passed; 332 PostgreSQL tests were reserved for CI. Exact PR and merged-main CI on Python 3.12.15 each passed all 793 tests with zero failures/skips on PostgreSQL 16 and 17.",
+  "pr_number": 40,
+  "ci_status": "SUCCESS on exact AIR-24 per-signal calibration PR and merged-main heads; records CI pending",
+  "merge_status": "AIR24_PER_SIGNAL_CALIBRATION_MERGED_AND_VERIFIED_RECORDS_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish and verify this AIR-24 outcome-calibration receipt with exact PostgreSQL 16/17 PR and merged-main CI, explicitly release the bounded writer slice, then review the smallest remaining AIR-24 acceptance gap.",
+  "next_action": "Publish and verify this AIR-24 per-signal calibration receipt with exact PostgreSQL 16/17 PR and merged-main CI, explicitly release the bounded writer slice, then review the smallest remaining AIR-24 acceptance gap.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -132,9 +132,9 @@
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-17T21:25:00Z",
-  "observed_branch_sha": "c364c20d66aaf5398383aa781c85fec257794f07",
-  "observed_feature_sha": "c364c20d66aaf5398383aa781c85fec257794f07",
+  "observed_at_utc": "2026-10-18T14:20:29Z",
+  "observed_branch_sha": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
+  "observed_feature_sha": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
@@ -143,40 +143,40 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 38,
+    "number": 40,
     "state": "closed",
     "merged": true,
-    "head_sha": "c364c20d66aaf5398383aa781c85fec257794f07",
-    "merge_commit_sha": "0c1e555f437ad17c3321dd7c43abd93352af1120",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/38"
+    "head_sha": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
+    "merge_commit_sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/40"
   },
   "ci_state": {
     "status": "success",
     "pr_run": {
-      "id": 39070558604,
-      "sha": "c364c20d66aaf5398383aa781c85fec257794f07",
+      "id": 39114728167,
+      "sha": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
       "event": "pull_request",
       "conclusion": "success"
     },
     "merged_main_run": {
-      "id": 39070668492,
-      "sha": "0c1e555f437ad17c3321dd7c43abd93352af1120",
+      "id": 39114895773,
+      "sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
       "event": "push",
       "conclusion": "success"
     },
     "pr_jobs": [
       {
-        "job": 117507093306,
+        "job": 117638080236,
         "name": "postgres (16)",
-        "passed": 792,
+        "passed": 793,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 117507093008,
+        "job": 117638080504,
         "name": "postgres (17)",
-        "passed": 792,
+        "passed": 793,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
@@ -184,29 +184,29 @@
     ],
     "merged_main_jobs": [
       {
-        "job": 117507421457,
+        "job": 117638585425,
         "name": "postgres (16)",
-        "passed": 792,
+        "passed": 793,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       },
       {
-        "job": 117507420946,
+        "job": 117638585503,
         "name": "postgres (17)",
-        "passed": 792,
+        "passed": 793,
         "failed": 0,
         "skipped": 0,
         "conclusion": "success"
       }
     ],
     "postgres_16": {
-      "passed": 792,
+      "passed": 793,
       "failed": 0,
       "skipped": 0
     },
     "postgres_17": {
-      "passed": 792,
+      "passed": 793,
       "failed": 0,
       "skipped": 0
     },
@@ -214,13 +214,13 @@
     "zero_database_skips_required": true,
     "separate_infrastructure_suite": "15 passed; one unrelated Memory-only diagnostic skipped, not a database product test"
   },
-  "stabilization_scope": "Append-only outcome evidence now requires the exact persisted tenant-scoped pre-execution claim and binds its artifact/content hash, executor identity hash and nonce hash to the plan, target state, approval, proposal, verification, revision and target. No command, URL, credential, callback, transport, production endpoint or deployment execution was added.",
+  "stabilization_scope": "AIR-24 per-signal outcome summaries independently enforce the fixed minimum resolved-label threshold for each radar signal and expose sparse coverage instead of inheriting a global calibration claim. Caller labels remain unverified offline metadata; rates are descriptive integers, not probabilities, forecasts, causal estimates, safety claims or authority.",
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "AIR-24 bounded offline outcome calibration merged through PR #38 after exact PostgreSQL 16/17 PR CI; merged-main CI passed 792 tests with zero failures/skips per matrix. Canonical records are prepared for independent CI.",
-    "REMOTE_SHA": "0c1e555f437ad17c3321dd7c43abd93352af1120",
-    "NEXT_ACTION": "Publish and verify the AIR-24 outcome-calibration records-only receipt, then explicitly release this bounded writer slice."
+    "SAFE_WORK_COMPLETED": "AIR-24 per-signal descriptive calibration merged through PR #40 after exact PostgreSQL 16/17 PR CI; merged-main CI passed 793 tests with zero failures/skips per matrix. Canonical records are prepared for independent CI.",
+    "REMOTE_SHA": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+    "NEXT_ACTION": "Publish and verify the AIR-24 per-signal calibration records-only receipt, then explicitly release this bounded writer slice."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -234,10 +234,10 @@
   },
   "next_checkpoint": "AIR-24 predictive breaking-change radar",
   "replay_started": true,
-  "checkpoint_status": "IN_PROGRESS_OUTCOME_CALIBRATION_MERGED_AND_VERIFIED",
-  "merge_commit_sha": "0c1e555f437ad17c3321dd7c43abd93352af1120",
-  "verified_main_sha": "0c1e555f437ad17c3321dd7c43abd93352af1120",
-  "final_pr_head": "c364c20d66aaf5398383aa781c85fec257794f07",
+  "checkpoint_status": "IN_PROGRESS_PER_SIGNAL_CALIBRATION_MERGED_AND_VERIFIED",
+  "merge_commit_sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+  "verified_main_sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+  "final_pr_head": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -553,6 +553,28 @@
       "skipped": 0
     },
     "scope": "Offline deterministic breaking-change risk baseline over caller-supplied redacted metadata with exact change/impact evidence binding, explicit coverage and uncertainty.",
-    "limitations": "No production monitoring, external calls, payloads, credentials, repair, deployment, approval bypass, or executor authority."
+    "limitations": "No production monitoring, external calls, payloads, credentials, repair, deployment, approval bypass, or executor authority.",
+    "per_signal_calibration_slice": {
+      "status": "SOURCE_MERGED_AND_VERIFIED_RECORDS_PENDING",
+      "base_main_sha": "d67179d0db52552aa450667439e4e4d2052bdedc",
+      "source_sha": "9b955918f060e78aff8bc71ae5ba43aeef03761f",
+      "source_tree_sha": "10196c19d621842bbf98b7a5a2cc2d6a44437d31",
+      "source_pr": 40,
+      "source_merge_sha": "1131281ee213f4fd943f3ca17226d5dc95e3a45e",
+      "source_pr_ci_run": 39114728167,
+      "source_merged_main_ci_run": 39114895773,
+      "postgres_16": {
+        "passed": 793,
+        "failed": 0,
+        "skipped": 0
+      },
+      "postgres_17": {
+        "passed": 793,
+        "failed": 0,
+        "skipped": 0
+      },
+      "scope": "Independent minimum-sample-gated descriptive outcome rates per radar signal with explicit sparse coverage and exact calibration-evidence binding.",
+      "limitations": "Caller labels remain unverified offline metadata. Rates are descriptive integers, not probabilities, forecasts, causal estimates, safety claims, repair, deployment, approval or execution authority."
+    }
   }
 }
