@@ -48,3 +48,13 @@ verified, and no-impact does not prove that a change was harmless.
 Calibration is offline and performs no observation, network access, production
 data collection, repair, deployment, credential use, or external action. It
 does not change the diagnostic-only authority of the radar.
+
+## Verified outcome-calibration slice
+
+PR #38 source `c364c20d66aaf5398383aa781c85fec257794f07`, tree
+`1049af808bcf03bb2128bf7b4331cba6abe6d992`, passed exact-head CI run
+39070558604 on Python 3.12.15 with 792 tests and zero product skips on each of
+PostgreSQL 16 and 17. Guarded merge
+`0c1e555f437ad17c3321dd7c43abd93352af1120` passed exact merged-main run
+39070668492 with the same result. This verifies only bounded offline outcome
+calibration; AIR-24 remains in progress.
