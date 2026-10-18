@@ -20,7 +20,7 @@ from .postgres import canonical_json
 
 VERSION = "air-breaking-change-radar-v1"
 TREND_VERSION = "air-breaking-change-risk-trend-v1"
-CALIBRATION_VERSION = "air-breaking-change-outcome-calibration-v1"
+CALIBRATION_VERSION = "air-breaking-change-outcome-calibration-v2"
 MIN_OBSERVATIONS = 2
 MAX_OBSERVATIONS = 64
 MAX_SIGNALS = 128
@@ -439,12 +439,34 @@ def calibrate_risk_outcomes(
     no_impact = sum(value["NO_IMPACT_OBSERVED"] for value in counts.values())
     inconclusive = sum(value["INCONCLUSIVE"] for value in counts.values())
     resolved = confirmed + no_impact
-    rate_available = resolved >= MIN_RESOLVED_LABELS_FOR_RATE
+    def observed_no_impact_rate(confirmed_count: int, no_impact_count: int) -> dict:
+        resolved_count = confirmed_count + no_impact_count
+        available = resolved_count >= MIN_RESOLVED_LABELS_FOR_RATE
+        return {
+            "status": "AVAILABLE" if available
+            else "INSUFFICIENT_RESOLVED_LABELS",
+            "minimum_resolved_labels": MIN_RESOLVED_LABELS_FOR_RATE,
+            "numerator": no_impact_count,
+            "denominator": resolved_count,
+            "basis_points": (no_impact_count * 10000) // resolved_count
+            if available else None,
+            "kind": "DESCRIPTIVE_CALLER_LABEL_RATE_NOT_PROBABILITY",
+        }
+
     summaries = []
     for signal_id in sorted(signal_ids):
         value = counts[signal_id]
         if sum(value.values()):
-            summaries.append({"signal_id": signal_id, **value})
+            summaries.append({
+                "signal_id": signal_id,
+                **value,
+                "resolved_label_count": (
+                    value["IMPACT_CONFIRMED"] + value["NO_IMPACT_OBSERVED"]
+                ),
+                "observed_no_impact_rate": observed_no_impact_rate(
+                    value["IMPACT_CONFIRMED"], value["NO_IMPACT_OBSERVED"]
+                ),
+            })
 
     payload = {
         "calibration_version": CALIBRATION_VERSION,
@@ -468,20 +490,12 @@ def calibrate_risk_outcomes(
             "resolved_label_count": resolved,
             "inconclusive_label_count": inconclusive,
         },
-        "observed_no_impact_rate": {
-            "status": "AVAILABLE" if rate_available
-            else "INSUFFICIENT_RESOLVED_LABELS",
-            "minimum_resolved_labels": MIN_RESOLVED_LABELS_FOR_RATE,
-            "numerator": no_impact,
-            "denominator": resolved,
-            "basis_points": (no_impact * 10000) // resolved
-            if rate_available else None,
-            "kind": "DESCRIPTIVE_CALLER_LABEL_RATE_NOT_PROBABILITY",
-        },
+        "observed_no_impact_rate": observed_no_impact_rate(confirmed, no_impact),
         "uncertainty": [
             "Outcome labels are caller declarations and are not independently verified.",
             "No-impact labels do not prove that a change was safe or harmless.",
             "Unlabeled and inconclusive signals are excluded from the descriptive rate.",
+            "Per-signal rates are withheld independently below the minimum sample count.",
             "The rate is not a forecast, probability, causal estimate, or authorization.",
         ],
         "review_required": True,
