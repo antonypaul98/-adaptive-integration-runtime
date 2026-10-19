@@ -1,5 +1,6 @@
 from copy import deepcopy
 from dataclasses import replace
+from hashlib import sha256
 import json
 
 import pytest
@@ -174,10 +175,14 @@ def test_window_trends_reject_overlap_and_do_not_leak_contract_values():
 
 
 def outcome(radar, at, value="IMPACT_CONFIRMED", signal_id=None):
+    signal = signal_id or radar.to_dict()["signals"][0]["signal_id"]
     return RiskOutcomeLabel(
         observed_at=at,
         radar_hash=radar.content_hash,
-        signal_id=signal_id or radar.to_dict()["signals"][0]["signal_id"],
+        signal_id=signal,
+        outcome_evidence_hash=sha256(
+            f"{at}:{signal}:{value}".encode("utf-8")
+        ).hexdigest(),
         outcome=value,
     )
 
@@ -268,6 +273,8 @@ def test_outcome_calibration_bindings_times_and_enums_fail_closed():
     cases = [
         (replace(good, radar_hash="0" * 64), "outcome_radar_hash_mismatch"),
         (replace(good, signal_id="0" * 64), "outcome_signal_mismatch"),
+        (replace(good, outcome_evidence_hash="not-a-hash"),
+         "invalid_outcome_evidence_hash"),
         (replace(good, outcome="SAFE"), "invalid_outcome"),
         (replace(good, observed_at="2026-01-02T00:00:00Z"),
          "outcome_precedes_radar_window"),
@@ -277,6 +284,9 @@ def test_outcome_calibration_bindings_times_and_enums_fail_closed():
             calibrate_risk_outcomes(radar, [label])
     with pytest.raises(RadarError, match="^duplicate_outcome_label$"):
         calibrate_risk_outcomes(radar, [good, good])
+    replayed = replace(good, observed_at="2026-02-02T00:00:00Z")
+    with pytest.raises(RadarError, match="^duplicate_outcome_evidence$"):
+        calibrate_risk_outcomes(radar, [good, replayed])
     with pytest.raises(RadarError, match="^outcome_label_count_out_of_bounds$"):
         calibrate_risk_outcomes(radar, [])
     malformed = replace(good, signal_id=[])  # type: ignore[arg-type]
@@ -285,6 +295,25 @@ def test_outcome_calibration_bindings_times_and_enums_fail_closed():
     forged = RiskRadar(json.dumps({"radar_version": "forged"}))
     with pytest.raises(RadarError, match="^invalid_risk_radar$"):
         calibrate_risk_outcomes(forged, [good])
+
+
+def test_distinct_outcome_evidence_is_bound_into_label_receipts():
+    radar = rank_breaking_risks([
+        observation("2026-01-01T00:00:00Z"),
+        observation("2026-01-02T00:00:00Z"),
+    ])
+    label = outcome(radar, "2026-02-01T00:00:00Z")
+    payload = calibrate_risk_outcomes(radar, [label]).to_dict()
+    assert payload["labels"][0]["outcome_evidence_hash"] == (
+        label.outcome_evidence_hash
+    )
+    assert payload["source"]["label_set_hash"] == sha256(
+        json.dumps(
+            {"labels": payload["labels"]},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
 
 
 def test_outcome_calibration_does_not_copy_contract_values():

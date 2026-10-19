@@ -101,6 +101,7 @@ class RiskOutcomeLabel:
     observed_at: str
     radar_hash: str
     signal_id: str
+    outcome_evidence_hash: str
     outcome: str
 
 
@@ -392,11 +393,13 @@ def calibrate_risk_outcomes(
 
     validated = []
     identities = set()
+    evidence_identities = set()
     for item in items:
         if not isinstance(item, RiskOutcomeLabel):
             raise RadarError("invalid_outcome_label")
         if (not isinstance(item.radar_hash, str)
                 or not isinstance(item.signal_id, str)
+                or not isinstance(item.outcome_evidence_hash, str)
                 or not isinstance(item.outcome, str)):
             raise RadarError("invalid_outcome_label")
         observed = _time(item.observed_at)
@@ -406,12 +409,17 @@ def calibrate_risk_outcomes(
             raise RadarError("outcome_radar_hash_mismatch")
         if item.signal_id not in signal_ids:
             raise RadarError("outcome_signal_mismatch")
+        if not _HASH.fullmatch(item.outcome_evidence_hash):
+            raise RadarError("invalid_outcome_evidence_hash")
         if item.outcome not in _OUTCOMES:
             raise RadarError("invalid_outcome")
         identity = (item.observed_at, item.signal_id)
         if identity in identities:
             raise RadarError("duplicate_outcome_label")
         identities.add(identity)
+        if item.outcome_evidence_hash in evidence_identities:
+            raise RadarError("duplicate_outcome_evidence")
+        evidence_identities.add(item.outcome_evidence_hash)
         validated.append(item)
     validated.sort(key=lambda item: (
         item.observed_at, item.signal_id, item.outcome,
@@ -428,6 +436,7 @@ def calibrate_risk_outcomes(
             "observed_at": item.observed_at,
             "radar_hash": item.radar_hash,
             "signal_id": item.signal_id,
+            "outcome_evidence_hash": item.outcome_evidence_hash,
             "outcome": item.outcome,
         }
         label_receipts.append({
