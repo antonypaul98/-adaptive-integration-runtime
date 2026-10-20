@@ -1,19 +1,19 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-25 dependency visualization and impact reports",
-  "active_branch": "work/air24-closure",
-  "main_sha_at_start": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-  "current_branch_sha": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
+  "active_branch": "work/air25-projection-foundation",
+  "main_sha_at_start": "98b97adba78ac2be3742a77bdae72801be1d855c",
+  "current_branch_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-24 source PRs #34, #36, #38, #40 and #42 and records PRs #35, #37, #39, #41 and #43 are merged, independently verified and explicitly released. This records-only checkpoint closure requires exact PR and merged-main CI before AIR-25 begins.",
-  "local_test_status": "Pinned local Python 3.12.14 closure validation: focused AIR-24 tests, the complete non-PostgreSQL suite and infrastructure guards passed; PostgreSQL 16/17 exact closure-head CI remains required. Prior records PR/main CI each passed all 794 product tests with zero failures/skips per matrix.",
-  "pr_number": 43,
-  "ci_status": "SUCCESS on exact AIR-24 records PR and merged-main heads; closure CI pending",
-  "merge_status": "AIR24_MERGED_AND_VERIFIED_CLOSURE_RECORDS_PENDING",
+  "branch_remote_status": "AIR-24 closure PR #44 is merged, exact PR and merged-main PostgreSQL 16/17 CI passed 794 tests with zero product skips per matrix, and the writer was explicitly released. AIR-25 deterministic dependency-projection source is prepared and requires its own exact CI.",
+  "local_test_status": "AIR-25 projection source has not been claimed locally because the transient shell executor was unavailable. Exact Python 3.12 PostgreSQL 16/17 PR CI with zero product skips is required before merge; prior AIR-24 closure CI passed 794 tests per matrix.",
+  "pr_number": 44,
+  "ci_status": "SUCCESS on exact AIR-24 closure PR and merged-main heads; AIR-25 projection source CI pending",
+  "merge_status": "AIR25_PROJECTION_SOURCE_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish and verify this AIR-24 records-only acceptance closure with exact PostgreSQL 16/17 PR and merged-main CI, explicitly release the writer, then begin AIR-25 with one bounded deterministic projection invariant.",
-  "feature_checkpoint_advanced": true,
+  "next_action": "Publish and verify the AIR-25 deterministic dependency-projection source with exact PostgreSQL 16/17 PR and merged-main CI, then preserve its canonical records before another source slice.",
+  "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
     "checkpoint_range": "AIR-23..AIR-34",
@@ -132,9 +132,9 @@
     "AIR_TEST_DATABASE_URL"
   ],
   "schema_version": 2,
-  "observed_at_utc": "2026-10-20T13:20:00Z",
-  "observed_branch_sha": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-  "observed_feature_sha": "80b27fc375f04848439fb423d7f29ebf9dba9dda",
+  "observed_at_utc": "2026-10-20T18:25:09.992Z",
+  "observed_branch_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
+  "observed_feature_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
   "current_repository_sha": null,
   "current_repository_sha_command": "git rev-parse HEAD",
   "prior_local_test_receipt": {
@@ -218,9 +218,9 @@
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "All five AIR-24 source and records slices are merged, independently verified and writer-released. The final bounded-scope acceptance review is prepared for independent closure CI.",
-    "REMOTE_SHA": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-    "NEXT_ACTION": "Publish and verify the AIR-24 records-only acceptance closure, explicitly release the writer, then begin AIR-25."
+    "SAFE_WORK_COMPLETED": "AIR-24 bounded closure merged and independently verified. AIR-25 deterministic explicit-registry projection source is prepared for exact CI.",
+    "REMOTE_SHA": "98b97adba78ac2be3742a77bdae72801be1d855c",
+    "NEXT_ACTION": "Publish and verify the AIR-25 projection source, then create its canonical records receipt."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -234,10 +234,10 @@
   },
   "next_checkpoint": "AIR-25 dependency visualization and impact reports",
   "replay_started": true,
-  "checkpoint_status": "READY_AFTER_AIR24_CLOSURE_CI",
-  "merge_commit_sha": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-  "verified_main_sha": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-  "final_pr_head": "78122618600f0b608b4fc0338631f1358aeba827",
+  "checkpoint_status": "IN_PROGRESS_PROJECTION_SOURCE_PENDING",
+  "merge_commit_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
+  "verified_main_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
+  "final_pr_head": "e9cfe67c3c4a7086590c885afe16ba1f771bc739",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -388,19 +388,15 @@
   },
   "writer_handoff": {
     "owner": "AIR Hourly Build",
-    "ownership_id": "AIR24-FINAL-ACCEPTANCE-20261020",
-    "status": "closure_records_pending",
+    "ownership_id": "AIR25-DEPENDENCY-PROJECTION-20261020",
+    "status": "source_pending",
     "source_writing_stopped": true,
     "next_owner": "AIR Hourly Build",
-    "source_head": "78122618600f0b608b4fc0338631f1358aeba827",
-    "source_tree": "8cd33c45a8729b71c1134e95b9cb3a4e24a15766",
-    "merge_commit": "5d520c80a2ff83b215f9d06ad7e4ddb040248330",
-    "pr": 43,
-    "release_condition": "Exact AIR-24 closure PR and merged-main PostgreSQL 16/17 CI green, followed by explicit writer release before AIR-25 source work.",
+    "release_condition": "Exact AIR-25 source PR and merged-main PostgreSQL 16/17 CI green, then a separate canonical records PR and explicit release before another AIR-25 source slice.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,
-    "recorded_at": "2026-10-20T13:20:00Z",
-    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/43#issuecomment-6290908813"
+    "recorded_at": "2026-10-20T18:25:09.992Z",
+    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/44#issuecomment-6296942781"
   },
   "claim_bound_outcome_receipt": {
     "status": "COMPLETE",
@@ -534,7 +530,7 @@
     "scope": "Append-only permanent single-use claim keyed to exact plan hash, target state, tenant, authorization boundary, proposal, verification, revision and executor/nonce hashes; byte-identical retries only; no lease takeover or execution capability."
   },
   "air24_progress": {
-    "status": "MERGED_AND_VERIFIED_CLOSURE_RECORDS_PENDING",
+    "status": "MERGED_AND_VERIFIED",
     "accepted_checkpoints": 2,
     "total_checkpoints": 12,
     "source_sha": "93e8e0fed2715aee0a2b3121c844ce0a5eae5c66",
@@ -604,6 +600,20 @@
       "records_pr_ci_run": 39422447207,
       "records_merged_main_ci_run": 39422771453,
       "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/43#issuecomment-6290908813"
-    }
+    },
+    "closure_pr": 44,
+    "closure_head": "e9cfe67c3c4a7086590c885afe16ba1f771bc739",
+    "closure_merge": "98b97adba78ac2be3742a77bdae72801be1d855c",
+    "closure_pr_ci_run": 39429952726,
+    "closure_merged_main_ci_run": 39465718845,
+    "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/44#issuecomment-6296942781"
+  },
+  "air25_progress": {
+    "status": "SOURCE_PENDING",
+    "accepted_checkpoints": 2,
+    "total_checkpoints": 12,
+    "base_main_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
+    "scope": "Deterministic read-only projection of explicit dependency registrations, workflow edges and content-addressed impact annotations into stable nodes and edges with explicit coverage warnings.",
+    "limitations": "No dependency discovery, production observation, payload or credential access, external calls, repair, approval, deployment, execution, or safety inference from an unannotated node."
   }
 }

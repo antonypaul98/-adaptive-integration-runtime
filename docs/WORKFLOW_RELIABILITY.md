@@ -221,3 +221,16 @@ adds no repair, approval, deployment, credential or execution authority. No
 production observation, network access, external action or approval bypass was
 added. This records change requires its own exact PR and merged-main CI before
 writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
+
+
+## AIR-25 deterministic dependency projection source (2026-10-20)
+
+The first bounded source slice projects only caller-supplied explicit dependency
+registrations, declared workflow edges and verified impact metadata into stable
+content-addressed nodes and edges. It preserves registry-only coverage warnings
+and labels an unannotated node as `no_recorded_impact`, never as safe.
+
+No dependency discovery, production observation, payload/credential access,
+external call, repair, approval, deployment or execution is added. Exact
+PostgreSQL 16/17 PR and merged-main CI with zero product skips is required
+before a canonical records receipt or further AIR-25 source work.
