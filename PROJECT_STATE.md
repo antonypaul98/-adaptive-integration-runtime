@@ -594,14 +594,18 @@ skips in both runs. This remains offline and diagnostic-only. Canonical records,
 tenant-scoped persistence and wider cross-evidence correlation remain pending.
 
 
-## AIR-25 dependency projection foundation — source pending (2026-10-20)
+## AIR-25 dependency projection foundation — source verified (2026-10-20)
 
-The first bounded AIR-25 slice adds a deterministic read-only projection over
-explicit dependency registrations, declared workflow edges and an optional
-content-addressed impact report. It produces stable node/edge identities,
-direct/transitive/no-recorded-impact review annotations, explicit registry-only
-coverage and a statement that missing impact evidence is not proof of safety.
+PR #45 source `fcd0902b00ddd9a55668d45935ccc09fb31b86c0`, tree
+`1ea5f0c99412cf6cc9bddfe9eb58d2cf8c470336`, passed exact PR CI
+`39474623923` on Python 3.12.15. PostgreSQL 16 and 17 each executed 802
+tests with zero failures and zero skips. Guarded merge produced main
+`dfb7acd43c9f6786a4bf09d93084e8cc325c6ecc`; exact merged-main CI
+`39474887370` passed the same 802/0/0 result per database version.
 
-This source requires exact PostgreSQL 16/17 PR and merged-main CI before it is
-accepted. It performs no discovery, production observation, payload/credential
-access, external calls, repair, approval, deployment or execution.
+The bounded slice projects only explicit registrations, declared workflow edges
+and verified impact metadata into deterministic content-addressed nodes and
+edges. Registry-only coverage is explicit, and `no_recorded_impact` is not a
+safety claim. It performs no discovery, production observation, tenant-crossing
+query, payload/credential access, external call, repair, approval, deployment
+or execution. Canonical records CI and explicit writer release remain pending.
