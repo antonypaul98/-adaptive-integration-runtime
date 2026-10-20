@@ -1,6 +1,7 @@
 # AIR competitive roadmap — AIR-23 through AIR-34
 
-Status: **AUTHORIZED, 1/12 checkpoints accepted**. AIR-23 is accepted; the earlier evidence and
+Status: **AUTHORIZED, 2/12 checkpoints accepted**. AIR-23 and AIR-24 are
+accepted for their bounded scopes; AIR-25 is next. The earlier evidence and
 control-plane roadmap remains accepted and is not reimplemented.
 
 The estimated 10–16 week sequence is planning guidance, not a delivery promise.

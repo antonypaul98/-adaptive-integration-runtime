@@ -14,7 +14,8 @@ external execution, credential, or approval authority. Next is AIR-24's bounded
 offline breaking-change risk baseline.
 
 
-AIR-24 is **IN PROGRESS**. Its first bounded offline risk-baseline slice merged
+AIR-24 is **MERGED_AND_VERIFIED** for its bounded offline scope. Its first
+bounded offline risk-baseline slice merged
 through PR #34. Source `93e8e0fed2715aee0a2b3121c844ce0a5eae5c66` and tree
 `1e8430fa7f3344d0598004efd459a346055fab85` passed exact PostgreSQL 16/17
 PR CI `38849674422`; merged main `a6aac4f0ad942f4911d18a7541ebc0faa521c13d`
@@ -64,7 +65,19 @@ identity is included in the content-addressed label receipt, and replay of the
 same evidence identity under another timestamp fails closed. Evidence identities
 and outcome labels remain unverified caller metadata; the slice grants no
 probability, forecast, causal, safety, repair, approval, deployment or execution
-authority. AIR-24 remains in progress and roadmap acceptance remains 1/12.
+authority.
+
+Five source slices and their five records PRs collectively satisfy the bounded
+AIR-24 acceptance contract: deterministic baselines, strictly ordered window
+comparisons, explicit unsupported/coverage uncertainty, caller-declared outcome
+visibility, independently gated per-signal descriptive rates, and exact source,
+time, radar, signal, and evidence identities. Records PR #43 head
+`78122618600f0b608b4fc0338631f1358aeba827` and merged main
+`5d520c80a2ff83b215f9d06ad7e4ddb040248330` passed PostgreSQL 16/17 CI
+with 794 tests and zero failures/skips per matrix. AIR-24 is accepted only for
+this diagnostic metadata scope; no probability, future certainty, causal or
+safety claim, repair, approval, deployment, credential, external action, or
+execution authority is granted. Roadmap progress is 2/12; AIR-25 is next.
 
 Updated 2026-09-28. GitHub is the source of truth.
 

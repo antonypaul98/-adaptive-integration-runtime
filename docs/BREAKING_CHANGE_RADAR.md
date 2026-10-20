@@ -1,5 +1,7 @@
 # AIR-24 breaking-change radar
 
+Status: **MERGED AND VERIFIED** for the bounded offline, diagnostic-only scope.
+
 AIR-24 is an offline, deterministic triage aid over already accepted OpenAPI
 change evidence. It ranks recurring non-safe detector signals and can compare
 two strictly ordered, non-overlapping historical windows. Every radar and trend
@@ -62,3 +64,25 @@ PostgreSQL 16 and 17. Guarded merge
 `0c1e555f437ad17c3321dd7c43abd93352af1120` passed exact merged-main run
 39070668492 with the same result. This verifies only bounded offline outcome
 calibration; AIR-24 remains in progress.
+
+## Final scoped acceptance review — 2026-10-20
+
+AIR-24's five independently verified source slices and matching records PRs
+satisfy the authorized acceptance contract. The implementation provides
+deterministic evidence-bound baselines; strictly ordered, non-overlapping window
+comparisons; conservative unsupported-case, coverage, and uncertainty output;
+caller-declared false-positive visibility; independently gated descriptive
+rates per signal; and exact time, radar, signal, source-evidence, and outcome-
+evidence identities.
+
+Source PRs #34, #36, #38, #40, and #42 and records PRs #35, #37, #39,
+#41, and #43 passed exact-head and merged-main PostgreSQL 16/17 CI. The latest
+records head `78122618600f0b608b4fc0338631f1358aeba827` and accepted main
+`5d520c80a2ff83b215f9d06ad7e4ddb040248330` each passed 794 product tests
+with zero failures or skips per matrix.
+
+Acceptance remains limited to offline caller-supplied redacted metadata. Scores
+and descriptive rates are not probabilities, forecasts, causal estimates, or
+safety claims. AIR-24 performs no production observation, monitoring, repair,
+approval, deployment, credential use, external action, or execution. AIR-25
+dependency visualization and impact reports is next.
