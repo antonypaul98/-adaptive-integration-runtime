@@ -20,3 +20,12 @@ Source PR #45 and merged main passed exact PostgreSQL 16 and 17 CI on Python
 3.12.15 with 802 tests and zero product skips per matrix. A separate canonical
 records receipt must pass the same exact PR-head and merged-main gate, followed
 by explicit writer release, before another AIR-25 source slice.
+
+## CI recovery receipt
+
+Canonical records PR #46 merged as `1193ad5d509e913bd8f0f8135ea7e987943d3f82`
+after exact-head CI passed, but GitHub Actions did not create a run for that
+merge SHA despite the unfiltered `push` trigger in
+`.github/workflows/tests.yml`. This metadata-only receipt intentionally
+re-exercises the normal PR and merged-main gates; it does not change product
+behavior or relax acceptance.
