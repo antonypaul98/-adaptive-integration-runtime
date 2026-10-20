@@ -182,3 +182,22 @@ repair, deployment, approval or execution authority. No production
 observation, network access, credentials, external action or approval bypass
 was added. This records change requires its own exact PR and merged-main CI
 before writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
+
+## AIR-24 outcome-evidence identity receipt (2026-10-20)
+
+PR #42 source `80b27fc375f04848439fb423d7f29ebf9dba9dda`, tree
+`7f16acec94cd80701093d67eec76e2d3c157c739`, passed exact-head PR CI
+39184925190 on Python 3.12.15 with 794 tests, zero failures and zero skips on
+PostgreSQL 16 and 17. Guarded merge produced main
+`ecbbd1b784c3d1ee44d1f328494ef910d9875d10`; exact push CI 39185082984
+passed the same 794/0/0 result per matrix.
+
+Every caller-declared outcome label now requires a bounded SHA-256 evidence
+identity. That identity is included in the content-addressed label receipt, and
+reuse of one evidence identity under another timestamp fails closed. Evidence
+identities and outcome labels remain unverified offline caller metadata; this
+does not establish probability, forecasting accuracy, causality or safety and
+adds no repair, approval, deployment, credential or execution authority. No
+production observation, network access, external action or approval bypass was
+added. This records change requires its own exact PR and merged-main CI before
+writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
