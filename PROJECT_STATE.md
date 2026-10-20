@@ -592,3 +592,16 @@ passed exact PR-event run `38383623654`, and merge
 `38383837836`; PostgreSQL 16/17 each reported 740 passed, zero failures and zero
 skips in both runs. This remains offline and diagnostic-only. Canonical records,
 tenant-scoped persistence and wider cross-evidence correlation remain pending.
+
+
+## AIR-25 dependency projection foundation — source pending (2026-10-20)
+
+The first bounded AIR-25 slice adds a deterministic read-only projection over
+explicit dependency registrations, declared workflow edges and an optional
+content-addressed impact report. It produces stable node/edge identities,
+direct/transitive/no-recorded-impact review annotations, explicit registry-only
+coverage and a statement that missing impact evidence is not proof of safety.
+
+This source requires exact PostgreSQL 16/17 PR and merged-main CI before it is
+accepted. It performs no discovery, production observation, payload/credential
+access, external calls, repair, approval, deployment or execution.

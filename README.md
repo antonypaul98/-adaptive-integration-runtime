@@ -160,3 +160,10 @@ through the existing immutable registry, with separately auditable provenance.
 [Transitive workflow impact](docs/WORKFLOW_IMPACT.md) follows explicitly registered
 downstream edges within the existing registry, with bounded cycle-safe traversal,
 deterministic shortest-path evidence and preserved tenant isolation.
+
+
+AIR-25 is in progress with a bounded offline dependency-projection foundation.
+It converts only explicit registry entries, declared workflow edges and verified
+impact metadata into deterministic content-addressed nodes and edges. An
+unannotated node is explicitly not treated as safe; no dependency discovery,
+production access, repair, deployment or execution is performed.
