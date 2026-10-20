@@ -15,8 +15,9 @@ transport, credential use or production endpoint is separate future scope and
 requires explicit authorization before implementation.
 
 The separately authorized [AIR-23–AIR-34 competitive roadmap](docs/COMPETITIVE_ROADMAP.md)
-is now in progress. AIR-23 begins with offline, privacy-conscious explanation of
-bounded replay mismatches. It does not execute repairs or external tools.
+is now in progress. AIR-23 and AIR-24 are accepted for their bounded offline,
+diagnostic-only scopes; AIR-25 dependency visualization and impact reports is
+next. These checkpoints do not execute repairs or external tools.
 
 ## Install and test
 

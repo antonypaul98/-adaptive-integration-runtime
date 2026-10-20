@@ -183,6 +183,26 @@ observation, network access, credentials, external action or approval bypass
 was added. This records change requires its own exact PR and merged-main CI
 before writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
 
+## AIR-24 bounded-scope acceptance closure (2026-10-20)
+
+AIR-24 is accepted only for deterministic offline diagnostic metadata. Source
+PRs #34, #36, #38, #40, and #42 and records PRs #35, #37, #39, #41, and
+#43 provide independently verified baselines, historical-window comparisons,
+coverage and unsupported-case uncertainty, caller-declared outcome visibility,
+per-signal descriptive calibration, and exact time/source/evidence identities.
+
+Records head `78122618600f0b608b4fc0338631f1358aeba827` passed exact PR CI
+39422447207, and merged main `5d520c80a2ff83b215f9d06ad7e4ddb040248330`
+passed exact push CI 39422771453. PostgreSQL 16 and 17 each executed 794 tests
+with zero failures and zero skips in both runs. Writer ownership was explicitly
+released in PR #43.
+
+No accepted path performs production observation, monitoring, network access,
+repair, approval, deployment, credential use, external action, or execution.
+Scores and descriptive rates are not probabilities, forecasts, causal estimates,
+or safety claims. This closure must pass its own exact PR-head and merged-main
+CI before the 2/12 acceptance record is canonical and AIR-25 work begins.
+
 ## AIR-24 outcome-evidence identity receipt (2026-10-20)
 
 PR #42 source `80b27fc375f04848439fb423d7f29ebf9dba9dda`, tree
