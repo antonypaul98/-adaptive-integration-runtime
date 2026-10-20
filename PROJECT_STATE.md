@@ -53,6 +53,19 @@ Caller labels remain unverified and the summaries are descriptive only—not
 probabilities, forecasts, causal or safety claims, or execution authority.
 AIR-24 remains in progress and roadmap acceptance remains 1/12.
 
+The fifth bounded AIR-24 slice binds every caller-declared outcome label to a
+distinct SHA-256 evidence identity. PR #42 source
+`80b27fc375f04848439fb423d7f29ebf9dba9dda`, tree
+`7f16acec94cd80701093d67eec76e2d3c157c739`, passed exact PostgreSQL
+16/17 PR CI `39184925190`; merged main
+`ecbbd1b784c3d1ee44d1f328494ef910d9875d10` passed run `39185082984`.
+Every matrix job reported 794 passed, zero failed and zero skipped. The evidence
+identity is included in the content-addressed label receipt, and replay of the
+same evidence identity under another timestamp fails closed. Evidence identities
+and outcome labels remain unverified caller metadata; the slice grants no
+probability, forecast, causal, safety, repair, approval, deployment or execution
+authority. AIR-24 remains in progress and roadmap acceptance remains 1/12.
+
 Updated 2026-09-28. GitHub is the source of truth.
 
 ## Source reconciliation
