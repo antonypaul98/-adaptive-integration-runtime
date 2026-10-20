@@ -16,7 +16,7 @@ visualization remain future bounded slices.
 
 ## Acceptance gate
 
-This source must pass exact PostgreSQL 16 and 17 PR-head CI on Python 3.12 with
-zero product skips, a guarded merge, and exact merged-main CI. A separate
-canonical records receipt and explicit writer release are required before
-another AIR-25 source slice.
+Source PR #45 and merged main passed exact PostgreSQL 16 and 17 CI on Python
+3.12.15 with 802 tests and zero product skips per matrix. A separate canonical
+records receipt must pass the same exact PR-head and merged-main gate, followed
+by explicit writer release, before another AIR-25 source slice.
