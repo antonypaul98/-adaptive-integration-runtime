@@ -124,6 +124,13 @@ def project_dependency_graph(
         projected_edges.append({'edge_id': _digest(value), **value})
     projected_edges.sort(key=lambda value: value['edge_id'])
 
+    direct_review_nodes = sum(bool(node['direct_impact_ids']) for node in nodes)
+    transitive_review_nodes = sum(bool(node['transitive_impact_ids']) for node in nodes)
+    recorded_review_nodes = sum(
+        bool(node['direct_impact_ids'] or node['transitive_impact_ids'])
+        for node in nodes
+    )
+
     payload = {
         'projection_version': PROJECTION_VERSION,
         'dependencies_hash': _digest({'dependencies': registrations}),
@@ -131,6 +138,20 @@ def project_dependency_graph(
         'impact_report_hash': impact_hash,
         'nodes': nodes,
         'edges': projected_edges,
+        'impact_summary': {
+            'basis': 'recorded_annotations_only',
+            'dependency_count': len(nodes),
+            'workflow_edge_count': len(projected_edges),
+            'recorded_review_node_count': recorded_review_nodes,
+            'direct_review_node_count': direct_review_nodes,
+            'transitive_review_node_count': transitive_review_nodes,
+            'no_recorded_impact_node_count': len(nodes) - recorded_review_nodes,
+            'direct_impact_count': sum(len(node['direct_impact_ids']) for node in nodes),
+            'transitive_impact_count': sum(
+                len(node['transitive_impact_ids']) for node in nodes
+            ),
+            'counts_are_not_probabilities_or_completeness_claims': True,
+        },
         'coverage': {
             'scope': 'explicit_registry_only',
             'warnings': warnings,

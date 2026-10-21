@@ -8,6 +8,9 @@ declared `WorkflowEdge` values and an optional content-addressed
 `ImpactReport`. It emits stable node and edge identities, review annotations,
 source hashes, explicit registry-only coverage warnings and authority limits.
 `no_recorded_impact` is never represented as proof that a dependency is safe.
+The second bounded slice adds aggregate counts over only those recorded nodes,
+edges and annotations. The summary labels its basis explicitly and states that
+its counts are neither probabilities nor completeness claims.
 
 The projection performs no dependency discovery, production observation,
 payload or credential access, external call, repair, approval, deployment,
@@ -17,9 +20,10 @@ visualization remain future bounded slices.
 ## Acceptance gate
 
 Source PR #45 and merged main passed exact PostgreSQL 16 and 17 CI on Python
-3.12.15 with 802 tests and zero product skips per matrix. A separate canonical
-records receipt must pass the same exact PR-head and merged-main gate, followed
-by explicit writer release, before another AIR-25 source slice.
+3.12.15 with 802 tests and zero product skips per matrix. Canonical records PR
+#46 passed exact-head CI; recovery PR #47 and exact-current-main-SHA recovery
+run 39543021758 passed the same 802 tests with zero product skips per matrix.
+The prior writer was explicitly released before this second source slice.
 
 ## CI recovery receipt
 
@@ -29,3 +33,9 @@ merge SHA despite the unfiltered `push` trigger in
 `.github/workflows/tests.yml`. This metadata-only receipt intentionally
 re-exercises the normal PR and merged-main gates; it does not change product
 behavior or relax acceptance.
+
+Recovery PR #47 merged as current main
+`999f58abc9e3aeec0db971149c5a3615ac69dbd5`. Recovery push run 39543021758
+tested that exact SHA on a recovery ref (not a `main` event) and passed Python
+3.12.15 with 802 tests on each PostgreSQL version and zero product skips. The
+event/ref distinction is retained; writer release is recorded on PR #47.
