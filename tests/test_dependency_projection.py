@@ -77,6 +77,37 @@ def test_projection_without_impact_report_is_explicitly_unknown():
     assert projection['coverage']['no_recorded_impact_is_not_safe'] is True
 
 
+def test_projection_reports_bounded_recorded_impact_counts():
+    a, b = dep('a'), dep('b')
+    projection = project_dependency_graph(
+        [a, b], workflow_edges=[WorkflowEdge(a, b)],
+        impact_report=impact_report([a, b], a),
+    ).to_dict()
+
+    assert projection['impact_summary'] == {
+        'basis': 'recorded_annotations_only',
+        'dependency_count': 2,
+        'workflow_edge_count': 1,
+        'recorded_review_node_count': 1,
+        'direct_review_node_count': 1,
+        'transitive_review_node_count': 0,
+        'no_recorded_impact_node_count': 1,
+        'direct_impact_count': 1,
+        'transitive_impact_count': 0,
+        'counts_are_not_probabilities_or_completeness_claims': True,
+    }
+
+
+def test_projection_without_report_counts_all_nodes_as_unrecorded_not_safe():
+    projection = project_dependency_graph([dep('a'), dep('b')]).to_dict()
+
+    assert projection['impact_summary']['recorded_review_node_count'] == 0
+    assert projection['impact_summary']['no_recorded_impact_node_count'] == 2
+    assert projection['impact_summary'][
+        'counts_are_not_probabilities_or_completeness_claims'
+    ] is True
+
+
 def test_projection_rejects_registry_mismatch():
     a, b = dep('a'), dep('b')
     with pytest.raises(ProjectionError, match='^projection_registry_mismatch$'):
