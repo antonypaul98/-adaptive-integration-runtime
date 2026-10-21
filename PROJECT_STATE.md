@@ -609,3 +609,17 @@ edges. Registry-only coverage is explicit, and `no_recorded_impact` is not a
 safety claim. It performs no discovery, production observation, tenant-crossing
 query, payload/credential access, external call, repair, approval, deployment
 or execution. Canonical records CI and explicit writer release remain pending.
+
+## AIR-25 recorded-impact summary — source verified (2026-10-21)
+
+PR #48 head `c78c8c6e6510ebe31275232311f9c2b007c1e3b8`, tree
+`8b341bf750348e0de396f52f8432508127de970f`, passed exact PR run
+39576942933 on Python 3.12.15 with 804 tests and zero product skips on each
+PostgreSQL version. Guarded merge produced current main
+`ab355e398bc99cdbd5e5da4227fb97145712ecc9`; exact main push run
+39577293315 passed the same matrix.
+
+This second bounded AIR-25 slice adds deterministic recorded-annotation counts
+for review reports. The counts are explicitly not probabilities or completeness
+claims and add no discovery, production observation, repair, approval,
+deployment or execution authority. AIR-25 remains in progress at 2/12.

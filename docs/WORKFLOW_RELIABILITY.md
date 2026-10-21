@@ -252,3 +252,18 @@ production observation, tenant-crossing query, payload or credential access,
 external call, repair, approval, deployment or execution authority. This
 records-only change requires its own exact PostgreSQL 16/17 PR and merged-main
 CI before the writer is released or another source slice begins.
+
+## AIR-25 recorded-impact summary source receipt (2026-10-21)
+
+PR #48 head `c78c8c6e6510ebe31275232311f9c2b007c1e3b8`, tree
+`8b341bf750348e0de396f52f8432508127de970f`, passed exact PR run
+39576942933 on Python 3.12.15; PostgreSQL 16 and 17 each passed 804 tests
+with zero product skips. Guarded merge produced main
+`ab355e398bc99cdbd5e5da4227fb97145712ecc9`; exact main push run
+39577293315 passed the same 804-test matrix with zero product skips.
+
+The summary counts only caller-supplied recorded dependency nodes, workflow
+edges and verified impact annotations. Counts are not probabilities,
+completeness claims, safety claims or authority. No discovery, production
+observation, payload/credential access, external action, repair, approval,
+deployment or execution was added. AIR-25 remains in progress at 2/12.

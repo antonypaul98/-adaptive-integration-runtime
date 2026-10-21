@@ -39,3 +39,17 @@ Recovery PR #47 merged as current main
 tested that exact SHA on a recovery ref (not a `main` event) and passed Python
 3.12.15 with 802 tests on each PostgreSQL version and zero product skips. The
 event/ref distinction is retained; writer release is recorded on PR #47.
+
+## Recorded-impact summary source receipt
+
+PR #48 head `c78c8c6e6510ebe31275232311f9c2b007c1e3b8`, tree
+`8b341bf750348e0de396f52f8432508127de970f`, passed exact-head run
+39576942933 on Python 3.12.15. PostgreSQL 16 and 17 each reported 804
+tests passed with zero product skips. Guarded merge produced main
+`ab355e398bc99cdbd5e5da4227fb97145712ecc9`; exact main push run
+39577293315 passed the same 804-test matrix with zero product skips.
+
+The new aggregate is bounded to recorded annotations. Its node, edge and impact
+counts are explicitly neither probabilities nor completeness claims. AIR-25
+remains in progress at 2/12 pending later visualization/report slices and
+eventual checkpoint acceptance.
