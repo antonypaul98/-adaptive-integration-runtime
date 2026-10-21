@@ -11,6 +11,7 @@ from hashlib import sha256
 import json
 import re
 from typing import Iterable
+from uuid import UUID
 
 from air.dependency_impact import (
     Dependency,
@@ -19,11 +20,15 @@ from air.dependency_impact import (
     WorkflowEdge,
     _dependencies,
     _digest,
+    _edge,
     _workflow_edges,
+    load_impact,
+    load_registry,
 )
-from air.postgres import canonical_json
+from air.postgres import EvidenceTransaction, canonical_json
 
 PROJECTION_VERSION = 'air-dependency-projection-v1'
+PROJECTION_RECORD_VERSION = 'air-dependency-projection-record-v1'
 MAX_PROJECTION_IMPACTS = 5000
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
@@ -166,3 +171,84 @@ def project_dependency_graph(
         },
     }
     return DependencyProjection(canonical_json(payload))
+
+
+def _persisted_payload(
+    transaction: EvidenceTransaction,
+    registry_id: str | UUID,
+    impact_id: str | UUID | None,
+) -> dict:
+    try:
+        registry = load_registry(transaction, registry_id)
+        registry_payload = json.loads(registry['payload'])
+        impact = load_impact(transaction, impact_id) if impact_id is not None else None
+        impact_payload = json.loads(impact['payload']) if impact is not None else None
+        registry_ref = {
+            'artifact_id': str(registry['artifact_id']),
+            'artifact_hash': registry['content_hash'],
+        }
+        if impact_payload is not None and impact_payload['registry'] != registry_ref:
+            raise ProjectionError('projection_impact_registry_mismatch')
+        report = (ImpactReport(canonical_json(impact_payload['analysis']))
+                  if impact_payload is not None else None)
+        projection = project_dependency_graph(
+            [Dependency(**value) for value in registry_payload['dependencies']],
+            workflow_edges=[_edge(value)
+                            for value in registry_payload.get('workflow_edges', [])],
+            impact_report=report,
+        )
+        return {
+            'tenant_id': str(transaction.tenant_id),
+            'projection_record_version': PROJECTION_RECORD_VERSION,
+            'registry': registry_ref,
+            'impact': ({
+                'artifact_id': str(impact['artifact_id']),
+                'artifact_hash': impact['content_hash'],
+            } if impact is not None else None),
+            'projection_hash': projection.content_hash,
+            'projection_payload': projection.payload_json,
+        }
+    except ImpactError as exc:
+        raise ProjectionError('projection_evidence_not_found_or_invalid') from exc
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        if isinstance(exc, ProjectionError):
+            raise
+        raise ProjectionError('projection_persistence_rejected') from exc
+
+
+def project_and_persist(
+    transaction: EvidenceTransaction,
+    registry_id: str | UUID,
+    *,
+    impact_id: str | UUID | None = None,
+) -> dict:
+    """Persist a read-only projection bound to exact tenant-scoped evidence."""
+    payload = _persisted_payload(transaction, registry_id, impact_id)
+    return transaction.put('dependency_projection', _digest(payload), payload)
+
+
+def load_projection(transaction: EvidenceTransaction, identity: str | UUID) -> dict:
+    """Reload and recompute an immutable projection through tenant RLS."""
+    try:
+        record = transaction.get_by_id(identity, kind='dependency_projection')
+    except (TypeError, ValueError):
+        record = None
+    if record is None or record['tenant_id'] != transaction.tenant_id:
+        raise ProjectionError('projection_not_found_or_not_authorized')
+    try:
+        payload = json.loads(record['payload'])
+        expected = _persisted_payload(
+            transaction,
+            payload['registry']['artifact_id'],
+            payload['impact']['artifact_id'] if payload['impact'] is not None else None,
+        )
+        expected_json = canonical_json(expected)
+        if (record['payload'] != expected_json
+                or record['idempotency_key'] != _digest(expected)
+                or record['content_hash'] != _digest(expected)):
+            raise ProjectionError('invalid_persisted_projection')
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        if isinstance(exc, ProjectionError):
+            raise
+        raise ProjectionError('invalid_persisted_projection') from exc
+    return record

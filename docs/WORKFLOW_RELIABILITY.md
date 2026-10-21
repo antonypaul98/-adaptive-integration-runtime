@@ -267,3 +267,17 @@ edges and verified impact annotations. Counts are not probabilities,
 completeness claims, safety claims or authority. No discovery, production
 observation, payload/credential access, external action, repair, approval,
 deployment or execution was added. AIR-25 remains in progress at 2/12.
+
+## AIR-25 projection persistence source scope (2026-10-21)
+
+This bounded slice stores the existing deterministic projection as immutable,
+tenant-scoped evidence bound to one exact registry and optional exact impact
+artifact. Reload recomputes the projection from those authenticated inputs and
+fails closed on tampering, mismatched registry/impact evidence or cross-tenant
+access. Database validation retains append-only audit, RLS, strict references,
+explicit registry-only coverage and read-only authority.
+
+It adds no dependency discovery, production observation, payload/credential
+access, external action, repair, approval, deployment, agent/tool execution,
+probability, completeness or safety claim. Exact PostgreSQL 16/17 source PR
+and merged-main CI are required before canonical records or writer release.
