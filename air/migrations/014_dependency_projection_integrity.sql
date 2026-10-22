@@ -3,6 +3,7 @@ CREATE FUNCTION air.validate_dependency_projection() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, air AS $$
 DECLARE
     p JSONB; projection JSONB; registry JSONB; impact JSONB;
+    expected_impact_hash JSONB := 'null'::jsonb;
     registry_hash TEXT; impact_hash TEXT; registry_id UUID; impact_id UUID;
     root_keys TEXT[] := ARRAY['tenant_id','projection_record_version','registry',
                               'impact','projection_hash','projection_payload'];
@@ -54,6 +55,7 @@ BEGIN
            impact->'registry' IS DISTINCT FROM p->'registry' THEN
             RAISE EXCEPTION 'unbound dependency projection impact' USING ERRCODE='23514';
         END IF;
+        expected_impact_hash := to_jsonb(impact->>'impact_hash');
     END IF;
 
     projection := (p->>'projection_payload')::jsonb;
@@ -66,8 +68,7 @@ BEGIN
        projection->'authority' IS DISTINCT FROM jsonb_build_object(
            'read_only',true,'external_actions',false,
            'repair_authority',false,'deployment_authority',false) OR
-       projection->'impact_report_hash' IS DISTINCT FROM
-           CASE WHEN impact IS NULL THEN 'null'::jsonb ELSE to_jsonb(impact->>'impact_hash') END THEN
+       projection->'impact_report_hash' IS DISTINCT FROM expected_impact_hash THEN
         RAISE EXCEPTION 'invalid dependency projection payload' USING ERRCODE='23514';
     END IF;
     RETURN NEW;
