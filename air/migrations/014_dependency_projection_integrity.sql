@@ -73,7 +73,7 @@ BEGIN
     RETURN NEW;
 EXCEPTION WHEN invalid_text_representation OR invalid_parameter_value THEN
     RAISE EXCEPTION 'invalid dependency projection reference' USING ERRCODE='23514';
-END $$;
+END; $$;
 REVOKE ALL ON FUNCTION air.validate_dependency_projection() FROM PUBLIC;
 CREATE TRIGGER dependency_projection_integrity BEFORE INSERT ON air.artifacts
     FOR EACH ROW EXECUTE FUNCTION air.validate_dependency_projection();
