@@ -11,6 +11,9 @@ source hashes, explicit registry-only coverage warnings and authority limits.
 The second bounded slice adds aggregate counts over only those recorded nodes,
 edges and annotations. The summary labels its basis explicitly and states that
 its counts are neither probabilities nor completeness claims.
+The third bounded slice persists that projection as immutable, tenant-scoped
+evidence bound to the exact registry and optional impact artifacts. Reload
+recomputes the projection and fails closed on mismatched or forged evidence.
 
 The projection performs no dependency discovery, production observation,
 payload or credential access, external call, repair, approval, deployment,
