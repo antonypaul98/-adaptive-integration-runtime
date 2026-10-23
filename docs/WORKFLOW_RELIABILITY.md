@@ -322,3 +322,19 @@ and merged-main CI are required before canonical records or writer release.
   observation, credential/payload access, repair, approval, deployment,
   external action, agent/tool execution, probability, completeness or safety
   claim. AIR-25 remains in progress at 2/12.
+
+## AIR-25 visualization persistence source scope (2026-10-23)
+
+This bounded slice persists only the existing redacted dependency presentation,
+bound to one exact immutable tenant-scoped projection. Reload authenticates and
+recomputes the projection, then deterministically recomputes the presentation;
+it fails closed on cross-tenant access, substitution or tampering. Database
+validation enforces the exact projection reference, content hashes, explicit
+unknown/safety boundary and read-only authority.
+
+Local Python 3.12.14 validation passed 21 focused tests, 483 portable product
+tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with
+one documented Memory-only skip. PostgreSQL 16/17 CI remains pending. No raw
+dependency metadata, discovery, production observation, credentials, payload
+access, repair, approval, deployment, external action, agent/tool execution,
+probability, completeness or safety authority is added.

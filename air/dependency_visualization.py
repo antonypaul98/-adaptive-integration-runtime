@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 import re
+from uuid import UUID
 
 from air.dependency_impact import (
     MAX_DEPENDENCIES,
@@ -22,10 +23,12 @@ from air.dependency_projection import (
     DependencyProjection,
     MAX_PROJECTION_IMPACTS,
     PROJECTION_VERSION,
+    load_projection,
 )
-from air.postgres import canonical_json
+from air.postgres import EvidenceTransaction, canonical_json
 
 VISUALIZATION_VERSION = 'air-dependency-visualization-v1'
+VISUALIZATION_RECORD_VERSION = 'air-dependency-visualization-record-v1'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 _LANES = ('direct_review', 'transitive_review', 'no_recorded_impact')
 
@@ -248,3 +251,66 @@ def visualize_dependency_projection(projection) -> DependencyVisualization:
         },
     }
     return DependencyVisualization(canonical_json(payload))
+
+
+def _persisted_visualization_payload(
+    transaction: EvidenceTransaction,
+    projection_id: str | UUID,
+) -> dict:
+    """Recompute redacted presentation data from tenant-authorized evidence."""
+    try:
+        projection_record = load_projection(transaction, projection_id)
+        projection_envelope = json.loads(projection_record['payload'])
+        projection = DependencyProjection(projection_envelope['projection_payload'])
+        visualization = visualize_dependency_projection(projection)
+        return {
+            'tenant_id': str(transaction.tenant_id),
+            'visualization_record_version': VISUALIZATION_RECORD_VERSION,
+            'projection': {
+                'artifact_id': str(projection_record['artifact_id']),
+                'artifact_hash': projection_record['content_hash'],
+            },
+            'visualization_hash': visualization.content_hash,
+            'visualization_payload': visualization.payload_json,
+        }
+    except VisualizationError:
+        raise
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise VisualizationError('visualization_persistence_rejected') from exc
+
+
+def visualize_and_persist(
+    transaction: EvidenceTransaction,
+    projection_id: str | UUID,
+) -> dict:
+    """Persist a read-only visualization bound to one tenant projection."""
+    payload = _persisted_visualization_payload(transaction, projection_id)
+    return transaction.put('dependency_visualization', _digest(payload), payload)
+
+
+def load_visualization(
+    transaction: EvidenceTransaction,
+    identity: str | UUID,
+) -> dict:
+    """Reload and recompute immutable visualization evidence through tenant RLS."""
+    try:
+        record = transaction.get_by_id(identity, kind='dependency_visualization')
+    except (TypeError, ValueError):
+        record = None
+    if record is None or record['tenant_id'] != transaction.tenant_id:
+        raise VisualizationError('visualization_not_found_or_not_authorized')
+    try:
+        payload = json.loads(record['payload'])
+        expected = _persisted_visualization_payload(
+            transaction, payload['projection']['artifact_id']
+        )
+        expected_json = canonical_json(expected)
+        if (record['payload'] != expected_json
+                or record['idempotency_key'] != _digest(expected)
+                or record['content_hash'] != _digest(expected)):
+            raise VisualizationError('invalid_persisted_visualization')
+    except VisualizationError:
+        raise
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise VisualizationError('invalid_persisted_visualization') from exc
+    return record
