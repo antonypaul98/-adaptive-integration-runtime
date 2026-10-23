@@ -334,7 +334,13 @@ unknown/safety boundary and read-only authority.
 
 Local Python 3.12.14 validation passed 21 focused tests, 483 portable product
 tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with
-one documented Memory-only skip. PostgreSQL 16/17 CI remains pending. No raw
+one documented Memory-only skip. Source head
+`aa77d6284bf3afbfc37590dd5726c9c689d6b9ee` passed exact PR run
+`40002653145`; PostgreSQL 16 and 17 each passed 834 product tests on Python
+3.12.15 with zero product skips. Guarded merge produced exact main
+`fbd6cf37fd7f6f471169e4eab749636051a03e9c`, and exact merged-main run
+`40039245945` passed the same matrix. Canonical records CI and writer release
+remain pending. No raw
 dependency metadata, discovery, production observation, credentials, payload
 access, repair, approval, deployment, external action, agent/tool execution,
 probability, completeness or safety authority is added.
