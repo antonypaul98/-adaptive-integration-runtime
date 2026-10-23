@@ -11,9 +11,13 @@ product skips. PR #53 subsequently recorded and verified that source at current
 main `11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05`; exact final-main run
 `39970325308` passed 826 tests per PostgreSQL 16/17 matrix with zero product
 skips, and writer `AIR25-DETERMINISTIC-VISUALIZATION-20261023` was released.
-The next bounded candidate persists only the redacted visualization, bound to
-one exact tenant-scoped projection, and recomputes both artifacts on reload.
-Its PostgreSQL 16/17 PR CI is pending; AIR-25 remains in progress at 2/12.
+PR #54 now persists only the redacted visualization, bound to one exact
+tenant-scoped projection, and recomputes both artifacts on reload. Source head
+`aa77d6284bf3afbfc37590dd5726c9c689d6b9ee` passed exact PR run
+`40002653145`; guarded merge `fbd6cf37fd7f6f471169e4eab749636051a03e9c`
+passed exact main run `40039245945`. Each Python 3.12.15 PostgreSQL 16/17 job
+passed 834 product tests with zero product skips. Canonical records and writer
+release remain pending; AIR-25 remains in progress at 2/12.
 
 AIR-23 explainable failure investigation is **MERGED_AND_VERIFIED**. PR #32
 source head `21e469ce6a816d783f8fdee5a1b46214314ba9af` passed exact PostgreSQL

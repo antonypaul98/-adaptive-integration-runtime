@@ -132,3 +132,16 @@ source CI is pending. This slice adds no raw dependency metadata, discovery,
 production observation, credentials, payload access, external action, repair,
 approval, deployment, agent/tool execution, probability, completeness or safety
 authority. AIR-25 remains in progress at 2/12.
+
+## Visualization persistence source receipt
+
+PR #54 head `aa77d6284bf3afbfc37590dd5726c9c689d6b9ee`, tree
+`c88316f20b12056a678f4234d16a4295aabf6c0e`, passed exact PR run
+40002653145 on Python 3.12.15. PostgreSQL 16 and 17 each passed 834 product
+tests with zero product skips. The expected-head guarded merge produced exact
+main `fbd6cf37fd7f6f471169e4eab749636051a03e9c`; exact merged-main run
+40039245945 passed the same 834-test matrix with zero product skips.
+
+This receipt does not expand authority or mark AIR-25 complete. Canonical
+records CI and the explicit writer release remain pending; roadmap progress is
+still 2/12 accepted.
