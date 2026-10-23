@@ -93,6 +93,22 @@ loaded through the existing tenant-scoped recomputation path.
 
 Local Python 3.12.14 validation passed 21 focused projection/visualization tests,
 483 portable product tests with 343 PostgreSQL cases deselected, and 15 of 16
-infrastructure guards with the documented Memory-only skip. PostgreSQL 16/17
-CI, PR merge, merged-main CI, canonical records and writer release remain
-pending and are not claimed by this source-scope record.
+infrastructure guards with the documented Memory-only skip. At candidate
+creation, PostgreSQL 16/17 CI, PR merge and merged-main CI were still pending;
+the verified source receipt follows. Canonical records and writer release remain
+pending.
+
+## Deterministic visualization source receipt
+
+PR #52 head `cd5b51cd44030808c98b09f921b93e4935feaae4`, tree
+`8990c0b1c2b128e682b35270a3aaccef05a3fa4d`, passed exact PR run
+39969307864 on Python 3.12.15. PostgreSQL 16 and 17 each passed 826 product
+tests with zero skips. Guarded merge produced main
+`007e09a6c75a5918050f8f3ba672a3d2ec25568c`; exact push run 39969589955
+passed the same 826-test matrix with zero product skips.
+
+The output contains stable opaque aliases, review lanes, recorded counts and
+registered edge relations only. It includes no raw dependency metadata, and it
+explicitly withholds origin authentication, completeness, probability, safety,
+repair, approval, deployment, external-action or execution authority. This
+records change requires its own exact PR and merged-main CI before release.

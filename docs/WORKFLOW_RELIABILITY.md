@@ -14,10 +14,18 @@ the existing tenant-scoped recomputation path.
 
 Local Python 3.12.14 validation passed 21 focused tests, 483 portable product
 tests with 343 PostgreSQL tests deselected, and 15 of 16 infrastructure guards;
-the sole skip is the documented Memory-only diagnostic. PostgreSQL 16/17 PR CI,
-guarded merge, exact merged-main CI and canonical acceptance records are pending.
+the sole skip is the documented Memory-only diagnostic. At local candidate
+validation, PostgreSQL 16/17 PR CI and merged-main CI were pending; their exact
+receipt follows. Canonical acceptance records remain pending.
 No discovery, production observation, credential/payload access, external
 action, repair, approval, deployment, execution or safety claim was added.
+
+Source PR #52 head `cd5b51cd44030808c98b09f921b93e4935feaae4`
+passed exact run 39969307864, and merged main
+`007e09a6c75a5918050f8f3ba672a3d2ec25568c` passed exact push run
+39969589955. Python 3.12.15 with PostgreSQL 16 and 17 passed 826 product tests
+with zero product skips in every matrix. Canonical records CI and writer release
+remain pending.
 
 No product checkpoint advanced by the 2026-10-03 stabilization below. No
 feature source/test changed in that stabilization.
