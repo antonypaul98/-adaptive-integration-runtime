@@ -2,14 +2,13 @@
 
 ## Competitive roadmap status — 2026-10-16
 
-AIR-25 deterministic visualization is an unmerged source candidate on
-`work/air25-deterministic-visualization`, based on exact main
-`530fc80ea64dc480fc20e350bd3f3d7ea4368513`. It validates the existing
-projection before emitting redacted stable aliases, review lanes and recorded
-counts. Local Python 3.12.14 validation passed 21 focused tests, 483 portable
-tests (343 PostgreSQL cases deselected), and 15 infrastructure guards with one
-documented Memory-only skip. Exact PostgreSQL 16/17 PR CI, guarded merge and
-merged-main CI remain pending; AIR-25 is still in progress at 2/12 accepted.
+AIR-25 deterministic visualization source is merged through PR #52. Source head
+`cd5b51cd44030808c98b09f921b93e4935feaae4` passed exact PostgreSQL 16/17
+PR CI `39969307864`; merged main
+`007e09a6c75a5918050f8f3ba672a3d2ec25568c` passed exact push CI
+`39969589955`. Each Python 3.12.15 matrix passed 826 product tests with zero
+product skips. Canonical records and writer release remain pending; AIR-25 is
+still in progress at 2/12 accepted.
 
 AIR-23 explainable failure investigation is **MERGED_AND_VERIFIED**. PR #32
 source head `21e469ce6a816d783f8fdee5a1b46214314ba9af` passed exact PostgreSQL
