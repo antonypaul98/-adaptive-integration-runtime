@@ -623,3 +623,18 @@ This second bounded AIR-25 slice adds deterministic recorded-annotation counts
 for review reports. The counts are explicitly not probabilities or completeness
 claims and add no discovery, production observation, repair, approval,
 deployment or execution authority. AIR-25 remains in progress at 2/12.
+
+## AIR-25 projection persistence — source verified (2026-10-23)
+
+PR #50 head `c5161360dc12e2a658a4636020f583c3133a5727` (tree
+`996cd451fdb438fa4df34d356493d8bd86969dab`) passed exact-head run
+39871385727 on Python 3.12.15. PostgreSQL 16 and 17 each passed 815 product
+tests with zero product skips. The guarded merge is exact main
+`44331ae748f3995018000b29b755a4ba81c4f730`; push run 39877439471 passed the same matrix.
+
+This bounded slice adds immutable tenant-scoped persistence for deterministic
+dependency projections, exact registry/impact binding and fail-closed verified
+reload. It adds no discovery, production observation, secrets or payload
+access, repair, approval, deployment, external action, agent/tool execution,
+probability, completeness or safety claim. AIR-25 remains in progress and the
+roadmap remains 2/12 accepted; canonical records CI and writer release follow.

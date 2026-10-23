@@ -17,8 +17,7 @@ recomputes the projection and fails closed on mismatched or forged evidence.
 
 The projection performs no dependency discovery, production observation,
 payload or credential access, external call, repair, approval, deployment,
-agent/tool execution or tenant-crossing query. Persistence and interactive
-visualization remain future bounded slices.
+agent/tool execution or tenant-crossing query. Interactive visualization remains a future bounded slice.
 
 ## Acceptance gate
 
@@ -56,3 +55,20 @@ The new aggregate is bounded to recorded annotations. Its node, edge and impact
 counts are explicitly neither probabilities nor completeness claims. AIR-25
 remains in progress at 2/12 pending later visualization/report slices and
 eventual checkpoint acceptance.
+
+## Projection persistence source receipt
+
+PR #50 head `c5161360dc12e2a658a4636020f583c3133a5727`, tree
+`996cd451fdb438fa4df34d356493d8bd86969dab`, passed exact-head run
+39871385727 on Python 3.12.15. PostgreSQL 16 and 17 each reported 815
+product tests passed with zero product skips. Guarded merge produced main
+`44331ae748f3995018000b29b755a4ba81c4f730`; exact main push run
+39877439471 passed the same 815-test matrix with zero product skips.
+
+The slice stores immutable, tenant-scoped dependency projections bound to the
+exact registry and optional impact artifacts. Reload recomputes the projection
+and fails closed on mismatched or forged evidence. It performs no dependency
+discovery, production observation, payload or credential access, repair,
+approval, deployment, external action, agent/tool execution, probability,
+completeness or safety claim. AIR-25 remains in progress at 2/12 pending later
+visualization/report slices and eventual checkpoint acceptance.
