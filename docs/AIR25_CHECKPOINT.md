@@ -14,10 +14,17 @@ its counts are neither probabilities nor completeness claims.
 The third bounded slice persists that projection as immutable, tenant-scoped
 evidence bound to the exact registry and optional impact artifacts. Reload
 recomputes the projection and fails closed on mismatched or forged evidence.
+The fourth bounded slice derives a deterministic presentation model only after
+revalidating every projection identity, source hash, summary, coverage boundary
+and read-only authority. It replaces dependency names, mappings, locations and
+operations with stable opaque aliases, groups nodes into explicit review lanes,
+and retains only recorded counts and `consumes_output` edges.
 
 The projection performs no dependency discovery, production observation,
 payload or credential access, external call, repair, approval, deployment,
-agent/tool execution or tenant-crossing query. Interactive visualization remains a future bounded slice.
+agent/tool execution or tenant-crossing query. This presentation model renders
+no UI and grants no interactive or external-action authority; interactive
+visualization remains a later bounded slice.
 
 ## Acceptance gate
 
@@ -72,3 +79,20 @@ discovery, production observation, payload or credential access, repair,
 approval, deployment, external action, agent/tool execution, probability,
 completeness or safety claim. AIR-25 remains in progress at 2/12 pending later
 visualization/report slices and eventual checkpoint acceptance.
+
+## Deterministic visualization source scope
+
+The candidate source accepts only an existing canonical `DependencyProjection`
+and fails closed if node or edge identities, source hashes, recorded-impact
+summary, coverage claims, ordering, or read-only authority have been forged.
+Its output uses stable opaque aliases and fixed review lanes without copying raw
+dependency metadata or source warning text. `no_recorded_impact` remains an
+explicit unknown state, not a safety result. The in-memory presentation model
+does not authenticate the projection's origin; persisted evidence must still be
+loaded through the existing tenant-scoped recomputation path.
+
+Local Python 3.12.14 validation passed 21 focused projection/visualization tests,
+483 portable product tests with 343 PostgreSQL cases deselected, and 15 of 16
+infrastructure guards with the documented Memory-only skip. PostgreSQL 16/17
+CI, PR merge, merged-main CI, canonical records and writer release remain
+pending and are not claimed by this source-scope record.

@@ -1,6 +1,26 @@
 # Workflow reliability — stabilization 2026-10-03
 
-No product checkpoint advanced. No feature source/test changed.
+## AIR-25 deterministic visualization candidate (2026-10-23)
+
+The source candidate is based on exact main
+`530fc80ea64dc480fc20e350bd3f3d7ea4368513` and derives only redacted,
+read-only presentation data from an already canonical dependency projection.
+It revalidates node and edge identities, source hashes, summary counts,
+coverage limits and authority before assigning stable opaque aliases and review
+lanes. It copies no dependency names, mappings, locations, operations or free
+form warning text into the output. It explicitly does not authenticate an
+in-memory projection's origin; persisted origin remains the responsibility of
+the existing tenant-scoped recomputation path.
+
+Local Python 3.12.14 validation passed 21 focused tests, 483 portable product
+tests with 343 PostgreSQL tests deselected, and 15 of 16 infrastructure guards;
+the sole skip is the documented Memory-only diagnostic. PostgreSQL 16/17 PR CI,
+guarded merge, exact merged-main CI and canonical acceptance records are pending.
+No discovery, production observation, credential/payload access, external
+action, repair, approval, deployment, execution or safety claim was added.
+
+No product checkpoint advanced by the 2026-10-03 stabilization below. No
+feature source/test changed in that stabilization.
 
 ## Environment
 
