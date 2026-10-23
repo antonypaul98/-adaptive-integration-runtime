@@ -281,3 +281,16 @@ It adds no dependency discovery, production observation, payload/credential
 access, external action, repair, approval, deployment, agent/tool execution,
 probability, completeness or safety claim. Exact PostgreSQL 16/17 source PR
 and merged-main CI are required before canonical records or writer release.
+
+## AIR-25 projection persistence source receipt (2026-10-23)
+
+- Source PR #50: head `c5161360dc12e2a658a4636020f583c3133a5727`, tree `996cd451fdb438fa4df34d356493d8bd86969dab`.
+- Exact-head run 39871385727: Python 3.12.15; PostgreSQL 16 and 17 each passed
+  815 product tests with zero product skips.
+- Guarded merge: exact main `44331ae748f3995018000b29b755a4ba81c4f730`.
+- Exact merged-main run 39877439471: the same 815-test PostgreSQL 16/17 matrix
+  passed with zero product skips.
+- Authority remains read-only evidence persistence: no discovery, production
+  observation, credential/payload access, repair, approval, deployment,
+  external action, agent/tool execution, probability, completeness or safety
+  claim. AIR-25 remains in progress at 2/12.
