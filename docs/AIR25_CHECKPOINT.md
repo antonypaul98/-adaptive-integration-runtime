@@ -19,6 +19,10 @@ revalidating every projection identity, source hash, summary, coverage boundary
 and read-only authority. It replaces dependency names, mappings, locations and
 operations with stable opaque aliases, groups nodes into explicit review lanes,
 and retains only recorded counts and `consumes_output` edges.
+The fifth bounded slice persists that redacted presentation as immutable,
+tenant-scoped evidence bound to one exact persisted projection. Reload first
+revalidates and recomputes the projection, then recomputes the visualization;
+cross-tenant, forged, substituted and noncanonical evidence fails closed.
 
 The projection performs no dependency discovery, production observation,
 payload or credential access, external call, repair, approval, deployment,
@@ -112,3 +116,19 @@ registered edge relations only. It includes no raw dependency metadata, and it
 explicitly withholds origin authentication, completeness, probability, safety,
 repair, approval, deployment, external-action or execution authority. This
 records change requires its own exact PR and merged-main CI before release.
+
+## Visualization persistence source scope
+
+The candidate stores only the existing redacted presentation payload plus its
+content hash and exact tenant-scoped projection artifact identity/hash. Database
+validation enforces the tenant, immutable reference, payload hash, explicit
+unknown/safety boundary and read-only authority. Verified reload recomputes both
+the projection and visualization rather than trusting the stored presentation.
+
+Local Python 3.12.14 validation passed 21 focused projection/visualization tests,
+483 portable product tests with 351 PostgreSQL cases deselected, and 15 of 16
+infrastructure guards with the documented Memory-only skip. PostgreSQL 16/17
+source CI is pending. This slice adds no raw dependency metadata, discovery,
+production observation, credentials, payload access, external action, repair,
+approval, deployment, agent/tool execution, probability, completeness or safety
+authority. AIR-25 remains in progress at 2/12.

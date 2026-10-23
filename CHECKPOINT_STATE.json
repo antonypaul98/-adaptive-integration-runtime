@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-25 dependency visualization and impact reports",
-  "active_branch": "work/air25-deterministic-visualization-records",
-  "main_sha_at_start": "007e09a6c75a5918050f8f3ba672a3d2ec25568c",
-  "current_branch_sha": "007e09a6c75a5918050f8f3ba672a3d2ec25568c",
+  "active_branch": "work/air25-visualization-persistence",
+  "main_sha_at_start": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+  "current_branch_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-25 deterministic-visualization source PR #52 merged at exact main 007e09a6c75a5918050f8f3ba672a3d2ec25568c after PostgreSQL 16/17 PR and merged-main CI passed 826 product tests per matrix with zero product skips. Canonical records and writer release are pending.",
-  "local_test_status": "Python 3.12.14: 21 focused dependency projection/visualization tests passed; 483 portable product tests passed with 343 PostgreSQL cases deselected; infrastructure suite 15 passed with one documented Memory-only skip; diagnostics, compile and whitespace checks passed. PostgreSQL 16/17 source CI not yet run.",
-  "pr_number": 52,
-  "ci_status": "AIR-25 deterministic-visualization source exact PR run 39969307864 and merged-main run 39969589955 succeeded on Python 3.12.15 with PostgreSQL 16/17, 826 product tests and zero product skips per matrix; records-only CI pending.",
-  "merge_status": "AIR25_DETERMINISTIC_VISUALIZATION_RECORDS_PENDING",
+  "branch_remote_status": "AIR-25 deterministic-visualization records PR #53 merged as current main 11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05; exact final-main CI 39970325308 passed 826 product tests per PostgreSQL 16/17 matrix with zero product skips and the writer was released. New visualization-persistence candidate is local pending publication.",
+  "local_test_status": "Python 3.12.14: 21 focused dependency projection/visualization tests passed; 483 portable product tests passed with 351 PostgreSQL cases deselected; infrastructure suite 15 passed with one documented Memory-only skip; diagnostics, compile and whitespace checks passed. New PostgreSQL cases await CI.",
+  "pr_number": null,
+  "ci_status": "Prior deterministic-visualization records and exact-main CI are verified through run 39970325308. New visualization-persistence PostgreSQL 16/17 source CI has not run.",
+  "merge_status": "AIR25_VISUALIZATION_PERSISTENCE_SOURCE_CANDIDATE_LOCAL",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish the canonical records branch, require exact PostgreSQL 16/17 PR CI, guarded-merge it, verify exact merged-main CI, then post the explicit writer release receipt.",
+  "next_action": "Commit and publish the bounded visualization-persistence candidate, open one PR, and require exact PostgreSQL 16/17 CI with zero product skips before any guarded merge.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -194,9 +194,9 @@
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "AIR-25 deterministic-visualization source PR #52 and exact merged-main CI verified: Python 3.12.15, PostgreSQL 16/17, 826 product tests and zero product skips per matrix. Canonical records branch prepared.",
-    "REMOTE_SHA": "007e09a6c75a5918050f8f3ba672a3d2ec25568c",
-    "NEXT_ACTION": "Require exact-head records PR CI, guarded merge, exact merged-main CI and explicit writer release."
+    "SAFE_WORK_COMPLETED": "Prior visualization records and writer release verified from PR #53. Bounded tenant-scoped visualization persistence and verified reload implemented with synthetic local validation; publication and PostgreSQL CI pending.",
+    "REMOTE_SHA": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+    "NEXT_ACTION": "Commit/publish the source candidate, open its PR, and require exact PostgreSQL 16/17 PR CI with zero product skips."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -210,9 +210,9 @@
   },
   "next_checkpoint": "AIR-25 dependency visualization and impact reports",
   "replay_started": true,
-  "checkpoint_status": "IN_PROGRESS_PROJECTION_PERSISTENCE_RECORDS_PENDING",
-  "merge_commit_sha": "44331ae748f3995018000b29b755a4ba81c4f730",
-  "verified_main_sha": "44331ae748f3995018000b29b755a4ba81c4f730",
+  "checkpoint_status": "IN_PROGRESS_VISUALIZATION_PERSISTENCE_SOURCE_CANDIDATE",
+  "merge_commit_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+  "verified_main_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
   "final_pr_head": "c5161360dc12e2a658a4636020f583c3133a5727",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
@@ -364,23 +364,23 @@
   },
   "writer_handoff": {
     "owner": "AIR Hourly Build",
-    "ownership_id": "AIR25-DETERMINISTIC-VISUALIZATION-20261023",
-    "status": "records_pending",
-    "source_writing_stopped": true,
-    "next_owner": "AIR Hourly Build",
-    "base_main_sha": "530fc80ea64dc480fc20e350bd3f3d7ea4368513",
-    "branch": "work/air25-deterministic-visualization-records",
-    "source_head": "cd5b51cd44030808c98b09f921b93e4935feaae4",
-    "source_tree": "8990c0b1c2b128e682b35270a3aaccef05a3fa4d",
-    "merge_commit": "007e09a6c75a5918050f8f3ba672a3d2ec25568c",
-    "pr": 52,
-    "source_pr_ci_run": 39969307864,
-    "source_merged_main_ci_run": 39969589955,
-    "release_condition": "Exact records PR and merged-main PostgreSQL 16/17 CI green, then an explicit release receipt.",
+    "ownership_id": "AIR25-VISUALIZATION-PERSISTENCE-20261023",
+    "status": "source_candidate_local",
+    "source_writing_stopped": false,
+    "next_owner": null,
+    "base_main_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+    "branch": "work/air25-visualization-persistence",
+    "source_head": null,
+    "source_tree": null,
+    "merge_commit": null,
+    "pr": null,
+    "source_pr_ci_run": null,
+    "source_merged_main_ci_run": null,
+    "release_condition": "Exact source PR and merged-main PostgreSQL 16/17 CI green, then canonical records CI and an explicit release receipt.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,
-    "recorded_at": "2026-10-23T14:28:00Z",
-    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/51#issuecomment-6361703260"
+    "recorded_at": "2026-10-23T18:18:27Z",
+    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/53#issuecomment-6367346574"
   },
   "claim_bound_outcome_receipt": {
     "status": "COMPLETE",
@@ -593,7 +593,7 @@
     "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/44#issuecomment-6296942781"
   },
   "air25_progress": {
-    "status": "MERGED_AND_VERIFIED_PROJECTION_PERSISTENCE_RECORDS_PENDING",
+    "status": "VISUALIZATION_PERSISTENCE_SOURCE_CANDIDATE_LOCAL",
     "accepted_checkpoints": 2,
     "total_checkpoints": 12,
     "base_main_sha": "98b97adba78ac2be3742a77bdae72801be1d855c",
@@ -636,6 +636,33 @@
       },
       "scope": "Immutable tenant-scoped persistence of deterministic dependency projections, bound to the exact registry and optional impact artifacts; reload recomputes and fails closed on mismatched or forged evidence.",
       "limitations": "No dependency discovery, production observation, credentials or payload access, repair, approval, deployment, external action, agent/tool execution, probability, completeness, or safety claim."
+    },
+    "deterministic_visualization_slice": {
+      "status": "MERGED_VERIFIED_AND_RELEASED",
+      "source_sha": "cd5b51cd44030808c98b09f921b93e4935feaae4",
+      "source_tree_sha": "8990c0b1c2b128e682b35270a3aaccef05a3fa4d",
+      "source_pr": 52,
+      "source_merge_sha": "007e09a6c75a5918050f8f3ba672a3d2ec25568c",
+      "source_pr_ci_run": 39969307864,
+      "source_merged_main_ci_run": 39969589955,
+      "records_sha": "9ad8b6ab73b9b2b70d6d1c94435ab1084f7dd7ee",
+      "records_pr": 53,
+      "records_merge_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+      "records_pr_ci_run": 39970049298,
+      "records_merged_main_ci_run": 39970325308,
+      "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/53#issuecomment-6367346574"
+    },
+    "visualization_persistence_slice": {
+      "status": "SOURCE_CANDIDATE_LOCAL",
+      "base_main_sha": "11b4a4a6fc531f5de798bb7ecbb73f15bb10ea05",
+      "source_sha": null,
+      "source_tree_sha": null,
+      "source_pr": null,
+      "source_merge_sha": null,
+      "source_pr_ci_run": null,
+      "source_merged_main_ci_run": null,
+      "scope": "Immutable tenant-scoped persistence of the redacted visualization bound to one exact projection; reload revalidates and recomputes both artifacts.",
+      "limitations": "No raw dependency metadata, discovery, production observation, credentials or payload access, repair, approval, deployment, external action, agent/tool execution, probability, completeness or safety authority."
     }
   }
 }

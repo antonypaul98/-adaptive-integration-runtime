@@ -21,6 +21,11 @@ from air.dependency_projection import (
     load_projection,
     project_and_persist,
 )
+from air.dependency_visualization import (
+    VisualizationError,
+    load_visualization,
+    visualize_and_persist,
+)
 from air.observer import ContractSnapshot
 from air.postgres import canonical_json
 
@@ -174,6 +179,91 @@ def test_persisted_projection_is_append_only(database, repos, saved):
     with repos[0].transaction(database['tenants'][0]) as tx:
         record = project_and_persist(
             tx, saved['registry']['artifact_id'], impact_id=saved['impact']['artifact_id'])
+    with pytest.raises(psycopg.errors.InsufficientPrivilege):
+        with repos[0].transaction(database['tenants'][0]) as tx:
+            tx._connection.execute(
+                'DELETE FROM air.artifacts WHERE artifact_id=%s',
+                (record['artifact_id'],),
+            )
+
+
+def _saved_visualization(tx, saved):
+    projection = project_and_persist(
+        tx, saved['registry']['artifact_id'], impact_id=saved['impact']['artifact_id'])
+    return projection, visualize_and_persist(tx, projection['artifact_id'])
+
+
+def test_visualization_persistence_reload_idempotence_and_audit(database, repos, saved):
+    with repos[0].transaction(database['tenants'][0]) as tx:
+        projection, first = _saved_visualization(tx, saved)
+        repeated = visualize_and_persist(tx, projection['artifact_id'])
+        assert repeated == first
+        assert load_visualization(tx, first['artifact_id']) == first
+        payload = json.loads(first['payload'])
+        assert payload['tenant_id'] == str(tx.tenant_id)
+        assert payload['projection'] == {
+            'artifact_id': str(projection['artifact_id']),
+            'artifact_hash': projection['content_hash'],
+        }
+        visualization = json.loads(payload['visualization_payload'])
+        assert visualization['coverage']['raw_dependency_metadata_included'] is False
+        assert visualization['authority']['external_actions'] is False
+        assert len([event for event in tx.audit()
+                    if event['artifact_id'] == first['artifact_id']]) == 1
+
+
+def test_other_tenant_cannot_read_or_visualize_foreign_projection(
+        database, repos, saved):
+    with repos[0].transaction(database['tenants'][0]) as tx:
+        projection, visualization = _saved_visualization(tx, saved)
+    with repos[1].transaction(database['tenants'][1]) as tx:
+        with pytest.raises(VisualizationError, match='persistence_rejected'):
+            visualize_and_persist(tx, projection['artifact_id'])
+        with pytest.raises(VisualizationError, match='not_found_or_not_authorized'):
+            load_visualization(tx, visualization['artifact_id'])
+        assert tx._connection.execute(
+            "SELECT * FROM air.artifacts WHERE kind='dependency_visualization'"
+        ).fetchall() == []
+
+
+@pytest.mark.parametrize('mutation', [
+    'tenant', 'projection_hash', 'visualization_hash', 'extra_key',
+])
+def test_database_rejects_forged_visualization_envelopes(
+        database, repos, saved, mutation):
+    with repos[0].transaction(database['tenants'][0]) as tx:
+        _, original = _saved_visualization(tx, saved)
+        payload = json.loads(original['payload'])
+        if mutation == 'tenant':
+            payload['tenant_id'] = str(database['tenants'][1])
+        elif mutation == 'projection_hash':
+            payload['projection']['artifact_hash'] = '0' * 64
+        elif mutation == 'visualization_hash':
+            payload['visualization_hash'] = '0' * 64
+        else:
+            payload['unexpected'] = True
+        with pytest.raises((psycopg.errors.CheckViolation,
+                            psycopg.errors.InsufficientPrivilege)):
+            tx.put('dependency_visualization', _digest(payload), payload)
+
+
+def test_reload_recomputes_and_rejects_forged_visualization(database, repos, saved):
+    with repos[0].transaction(database['tenants'][0]) as tx:
+        _, original = _saved_visualization(tx, saved)
+        payload = json.loads(original['payload'])
+        visualization = json.loads(payload['visualization_payload'])
+        visualization['nodes'][0]['review_lane'] = 'no_recorded_impact'
+        payload['visualization_payload'] = canonical_json(visualization)
+        payload['visualization_hash'] = sha256(
+            payload['visualization_payload'].encode()).hexdigest()
+        forged = tx.put('dependency_visualization', _digest(payload), payload)
+        with pytest.raises(VisualizationError, match='invalid_persisted_visualization'):
+            load_visualization(tx, forged['artifact_id'])
+
+
+def test_persisted_visualization_is_append_only(database, repos, saved):
+    with repos[0].transaction(database['tenants'][0]) as tx:
+        _, record = _saved_visualization(tx, saved)
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         with repos[0].transaction(database['tenants'][0]) as tx:
             tx._connection.execute(
