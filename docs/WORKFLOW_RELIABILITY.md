@@ -344,3 +344,19 @@ remain pending. No raw
 dependency metadata, discovery, production observation, credentials, payload
 access, repair, approval, deployment, external action, agent/tool execution,
 probability, completeness or safety authority is added.
+
+## AIR-25 cycle-safe impact-report candidate (2026-10-24)
+
+The candidate is based on exact main
+`532cb5fca2a69c241faa9ec3afbdf87eb204626f`. It validates the complete explicit
+projection before bounded downstream traversal, terminates cycles through visited
+state, and records deterministic strongly connected components with exact
+content-addressed node and edge identities. It exposes no raw dependency names,
+mappings, locations or operations and never infers undeclared dependencies.
+
+Local Python 3.12.14 validation passed 28 focused tests, 490 portable product
+tests with 351 PostgreSQL cases deselected, and 15 of 16 infrastructure guards;
+the sole skip is the documented Memory-only diagnostic. PostgreSQL 16/17 PR and
+merged-main CI are pending. This slice adds no production access, repair,
+approval, deployment, external action, execution, completeness or safety
+authority.

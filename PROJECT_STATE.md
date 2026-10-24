@@ -655,3 +655,18 @@ reload. It adds no discovery, production observation, secrets or payload
 access, repair, approval, deployment, external action, agent/tool execution,
 probability, completeness or safety claim. AIR-25 remains in progress and the
 roadmap remains 2/12 accepted; canonical records CI and writer release follow.
+
+## AIR-25 cycle-safe impact report — source candidate (2026-10-24)
+
+Starting from exact verified main `532cb5fca2a69c241faa9ec3afbdf87eb204626f`,
+this bounded slice traverses only declared downstream workflow edges from one or
+more registered hash identities. It uses a visited set and deterministic
+strongly-connected components so cycles terminate and are represented with exact
+node and edge evidence links. Output is canonical, content-addressed and excludes
+raw dependency names, mappings, operations and locations.
+
+Local Python 3.12.14 validation passed 28 focused tests, 490 portable product
+tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with one
+documented Memory-only skip. Exact PostgreSQL 16/17 source CI is pending. The
+report infers no undeclared dependency and grants no repair, approval, deployment,
+external-action or execution authority. AIR-25 remains in progress at 2/12.

@@ -145,3 +145,19 @@ main `fbd6cf37fd7f6f471169e4eab749636051a03e9c`; exact merged-main run
 This receipt does not expand authority or mark AIR-25 complete. Canonical
 records CI and the explicit writer release remain pending; roadmap progress is
 still 2/12 accepted.
+
+## Cycle-safe impact-report source scope
+
+The candidate consumes one already validated dependency projection and a bounded
+set of registered hash identities. It traverses declared downstream edges once,
+computes deterministic minimum-hop distances, and reports deterministic strongly
+connected components for cycles. The output retains only hashes, fixed impact
+states, recorded impact identities, counts and explicit coverage/authority flags;
+it copies no raw dependency metadata.
+
+Local Python 3.12.14 validation passed 28 focused tests and 490 portable product
+tests with 351 PostgreSQL cases deselected. Infrastructure validation passed 15
+guards with one documented Memory-only skip. PostgreSQL 16/17 source CI is
+pending. No discovery, production observation, credential/payload access,
+external action, repair, approval, deployment, agent/tool execution,
+completeness inference or safety claim is added.
