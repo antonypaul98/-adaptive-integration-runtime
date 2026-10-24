@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v2'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v3'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -181,6 +181,7 @@ def build_cycle_safe_impact_report(
                 queue.append(target)
 
     reachable = set(distances)
+    unreachable = sorted(set(by_id) - reachable)
     edges = sorted(traversed.values(), key=lambda value: value['edge_id'])
     nodes = []
     for node_id in sorted(reachable):
@@ -193,6 +194,17 @@ def build_cycle_safe_impact_report(
             'transitive_impact_ids': node['transitive_impact_ids'],
         })
     cycles = _cyclic_components(reachable, edges)
+    coverage_warnings = [
+        'seed_reachability_is_not_registry_completeness',
+        'undeclared_dependencies_are_out_of_scope',
+    ]
+    if unreachable:
+        coverage_warnings.append(
+            'unreachable_registered_nodes_omitted_from_impact_body'
+        )
+    if source['coverage']['warnings']:
+        coverage_warnings.append('source_projection_has_coverage_warnings')
+    coverage_warnings.sort()
     payload = {
         'impact_report_version': IMPACT_REPORT_VERSION,
         'projection_hash': projection.content_hash,
@@ -202,9 +214,12 @@ def build_cycle_safe_impact_report(
         'shortest_path_witnesses': [witnesses[node_id]
                                     for node_id in sorted(witnesses)],
         'cycle_components': cycles,
+        'unreachable_registered_node_ids': unreachable,
         'summary': {
             'seed_count': len(seeds),
+            'registered_node_count': len(by_id),
             'reachable_node_count': len(nodes),
+            'unreachable_registered_node_count': len(unreachable),
             'traversed_edge_count': len(edges),
             'cycle_component_count': len(cycles),
             'shortest_path_witness_count': len(witnesses),
@@ -213,6 +228,7 @@ def build_cycle_safe_impact_report(
         'coverage': {
             'scope': 'validated_explicit_projection_only',
             'source_warning_count': len(source['coverage']['warnings']),
+            'warnings': coverage_warnings,
             'cycle_safe_traversal': True,
             'shortest_path_witness_basis': (
                 'first_by_sorted_seed_then_declared_edge_id'
