@@ -360,3 +360,10 @@ the sole skip is the documented Memory-only diagnostic. PostgreSQL 16/17 PR and
 merged-main CI are pending. This slice adds no production access, repair,
 approval, deployment, external action, execution, completeness or safety
 authority.
+
+Source PR #56 head `08f4be44d631b7b584caed9f977114c10eb33ea3`, tree
+`570130da6975a9bd018f1c48dd87d64c8f201132`, passed exact run
+40066183394; PostgreSQL 16 and 17 each passed 841 product tests with zero
+product skips. Guarded merge `9e2a8a387ef5573f1969f6ae76a09fbd8e567dc9`
+passed exact merged-main run 40066344089 with the same result. Canonical records
+CI and writer release remain pending.

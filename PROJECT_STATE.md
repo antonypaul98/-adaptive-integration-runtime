@@ -670,3 +670,10 @@ tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with on
 documented Memory-only skip. Exact PostgreSQL 16/17 source CI is pending. The
 report infers no undeclared dependency and grants no repair, approval, deployment,
 external-action or execution authority. AIR-25 remains in progress at 2/12.
+
+Source head `08f4be44d631b7b584caed9f977114c10eb33ea3`, tree
+`570130da6975a9bd018f1c48dd87d64c8f201132`, passed exact PR run
+40066183394. PostgreSQL 16 and 17 each passed 841 product tests with zero
+product skips. Guarded merge produced exact main
+`9e2a8a387ef5573f1969f6ae76a09fbd8e567dc9`; exact push run 40066344089
+passed the same matrix. Canonical records and writer release remain pending.
