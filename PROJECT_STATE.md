@@ -1,5 +1,22 @@
 # AIR implementation state
 
+## AIR-25 impact-path evidence — source verified (2026-10-24)
+
+PR #58 exact head `086099da7af047dac6b73c12d8dcfa6d61f3243e`, tree
+`8f63a6718d32af4e6c08f0584fb8f5d64272d078`, passed exact PostgreSQL
+16/17 run 40069743139 on Python 3.12.15. Each matrix passed 843 product tests
+with zero skips. Guarded merge produced exact main
+`86ffa37cd1f7f89d73bf9567cdfe14f54535a35a`; exact merged-main run
+40081774837 passed the same matrix.
+
+The slice adds one deterministic hash-only shortest-path predecessor witness
+per reachable recorded node. It is bounded to the validated explicit
+projection and does not enumerate or infer undeclared or alternative paths.
+It grants no discovery, production access, repair, approval, deployment,
+external-action, execution, completeness, or safety authority. Canonical
+records CI and writer release remain pending; AIR-25 remains in progress at
+2/12.
+
 ## Competitive roadmap status — 2026-10-16
 
 AIR-25 deterministic visualization source is merged through PR #52. Source head
