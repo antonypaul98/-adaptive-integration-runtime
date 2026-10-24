@@ -251,7 +251,7 @@ added. This records change requires its own exact PR and merged-main CI before
 writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
 
 
-## AIR-25 impact completeness-warning source candidate (2026-10-24)
+## AIR-25 impact completeness-warning source receipt (2026-10-24)
 
 Impact-path source and records PRs #58/#59 are verified through exact main
 `f6f072f00e71c97f8ac00cd351ffb526eead5815` and PostgreSQL 16/17 final-main
@@ -265,8 +265,14 @@ caller warning text. This remains bounded to one validated explicit projection;
 it infers no undeclared dependency and grants no completeness, safety, repair,
 approval, deployment, external-action or execution authority. Local Python
 3.12.14 validation passed 32 focused tests and 494 portable product tests with
-351 PostgreSQL cases deselected. Exact source PR and merged-main PostgreSQL
-16/17 CI remain required before canonical records.
+351 PostgreSQL cases deselected. Source PR #60 exact head
+`7960898a1da1b515f51c42011c669f490201da86`, tree
+`d3d68a10b27fcfe87b0bfaf39b25d5e1c5f3b341`, passed run 40129737781 on
+Python 3.12.15; PostgreSQL 16 and 17 each passed 845 product tests with zero
+product skips. Guarded merge produced exact main
+`f276519803d5d85a9eaedc00ea4b40a4c7d3db75`, and run 40129867893 passed the
+same matrix. This records change requires its own exact PR and merged-main CI
+before explicit writer release. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 deterministic dependency projection source (2026-10-20)
 

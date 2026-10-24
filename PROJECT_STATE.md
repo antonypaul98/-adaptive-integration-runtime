@@ -1,19 +1,26 @@
 # AIR implementation state
 
-## AIR-25 impact completeness warnings — source candidate (2026-10-24)
+## AIR-25 impact completeness warnings — source verified (2026-10-24)
 
 Impact-path records PR #59 and exact main
 `f6f072f00e71c97f8ac00cd351ffb526eead5815` passed PostgreSQL 16/17 CI
 with 843 product tests and zero skips per matrix; writer
 `AIR25-IMPACT-PATH-EVIDENCE-20261024` is released.
 
-The new bounded candidate adds a sorted hash-only manifest for registered nodes
+Source PR #60 exact head `7960898a1da1b515f51c42011c669f490201da86`,
+tree `d3d68a10b27fcfe87b0bfaf39b25d5e1c5f3b341`, passed run 40129737781
+on Python 3.12.15. PostgreSQL 16 and 17 each passed 845 product tests with
+zero skips. Guarded merge produced exact main
+`f276519803d5d85a9eaedc00ea4b40a4c7d3db75`; merged-main run 40129867893
+passed the same matrix.
+
+The bounded slice adds a sorted hash-only manifest for registered nodes
 that are unreachable from the chosen seeds, exact registered/reachable/gap
 counts, and fixed completeness warnings. It never copies caller warning text or
 infers undeclared dependencies. Local Python 3.12.14 validation passed 32
 focused tests and 494 portable product tests with 351 PostgreSQL cases
-deselected. Exact PR-head and merged-main PostgreSQL 16/17 CI remain required.
-AIR-25 remains in progress at 2/12.
+deselected. Canonical records CI and explicit writer release remain pending.
+AIR-25 remains in progress at 2/12; no checkpoint is advanced by this receipt.
 
 ## AIR-25 impact-path evidence — source verified (2026-10-24)
 
