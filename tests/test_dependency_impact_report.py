@@ -46,6 +46,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'reachable_node_count': 3,
         'traversed_edge_count': 3,
         'cycle_component_count': 1,
+        'shortest_path_witness_count': 3,
         'maximum_minimum_hops': 2,
     }
     assert ids['isolated'] not in {node['node_id'] for node in payload['nodes']}
@@ -74,6 +75,9 @@ def test_report_is_redacted_and_has_no_action_authority():
         'scope': 'validated_explicit_projection_only',
         'source_warning_count': 0,
         'cycle_safe_traversal': True,
+        'shortest_path_witness_basis': (
+            'first_by_sorted_seed_then_declared_edge_id'
+        ),
         'undeclared_dependencies_inferred': False,
         'no_recorded_impact_is_not_safe': True,
     }
@@ -130,3 +134,65 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['traversed_edge_count'] == 999
     assert report['summary']['maximum_minimum_hops'] == 999
     assert report['summary']['cycle_component_count'] == 0
+    assert report['summary']['shortest_path_witness_count'] == 1000
+    assert len(report['shortest_path_witnesses']) == 1000
+
+
+def test_shortest_path_witnesses_are_hash_only_and_reconstructable():
+    projection, ids = cyclic_projection()
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+    witnesses = {
+        witness['node_id']: witness
+        for witness in payload['shortest_path_witnesses']
+    }
+    root = witnesses[ids['secret-a']]
+    assert root == {
+        'node_id': ids['secret-a'],
+        'witness_seed_node_id': ids['secret-a'],
+        'predecessor_node_id': None,
+        'predecessor_edge_id': None,
+        'minimum_hops': 0,
+    }
+    for node_id in (ids['secret-b'], ids['secret-c']):
+        witness = witnesses[node_id]
+        assert witness['witness_seed_node_id'] == ids['secret-a']
+        assert len(witness['predecessor_node_id']) == 64
+        assert len(witness['predecessor_edge_id']) == 64
+        assert witnesses[witness['predecessor_node_id']]['minimum_hops'] == (
+            witness['minimum_hops'] - 1
+        )
+
+
+def test_equal_length_witness_choice_is_deterministic():
+    seed, left, right, target = (
+        dep(name) for name in ('seed', 'left', 'right', 'target')
+    )
+    projection = project_dependency_graph(
+        [target, right, seed, left],
+        workflow_edges=[
+            WorkflowEdge(right, target),
+            WorkflowEdge(seed, right),
+            WorkflowEdge(left, target),
+            WorkflowEdge(seed, left),
+        ],
+    )
+    payload = projection.to_dict()
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in payload['nodes']
+    }
+    outgoing = sorted(
+        [edge for edge in payload['edges']
+         if edge['source_node_id'] == ids['seed']],
+        key=lambda edge: edge['edge_id'],
+    )
+    expected_predecessor = outgoing[0]['target_node_id']
+    report = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+    target_witness = next(
+        witness for witness in report['shortest_path_witnesses']
+        if witness['node_id'] == ids['target']
+    )
+    assert target_witness['predecessor_node_id'] == expected_predecessor
+    assert target_witness['minimum_hops'] == 2

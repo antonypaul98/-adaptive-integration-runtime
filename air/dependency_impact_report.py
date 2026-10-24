@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v1'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v2'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -150,6 +150,16 @@ def build_cycle_safe_impact_report(
         edges.sort(key=lambda value: value['edge_id'])
 
     distances = {node_id: 0 for node_id in seeds}
+    witnesses = {
+        node_id: {
+            'node_id': node_id,
+            'witness_seed_node_id': node_id,
+            'predecessor_node_id': None,
+            'predecessor_edge_id': None,
+            'minimum_hops': 0,
+        }
+        for node_id in seeds
+    }
     queue = deque(seeds)
     traversed: dict[str, dict] = {}
     while queue:
@@ -159,6 +169,15 @@ def build_cycle_safe_impact_report(
             target = edge['target_node_id']
             if target not in distances:
                 distances[target] = distances[source_id] + 1
+                witnesses[target] = {
+                    'node_id': target,
+                    'witness_seed_node_id': witnesses[source_id][
+                        'witness_seed_node_id'
+                    ],
+                    'predecessor_node_id': source_id,
+                    'predecessor_edge_id': edge['edge_id'],
+                    'minimum_hops': distances[target],
+                }
                 queue.append(target)
 
     reachable = set(distances)
@@ -180,18 +199,24 @@ def build_cycle_safe_impact_report(
         'seed_node_ids': seeds,
         'nodes': nodes,
         'edges': edges,
+        'shortest_path_witnesses': [witnesses[node_id]
+                                    for node_id in sorted(witnesses)],
         'cycle_components': cycles,
         'summary': {
             'seed_count': len(seeds),
             'reachable_node_count': len(nodes),
             'traversed_edge_count': len(edges),
             'cycle_component_count': len(cycles),
+            'shortest_path_witness_count': len(witnesses),
             'maximum_minimum_hops': max(distances.values()),
         },
         'coverage': {
             'scope': 'validated_explicit_projection_only',
             'source_warning_count': len(source['coverage']['warnings']),
             'cycle_safe_traversal': True,
+            'shortest_path_witness_basis': (
+                'first_by_sorted_seed_then_declared_edge_id'
+            ),
             'undeclared_dependencies_inferred': False,
             'no_recorded_impact_is_not_safe': True,
         },
