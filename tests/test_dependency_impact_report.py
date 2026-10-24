@@ -48,6 +48,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'unreachable_registered_node_count': 1,
         'traversed_edge_count': 3,
         'cycle_component_count': 1,
+        'impact_layer_count': 3,
         'shortest_path_witness_count': 3,
         'maximum_minimum_hops': 2,
     }
@@ -86,6 +87,7 @@ def test_report_is_redacted_and_has_no_action_authority():
         'shortest_path_witness_basis': (
             'first_by_sorted_seed_then_declared_edge_id'
         ),
+        'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
         'undeclared_dependencies_inferred': False,
         'no_recorded_impact_is_not_safe': True,
     }
@@ -144,9 +146,11 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['traversed_edge_count'] == 999
     assert report['summary']['maximum_minimum_hops'] == 999
     assert report['summary']['cycle_component_count'] == 0
+    assert report['summary']['impact_layer_count'] == 1000
     assert report['summary']['shortest_path_witness_count'] == 1000
     assert len(report['shortest_path_witnesses']) == 1000
     assert report['unreachable_registered_node_ids'] == []
+    assert len(report['impact_layers']) == 1000
     assert 'unreachable_registered_nodes_omitted_from_impact_body' not in (
         report['coverage']['warnings']
     )
@@ -253,3 +257,40 @@ def test_equal_length_witness_choice_is_deterministic():
     )
     assert target_witness['predecessor_node_id'] == expected_predecessor
     assert target_witness['minimum_hops'] == 2
+
+
+def test_impact_layers_are_deterministic_hash_only_and_reconcile_reachable_nodes():
+    projection, ids = cyclic_projection()
+    first = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+    second = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+
+    assert first['impact_layers'] == second['impact_layers']
+    assert [layer['minimum_hops'] for layer in first['impact_layers']] == [0, 1, 2]
+    assert first['impact_layers'][0]['node_ids'] == [ids['secret-a']]
+    assert all(len(layer['layer_id']) == 64 for layer in first['impact_layers'])
+    assert all(
+        len(node_id) == 64
+        for layer in first['impact_layers']
+        for node_id in layer['node_ids']
+    )
+    assert sorted(
+        node_id
+        for layer in first['impact_layers']
+        for node_id in layer['node_ids']
+    ) == sorted(node['node_id'] for node in first['nodes'])
+
+
+def test_multi_seed_impact_layers_use_minimum_declared_hops():
+    projection, ids = cyclic_projection()
+    report = build_cycle_safe_impact_report(
+        projection, [ids['secret-a'], ids['secret-c']]
+    ).to_dict()
+
+    layers = {layer['minimum_hops']: layer for layer in report['impact_layers']}
+    assert layers[0]['node_ids'] == sorted([ids['secret-a'], ids['secret-c']])
+    assert layers[1]['node_ids'] == [ids['secret-b']]
+    assert report['summary']['impact_layer_count'] == 2

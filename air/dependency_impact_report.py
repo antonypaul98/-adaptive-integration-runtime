@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v3'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v4'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -194,6 +194,16 @@ def build_cycle_safe_impact_report(
             'transitive_impact_ids': node['transitive_impact_ids'],
         })
     cycles = _cyclic_components(reachable, edges)
+    layer_nodes: dict[int, list[str]] = {}
+    for node_id, minimum_hops in distances.items():
+        layer_nodes.setdefault(minimum_hops, []).append(node_id)
+    impact_layers = []
+    for minimum_hops in sorted(layer_nodes):
+        core = {
+            'minimum_hops': minimum_hops,
+            'node_ids': sorted(layer_nodes[minimum_hops]),
+        }
+        impact_layers.append({'layer_id': _digest(core), **core})
     coverage_warnings = [
         'seed_reachability_is_not_registry_completeness',
         'undeclared_dependencies_are_out_of_scope',
@@ -214,6 +224,7 @@ def build_cycle_safe_impact_report(
         'shortest_path_witnesses': [witnesses[node_id]
                                     for node_id in sorted(witnesses)],
         'cycle_components': cycles,
+        'impact_layers': impact_layers,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
             'seed_count': len(seeds),
@@ -222,6 +233,7 @@ def build_cycle_safe_impact_report(
             'unreachable_registered_node_count': len(unreachable),
             'traversed_edge_count': len(edges),
             'cycle_component_count': len(cycles),
+            'impact_layer_count': len(impact_layers),
             'shortest_path_witness_count': len(witnesses),
             'maximum_minimum_hops': max(distances.values()),
         },
@@ -233,6 +245,7 @@ def build_cycle_safe_impact_report(
             'shortest_path_witness_basis': (
                 'first_by_sorted_seed_then_declared_edge_id'
             ),
+            'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
             'undeclared_dependencies_inferred': False,
             'no_recorded_impact_is_not_safe': True,
         },
