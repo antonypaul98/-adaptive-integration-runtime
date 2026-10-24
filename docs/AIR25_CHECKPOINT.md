@@ -173,3 +173,20 @@ product skips. The expected-head guarded merge produced exact main
 
 This receipt adds no authority and does not mark AIR-25 complete. Canonical
 records CI and explicit writer release remain pending; progress stays 2/12.
+
+## Impact-path witness evidence source scope
+
+Starting from exact verified main
+`aa87735e78e0173840662731a7593753baa937a2`, this bounded candidate adds one
+canonical shortest-path predecessor witness per reachable recorded node. Seed
+and declared-edge hashes resolve equal-length choices deterministically. The
+evidence is linear in the bounded node count and can be reconstructed without
+copying dependency names, mappings, locations or operations.
+
+This is one witness through recorded edges, not a discovery or alternative-path
+completeness claim. It adds no production observation, credential or payload
+access, repair, approval, deployment, external action, execution or safety
+authority. Local Python 3.12.14 validation passed 30 focused tests, 492
+portable product tests with 351 PostgreSQL cases deselected, and 15 of 16
+infrastructure guards; the sole skip is the documented Memory-only diagnostic.
+Exact PostgreSQL 16/17 PR and merged-main CI remain required.

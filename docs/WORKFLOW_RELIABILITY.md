@@ -367,3 +367,18 @@ Source PR #56 head `08f4be44d631b7b584caed9f977114c10eb33ea3`, tree
 product skips. Guarded merge `9e2a8a387ef5573f1969f6ae76a09fbd8e567dc9`
 passed exact merged-main run 40066344089 with the same result. Canonical records
 CI and writer release remain pending.
+
+Records PR #57 head `a17b8bd4bbd6c40ced5be2848da30a9b3fe8e846`
+passed run 40066597342; guarded merge
+`aa87735e78e0173840662731a7593753baa937a2` passed exact-main run
+40066726558. PostgreSQL 16 and 17 each passed 841 product tests with zero
+product skips, and the writer was explicitly released.
+
+The next source candidate adds a deterministic hash-only shortest-path witness
+predecessor forest over the already validated explicit traversal. It is bounded
+to one entry per reachable node, does not enumerate all paths, and grants no
+discovery, completeness, repair, approval, deployment, action or execution
+authority. Local Python 3.12.14 validation passed 30 focused tests, 492
+portable product tests with 351 PostgreSQL cases deselected, and 15
+infrastructure guards with one documented Memory-only skip. Exact PR-head and
+merged-main PostgreSQL 16/17 CI are required.

@@ -677,3 +677,17 @@ Source head `08f4be44d631b7b584caed9f977114c10eb33ea3`, tree
 product skips. Guarded merge produced exact main
 `9e2a8a387ef5573f1969f6ae76a09fbd8e567dc9`; exact push run 40066344089
 passed the same matrix. Canonical records and writer release remain pending.
+
+Records PR #57 head `a17b8bd4bbd6c40ced5be2848da30a9b3fe8e846`
+passed exact PostgreSQL 16/17 run 40066597342 with 841 product tests and zero
+product skips per matrix. Guarded merge produced exact main
+`aa87735e78e0173840662731a7593753baa937a2`; run 40066726558 passed the
+same matrix, and writer `AIR25-CYCLE-SAFE-IMPACT-REPORT-20261024` was released.
+
+The next bounded candidate adds one deterministic, hash-only shortest-path
+witness predecessor for every reachable recorded node. It is linear in the
+bounded node count, reconstructable from declared edges, and makes no claim
+that unrecorded or alternative paths were discovered. Local Python 3.12.14
+validation passed 30 focused tests, 492 portable product tests with 351
+PostgreSQL cases deselected, and 15 infrastructure guards with one documented
+Memory-only skip. Exact CI is pending; AIR-25 remains in progress at 2/12.
