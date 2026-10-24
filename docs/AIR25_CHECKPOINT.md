@@ -191,7 +191,7 @@ portable product tests with 351 PostgreSQL cases deselected, and 15 of 16
 infrastructure guards; the sole skip is the documented Memory-only diagnostic.
 Exact PostgreSQL 16/17 PR and merged-main CI remain required.
 
-## Impact completeness-warning source candidate
+## Impact completeness-warning source receipt
 
 Starting from exact verified main
 `f6f072f00e71c97f8ac00cd351ffb526eead5815`, this bounded candidate makes
@@ -207,5 +207,11 @@ completeness. It adds no raw dependency metadata, production observation,
 credential or payload access, repair, approval, deployment, external action,
 execution or safety authority. Local Python 3.12.14 validation passed 32
 focused tests and 494 portable product tests with 351 PostgreSQL cases
-deselected. Exact PostgreSQL 16/17 PR and merged-main CI with zero product
-skips remain required before canonical records.
+deselected. Source PR #60 exact head
+`7960898a1da1b515f51c42011c669f490201da86`, tree
+`d3d68a10b27fcfe87b0bfaf39b25d5e1c5f3b341`, passed run 40129737781 on
+Python 3.12.15. PostgreSQL 16 and 17 each passed 845 product tests with zero
+product skips. Guarded merge produced exact main
+`f276519803d5d85a9eaedc00ea4b40a4c7d3db75`; run 40129867893 passed the
+same matrix. Canonical records CI and explicit writer release remain required;
+AIR-25 stays in progress at 2/12.
