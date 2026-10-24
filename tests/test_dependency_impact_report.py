@@ -43,13 +43,16 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
     payload = first.to_dict()
     assert payload['summary'] == {
         'seed_count': 1,
+        'registered_node_count': 4,
         'reachable_node_count': 3,
+        'unreachable_registered_node_count': 1,
         'traversed_edge_count': 3,
         'cycle_component_count': 1,
         'shortest_path_witness_count': 3,
         'maximum_minimum_hops': 2,
     }
     assert ids['isolated'] not in {node['node_id'] for node in payload['nodes']}
+    assert payload['unreachable_registered_node_ids'] == [ids['isolated']]
 
 
 def test_report_cycle_component_has_exact_hash_evidence_links():
@@ -74,6 +77,11 @@ def test_report_is_redacted_and_has_no_action_authority():
     assert report.to_dict()['coverage'] == {
         'scope': 'validated_explicit_projection_only',
         'source_warning_count': 0,
+        'warnings': [
+            'seed_reachability_is_not_registry_completeness',
+            'undeclared_dependencies_are_out_of_scope',
+            'unreachable_registered_nodes_omitted_from_impact_body',
+        ],
         'cycle_safe_traversal': True,
         'shortest_path_witness_basis': (
             'first_by_sorted_seed_then_declared_edge_id'
@@ -131,11 +139,60 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     )
     report = build_cycle_safe_impact_report(projection, [first_id]).to_dict()
     assert report['summary']['reachable_node_count'] == 1000
+    assert report['summary']['registered_node_count'] == 1000
+    assert report['summary']['unreachable_registered_node_count'] == 0
     assert report['summary']['traversed_edge_count'] == 999
     assert report['summary']['maximum_minimum_hops'] == 999
     assert report['summary']['cycle_component_count'] == 0
     assert report['summary']['shortest_path_witness_count'] == 1000
     assert len(report['shortest_path_witnesses']) == 1000
+    assert report['unreachable_registered_node_ids'] == []
+    assert 'unreachable_registered_nodes_omitted_from_impact_body' not in (
+        report['coverage']['warnings']
+    )
+
+
+def test_completeness_gap_manifest_is_hash_only_and_deterministic():
+    projection, ids = cyclic_projection()
+    first = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+    second = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+
+    assert first['unreachable_registered_node_ids'] == second[
+        'unreachable_registered_node_ids'
+    ]
+    assert first['unreachable_registered_node_ids'] == [ids['isolated']]
+    assert all(
+        len(node_id) == 64
+        for node_id in first['unreachable_registered_node_ids']
+    )
+    assert first['summary']['registered_node_count'] == (
+        first['summary']['reachable_node_count']
+        + first['summary']['unreachable_registered_node_count']
+    )
+
+
+def test_source_coverage_warning_is_exposed_only_as_fixed_code_and_count():
+    projection = project_dependency_graph([dep('source-a'), dep('source-b')])
+    projection_payload = projection.to_dict()
+    projection_payload['coverage']['warnings'] = [
+        'caller-private-warning-text'
+    ]
+    projection = DependencyProjection(canonical_json(projection_payload))
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    report = build_cycle_safe_impact_report(projection, [ids['source-a']])
+
+    assert 'caller-private-warning-text' not in report.payload_json
+    assert report.to_dict()['coverage']['source_warning_count'] == 1
+    assert 'source_projection_has_coverage_warnings' in (
+        report.to_dict()['coverage']['warnings']
+    )
 
 
 def test_shortest_path_witnesses_are_hash_only_and_reconstructable():

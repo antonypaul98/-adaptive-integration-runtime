@@ -190,3 +190,22 @@ authority. Local Python 3.12.14 validation passed 30 focused tests, 492
 portable product tests with 351 PostgreSQL cases deselected, and 15 of 16
 infrastructure guards; the sole skip is the documented Memory-only diagnostic.
 Exact PostgreSQL 16/17 PR and merged-main CI remain required.
+
+## Impact completeness-warning source candidate
+
+Starting from exact verified main
+`f6f072f00e71c97f8ac00cd351ffb526eead5815`, this bounded candidate makes
+the traversal gap explicit. It reports every registered node not reachable
+from the selected seeds as a sorted hash-only manifest, reconciles registered,
+reachable and unreachable counts, and emits fixed warning codes when coverage
+is partial or the source projection already carries warnings. Caller warning
+text is never copied into the report.
+
+The manifest covers only the validated explicit projection. It does not infer
+undeclared dependencies or claim that seed reachability is registry or system
+completeness. It adds no raw dependency metadata, production observation,
+credential or payload access, repair, approval, deployment, external action,
+execution or safety authority. Local Python 3.12.14 validation passed 32
+focused tests and 494 portable product tests with 351 PostgreSQL cases
+deselected. Exact PostgreSQL 16/17 PR and merged-main CI with zero product
+skips remain required before canonical records.

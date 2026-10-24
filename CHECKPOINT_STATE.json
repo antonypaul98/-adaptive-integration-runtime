@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-25 dependency visualization and impact reports",
-  "active_branch": "work/air25-impact-path-evidence-records",
-  "main_sha_at_start": "86ffa37cd1f7f89d73bf9567cdfe14f54535a35a",
-  "current_branch_sha": "86ffa37cd1f7f89d73bf9567cdfe14f54535a35a",
+  "active_branch": "work/air25-impact-completeness-warnings",
+  "main_sha_at_start": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
+  "current_branch_sha": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "AIR-25 impact-path evidence PR #58 exact head 086099da7af047dac6b73c12d8dcfa6d61f3243e passed PostgreSQL 16/17 CI and was guarded-merged as exact main 86ffa37cd1f7f89d73bf9567cdfe14f54535a35a; exact merged-main CI also passed. Canonical records and writer release remain pending.",
-  "local_test_status": "Python 3.12.14: 30 focused projection/visualization/impact-path tests passed; 492 portable product tests passed with 351 PostgreSQL cases deselected; infrastructure suite 15 passed with one documented Memory-only skip; diagnostics, install/import, compile and whitespace checks passed.",
+  "branch_remote_status": "No open PRs. Impact-path records PR #59 head d6cb9fb270e789fcf55b5985fc78dd7c83a7c5e4 and exact main f6f072f00e71c97f8ac00cd351ffb526eead5815 passed PostgreSQL 16/17 CI with 843 product tests and zero product skips per matrix; writer released. Completeness-warning source candidate is local and unpublished.",
+  "local_test_status": "Python 3.12.14: 32 focused projection/visualization/impact-report tests passed; 494 portable product tests passed with 351 PostgreSQL cases deselected; infrastructure suite passed 15 guards with one documented Memory-only skip; diagnostics, dependency checks, compile, JSON validation and whitespace checks passed.",
   "pr_number": null,
-  "ci_status": "Impact-path source PR run 40069743139 and exact merged-main run 40081774837 passed PostgreSQL 16/17 with 843 product tests and zero product skips per matrix. Records CI is pending.",
-  "merge_status": "AIR25_IMPACT_PATH_EVIDENCE_SOURCE_MERGED_AND_VERIFIED_RECORDS_PENDING",
+  "ci_status": "Prior impact-path records and exact-main CI are verified through runs 40082077294 and 40082210089. New completeness-warning PostgreSQL 16/17 source CI has not run.",
+  "merge_status": "AIR25_IMPACT_COMPLETENESS_WARNINGS_SOURCE_CANDIDATE_LOCAL",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish canonical impact-path source receipts in a separate records PR; require exact PostgreSQL 16/17 records PR and merged-main CI before explicit writer release.",
+  "next_action": "Complete bounded local validation, publish the completeness-warning source candidate, and require exact PostgreSQL 16/17 PR and merged-main CI with zero product skips before any records change.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -194,9 +194,9 @@
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "Cycle-safe impact-report records PR #57 head a17b8bd4bbd6c40ced5be2848da30a9b3fe8e846 passed run 40066597342 on PostgreSQL 16/17 with 841 product tests and zero product skips per matrix. Guarded merge produced exact main aa87735e78e0173840662731a7593753baa937a2, whose push run 40066726558 passed the same matrix; writer released in PR #57 comment 6380440705.",
-    "REMOTE_SHA": "aa87735e78e0173840662731a7593753baa937a2",
-    "NEXT_ACTION": "Finish and publish bounded deterministic impact-path witness evidence from exact main aa87735e78e0173840662731a7593753baa937a2."
+    "SAFE_WORK_COMPLETED": "Impact-path source/records PRs #58/#59 are merged and exact PostgreSQL 16/17 CI is green through main f6f072f00e71c97f8ac00cd351ffb526eead5815; writer AIR25-IMPACT-PATH-EVIDENCE-20261024 is released. A bounded completeness-warning source candidate passed 32 focused and 494 portable Python 3.12.14 tests locally.",
+    "REMOTE_SHA": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
+    "NEXT_ACTION": "Finish local validation, publish the completeness-warning candidate, then require exact PostgreSQL 16/17 PR and merged-main CI before canonical records."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -204,7 +204,7 @@
     "skipped": 1,
     "skip_reason": "Memory-only source-layout regression is not applicable",
     "yaml": "All existing workflow YAML parsed",
-    "product_tests": "492 portable product tests passed; 351 PostgreSQL-only cases deselected locally and remain required on the new exact CI head",
+    "product_tests": "494 portable product tests passed; 351 PostgreSQL-only cases deselected locally and remain required on the new exact CI head",
     "physical_camera": "not_run",
     "new_head_CI": "not_run_for_local_source_candidate"
   },
@@ -297,7 +297,7 @@
     "verified_main_sha": "c0c3c15f9a239610e451aa011582a53db5fed322",
     "final_pr_head": "70e5b07ba905bd0576e30a8159ba14b50f0632fb"
   },
-  "recorded_at_utc": "2026-10-23T09:30:00Z",
+  "recorded_at_utc": "2026-10-24T20:28:00Z",
   "previous_final_approval_receipt": {
     "current_checkpoint": "persisted target-bound final approval",
     "checkpoint_status": "COMPLETE",
@@ -364,23 +364,23 @@
   },
   "writer_handoff": {
     "owner": "AIR Hourly Build",
-    "ownership_id": "AIR25-IMPACT-PATH-EVIDENCE-20261024",
-    "status": "records_pending",
-    "source_writing_stopped": true,
+    "ownership_id": "AIR25-IMPACT-COMPLETENESS-WARNINGS-20261024",
+    "status": "source_candidate_local",
+    "source_writing_stopped": false,
     "next_owner": null,
-    "base_main_sha": "aa87735e78e0173840662731a7593753baa937a2",
-    "branch": "work/air25-impact-path-evidence-records",
-    "source_head": "086099da7af047dac6b73c12d8dcfa6d61f3243e",
-    "source_tree": "8f63a6718d32af4e6c08f0584fb8f5d64272d078",
-    "merge_commit": "86ffa37cd1f7f89d73bf9567cdfe14f54535a35a",
-    "pr": 58,
-    "source_pr_ci_run": 40069743139,
-    "source_merged_main_ci_run": 40081774837,
-    "release_condition": "Exact impact-path evidence source and records PR/merged-main PostgreSQL 16/17 CI green, followed by an explicit writer release receipt.",
+    "base_main_sha": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
+    "branch": "work/air25-impact-completeness-warnings",
+    "source_head": null,
+    "source_tree": null,
+    "merge_commit": null,
+    "pr": null,
+    "source_pr_ci_run": null,
+    "source_merged_main_ci_run": null,
+    "release_condition": "Exact completeness-warning source and records PR/merged-main PostgreSQL 16/17 CI green, followed by an explicit writer release receipt.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,
-    "recorded_at": "2026-10-24T09:28:00Z",
-    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/57#issuecomment-6380440705"
+    "recorded_at": "2026-10-24T20:28:00Z",
+    "prior_release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/59#issuecomment-6382594250"
   },
   "claim_bound_outcome_receipt": {
     "status": "COMPLETE",
@@ -693,7 +693,7 @@
       "limitations": "No dependency discovery, raw dependency metadata, production observation, credentials or payload access, repair, approval, deployment, external action, agent/tool execution, completeness or safety authority."
     },
     "impact_path_evidence_slice": {
-      "status": "SOURCE_MERGED_AND_VERIFIED_RECORDS_PENDING",
+      "status": "SOURCE_AND_RECORDS_MERGED_VERIFIED_WRITER_RELEASED",
       "base_main_sha": "aa87735e78e0173840662731a7593753baa937a2",
       "source_sha": "086099da7af047dac6b73c12d8dcfa6d61f3243e",
       "source_tree_sha": "8f63a6718d32af4e6c08f0584fb8f5d64272d078",
@@ -701,10 +701,29 @@
       "source_merge_sha": "86ffa37cd1f7f89d73bf9567cdfe14f54535a35a",
       "source_pr_ci_run": 40069743139,
       "source_merged_main_ci_run": 40081774837,
+      "records_sha": "d6cb9fb270e789fcf55b5985fc78dd7c83a7c5e4",
+      "records_tree_sha": "e20e88ddf1b410a1ae69a30be8676338b4206b2c",
+      "records_pr": 59,
+      "records_merge_sha": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
+      "records_pr_ci_run": 40082077294,
+      "records_merged_main_ci_run": 40082210089,
+      "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/59#issuecomment-6382594250",
       "postgres_16": {"passed": 843, "failed": 0, "skipped": 0},
       "postgres_17": {"passed": 843, "failed": 0, "skipped": 0},
       "scope": "One deterministic hash-only shortest-path witness predecessor per reachable recorded node, bounded to the validated explicit projection and reconstructable without copying raw dependency metadata.",
       "limitations": "No dependency discovery, alternative-path completeness claim, raw dependency metadata, production observation, credentials or payload access, repair, approval, deployment, external action, agent/tool execution or safety authority."
+    },
+    "impact_completeness_warning_slice": {
+      "status": "SOURCE_CANDIDATE_LOCAL",
+      "base_main_sha": "f6f072f00e71c97f8ac00cd351ffb526eead5815",
+      "source_sha": null,
+      "source_tree_sha": null,
+      "source_pr": null,
+      "source_merge_sha": null,
+      "source_pr_ci_run": null,
+      "source_merged_main_ci_run": null,
+      "scope": "Deterministic hash-only manifest of registered nodes unreachable from the selected seeds, plus fixed completeness warnings bound to one validated explicit projection.",
+      "limitations": "No dependency discovery, completeness or safety claim, raw dependency metadata, production observation, credentials or payload access, repair, approval, deployment, external action or execution authority."
     }
   }
 }

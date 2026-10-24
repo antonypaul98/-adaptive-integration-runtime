@@ -251,6 +251,23 @@ added. This records change requires its own exact PR and merged-main CI before
 writer release. AIR-24 remains in progress at 1/12 accepted checkpoints.
 
 
+## AIR-25 impact completeness-warning source candidate (2026-10-24)
+
+Impact-path source and records PRs #58/#59 are verified through exact main
+`f6f072f00e71c97f8ac00cd351ffb526eead5815` and PostgreSQL 16/17 final-main
+run 40082210089 with 843 product tests and zero product skips per matrix. The
+writer is explicitly released in PR #59.
+
+The new candidate reports the exact hash identities of registered nodes not
+reachable from the selected seeds and emits only fixed coverage-warning codes.
+It reconciles registered, reachable and unreachable counts and does not copy
+caller warning text. This remains bounded to one validated explicit projection;
+it infers no undeclared dependency and grants no completeness, safety, repair,
+approval, deployment, external-action or execution authority. Local Python
+3.12.14 validation passed 32 focused tests and 494 portable product tests with
+351 PostgreSQL cases deselected. Exact source PR and merged-main PostgreSQL
+16/17 CI remain required before canonical records.
+
 ## AIR-25 deterministic dependency projection source (2026-10-20)
 
 The first bounded source slice projects only caller-supplied explicit dependency
