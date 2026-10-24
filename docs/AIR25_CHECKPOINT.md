@@ -161,3 +161,15 @@ guards with one documented Memory-only skip. PostgreSQL 16/17 source CI is
 pending. No discovery, production observation, credential/payload access,
 external action, repair, approval, deployment, agent/tool execution,
 completeness inference or safety claim is added.
+
+## Cycle-safe impact-report source receipt
+
+PR #56 head `08f4be44d631b7b584caed9f977114c10eb33ea3`, tree
+`570130da6975a9bd018f1c48dd87d64c8f201132`, passed exact PR run
+40066183394. PostgreSQL 16 and 17 each passed 841 product tests with zero
+product skips. The expected-head guarded merge produced exact main
+`9e2a8a387ef5573f1969f6ae76a09fbd8e567dc9`; exact merged-main run
+40066344089 passed the same matrix.
+
+This receipt adds no authority and does not mark AIR-25 complete. Canonical
+records CI and explicit writer release remain pending; progress stays 2/12.
