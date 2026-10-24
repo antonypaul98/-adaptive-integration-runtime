@@ -382,3 +382,11 @@ authority. Local Python 3.12.14 validation passed 30 focused tests, 492
 portable product tests with 351 PostgreSQL cases deselected, and 15
 infrastructure guards with one documented Memory-only skip. Exact PR-head and
 merged-main PostgreSQL 16/17 CI are required.
+
+Source PR #58 exact head `086099da7af047dac6b73c12d8dcfa6d61f3243e`,
+tree `8f63a6718d32af4e6c08f0584fb8f5d64272d078`, passed run
+40069743139. Python 3.12.15 on PostgreSQL 16 and 17 passed 843 product tests
+with zero product skips per matrix. Guarded merge produced exact main
+`86ffa37cd1f7f89d73bf9567cdfe14f54535a35a`; exact merged-main run
+40081774837 passed the same matrix. Canonical records CI and writer release
+remain pending. AIR-25 remains in progress at 2/12.
