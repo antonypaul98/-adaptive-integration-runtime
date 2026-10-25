@@ -437,3 +437,24 @@ tests with zero product skips. Guarded merge produced exact main
 `2724254d91ea3a019eadcacd61470917bddcdfc2`; merged-main run 40168781130
 passed the same matrix. Canonical records CI and explicit writer release remain
 required. AIR-25 remains in progress at 2/12.
+
+## AIR-25 deterministic seed-partition source candidate (2026-10-25)
+
+Impact-layer records PR #63 head
+`c2272142c47700eed00dd95ed1b9941d6c7505ed` passed exact run 40172502509;
+guarded merge produced main `7cf039a5ffe6660212244037eccc92b8bfb3c183`,
+and run 40172624044 passed. Python 3.12.15 on PostgreSQL 16 and 17 passed
+847 product tests with zero product skips per matrix. The prior writer is
+explicitly released in PR #63.
+
+The new candidate groups reachable recorded nodes by the seed stored in each
+node's deterministic shortest-path witness. Each seed summary carries only its
+hash identity, member count and a content hash over sorted member node IDs, so
+the maximum-size report remains bounded. These partitions describe one selected
+witness forest only; they do not enumerate alternative paths, discover
+undeclared dependencies or claim completeness, importance, risk, probability
+or safety. No production observation, repair, approval, deployment, external
+action or execution authority is added. Local Python 3.12.14 validation passed
+15 focused and 498 portable tests; 351 PostgreSQL cases remain delegated to
+exact PR CI. Infrastructure passed 15 guards with one documented Memory-only
+skip.

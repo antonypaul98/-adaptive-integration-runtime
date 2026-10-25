@@ -1,5 +1,25 @@
 # AIR implementation state
 
+## AIR-25 deterministic seed partitions — source candidate (2026-10-25)
+
+Impact-layer source and records PRs #62/#63 are fully verified through exact
+main `7cf039a5ffe6660212244037eccc92b8bfb3c183` and final-main run 40172624044.
+PostgreSQL 16 and 17 each passed 847 product tests with zero product skips, and
+writer `AIR25-IMPACT-LAYER-SUMMARY-20261024` is explicitly released.
+
+The next bounded candidate emits one compact content-addressed partition summary
+per selected seed. Membership follows only the report's existing deterministic
+shortest-path witness choice; member counts reconcile to the reachable report
+body, while a membership hash avoids duplicating node identities and preserves
+the payload-size bound. The partition is not an all-path, completeness,
+importance, risk, probability or safety claim and adds no discovery, production
+observation, repair, approval, deployment, external action or execution.
+
+Local Python 3.12.14 validation passed 15 focused tests and 498 portable product
+tests with 351 PostgreSQL cases deselected. Infrastructure passed 15 guards with
+one documented Memory-only skip. Exact PostgreSQL 16/17 PR and merged-main CI
+with zero product skips remain required. AIR-25 remains in progress at 2/12.
+
 ## AIR-25 deterministic impact layers — source verified (2026-10-25)
 
 Completeness-warning source/records PRs #60/#61 are fully verified through
