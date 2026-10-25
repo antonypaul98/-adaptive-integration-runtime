@@ -50,6 +50,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'cycle_component_count': 1,
         'impact_layer_count': 3,
         'shortest_path_witness_count': 3,
+        'seed_partition_count': 1,
         'maximum_minimum_hops': 2,
     }
     assert ids['isolated'] not in {node['node_id'] for node in payload['nodes']}
@@ -88,6 +89,7 @@ def test_report_is_redacted_and_has_no_action_authority():
             'first_by_sorted_seed_then_declared_edge_id'
         ),
         'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
+        'seed_partition_basis': 'selected_shortest_path_witness_seed_only',
         'undeclared_dependencies_inferred': False,
         'no_recorded_impact_is_not_safe': True,
     }
@@ -148,6 +150,7 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['cycle_component_count'] == 0
     assert report['summary']['impact_layer_count'] == 1000
     assert report['summary']['shortest_path_witness_count'] == 1000
+    assert report['summary']['seed_partition_count'] == 1
     assert len(report['shortest_path_witnesses']) == 1000
     assert report['unreachable_registered_node_ids'] == []
     assert len(report['impact_layers']) == 1000
@@ -294,3 +297,64 @@ def test_multi_seed_impact_layers_use_minimum_declared_hops():
     assert layers[0]['node_ids'] == sorted([ids['secret-a'], ids['secret-c']])
     assert layers[1]['node_ids'] == [ids['secret-b']]
     assert report['summary']['impact_layer_count'] == 2
+
+
+def test_seed_partitions_are_deterministic_hash_only_and_reconcile_nodes():
+    projection, ids = cyclic_projection()
+    first = build_cycle_safe_impact_report(
+        projection, [ids['secret-a'], ids['secret-c']]
+    ).to_dict()
+    second = build_cycle_safe_impact_report(
+        projection, [ids['secret-c'], ids['secret-a']]
+    ).to_dict()
+
+    assert first['seed_partitions'] == second['seed_partitions']
+    assert first['summary']['seed_partition_count'] == 2
+    assert [partition['seed_node_id'] for partition in first['seed_partitions']] == (
+        sorted([ids['secret-a'], ids['secret-c']])
+    )
+    assert all(
+        len(partition['partition_id']) == 64
+        for partition in first['seed_partitions']
+    )
+    assert sum(
+        partition['member_node_count']
+        for partition in first['seed_partitions']
+    ) == len(first['nodes'])
+    assert all(
+        len(partition['member_node_ids_hash']) == 64
+        for partition in first['seed_partitions']
+    )
+
+
+def test_seed_partition_tie_uses_recorded_witness_not_completeness_claim():
+    first_seed, second_seed, shared = (
+        dep(name) for name in ('first-seed', 'second-seed', 'shared')
+    )
+    projection = project_dependency_graph(
+        [shared, second_seed, first_seed],
+        workflow_edges=[
+            WorkflowEdge(second_seed, shared),
+            WorkflowEdge(first_seed, shared),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['second-seed'], ids['first-seed']]
+    ).to_dict()
+    partitions = {
+        partition['seed_node_id']: partition
+        for partition in payload['seed_partitions']
+    }
+    selected_seed = min(ids['first-seed'], ids['second-seed'])
+
+    assert partitions[selected_seed]['member_node_count'] == 2
+    assert sum(
+        partition['member_node_count'] for partition in partitions.values()
+    ) == 3
+    assert payload['coverage']['seed_partition_basis'] == (
+        'selected_shortest_path_witness_seed_only'
+    )

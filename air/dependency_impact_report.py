@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v4'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v5'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -204,6 +204,18 @@ def build_cycle_safe_impact_report(
             'node_ids': sorted(layer_nodes[minimum_hops]),
         }
         impact_layers.append({'layer_id': _digest(core), **core})
+    partition_nodes: dict[str, list[str]] = {seed: [] for seed in seeds}
+    for node_id, witness in witnesses.items():
+        partition_nodes[witness['witness_seed_node_id']].append(node_id)
+    seed_partitions = []
+    for seed_node_id in seeds:
+        node_ids = sorted(partition_nodes[seed_node_id])
+        core = {
+            'seed_node_id': seed_node_id,
+            'member_node_count': len(node_ids),
+            'member_node_ids_hash': _digest({'node_ids': node_ids}),
+        }
+        seed_partitions.append({'partition_id': _digest(core), **core})
     coverage_warnings = [
         'seed_reachability_is_not_registry_completeness',
         'undeclared_dependencies_are_out_of_scope',
@@ -225,6 +237,7 @@ def build_cycle_safe_impact_report(
                                     for node_id in sorted(witnesses)],
         'cycle_components': cycles,
         'impact_layers': impact_layers,
+        'seed_partitions': seed_partitions,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
             'seed_count': len(seeds),
@@ -235,6 +248,7 @@ def build_cycle_safe_impact_report(
             'cycle_component_count': len(cycles),
             'impact_layer_count': len(impact_layers),
             'shortest_path_witness_count': len(witnesses),
+            'seed_partition_count': len(seed_partitions),
             'maximum_minimum_hops': max(distances.values()),
         },
         'coverage': {
@@ -246,6 +260,9 @@ def build_cycle_safe_impact_report(
                 'first_by_sorted_seed_then_declared_edge_id'
             ),
             'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
+            'seed_partition_basis': (
+                'selected_shortest_path_witness_seed_only'
+            ),
             'undeclared_dependencies_inferred': False,
             'no_recorded_impact_is_not_safe': True,
         },
