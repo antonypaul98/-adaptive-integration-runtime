@@ -51,6 +51,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'impact_layer_count': 3,
         'shortest_path_witness_count': 3,
         'seed_partition_count': 1,
+        'declared_convergence_count': 0,
         'maximum_minimum_hops': 2,
     }
     assert ids['isolated'] not in {node['node_id'] for node in payload['nodes']}
@@ -80,6 +81,7 @@ def test_report_is_redacted_and_has_no_action_authority():
         'scope': 'validated_explicit_projection_only',
         'source_warning_count': 0,
         'warnings': [
+            'declared_convergence_is_not_path_completeness',
             'seed_reachability_is_not_registry_completeness',
             'undeclared_dependencies_are_out_of_scope',
             'unreachable_registered_nodes_omitted_from_impact_body',
@@ -90,6 +92,9 @@ def test_report_is_redacted_and_has_no_action_authority():
         ),
         'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
         'seed_partition_basis': 'selected_shortest_path_witness_seed_only',
+        'declared_convergence_basis': (
+            'multiple_reachable_incoming_traversed_declared_edges_only'
+        ),
         'undeclared_dependencies_inferred': False,
         'no_recorded_impact_is_not_safe': True,
     }
@@ -151,6 +156,7 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['impact_layer_count'] == 1000
     assert report['summary']['shortest_path_witness_count'] == 1000
     assert report['summary']['seed_partition_count'] == 1
+    assert report['summary']['declared_convergence_count'] == 0
     assert len(report['shortest_path_witnesses']) == 1000
     assert report['unreachable_registered_node_ids'] == []
     assert len(report['impact_layers']) == 1000
@@ -357,4 +363,65 @@ def test_seed_partition_tie_uses_recorded_witness_not_completeness_claim():
     ) == 3
     assert payload['coverage']['seed_partition_basis'] == (
         'selected_shortest_path_witness_seed_only'
+    )
+
+
+def test_declared_convergence_summary_is_deterministic_hash_only_and_bounded():
+    seed, left, right, target = (
+        dep(name) for name in ('seed', 'left', 'right', 'target')
+    )
+    projection = project_dependency_graph(
+        [target, right, seed, left],
+        workflow_edges=[
+            WorkflowEdge(right, target),
+            WorkflowEdge(seed, right),
+            WorkflowEdge(left, target),
+            WorkflowEdge(seed, left),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    first = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+    second = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+
+    assert first['declared_convergence_summaries'] == (
+        second['declared_convergence_summaries']
+    )
+    assert first['summary']['declared_convergence_count'] == 1
+    summary = first['declared_convergence_summaries'][0]
+    assert summary['node_id'] == ids['target']
+    assert summary['incoming_declared_edge_count'] == 2
+    assert len(summary['incoming_declared_edge_ids_hash']) == 64
+    assert len(summary['convergence_id']) == 64
+    assert 'edge_ids' not in summary
+
+
+def test_declared_convergence_excludes_unreachable_incoming_edges():
+    seed, reachable, unreachable = (
+        dep(name) for name in ('seed', 'reachable', 'unreachable')
+    )
+    projection = project_dependency_graph(
+        [unreachable, reachable, seed],
+        workflow_edges=[
+            WorkflowEdge(seed, reachable),
+            WorkflowEdge(unreachable, reachable),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['seed']]
+    ).to_dict()
+
+    assert payload['declared_convergence_summaries'] == []
+    assert payload['summary']['declared_convergence_count'] == 0
+    assert payload['coverage']['declared_convergence_basis'] == (
+        'multiple_reachable_incoming_traversed_declared_edges_only'
+    )
+    assert 'declared_convergence_is_not_path_completeness' in (
+        payload['coverage']['warnings']
     )
