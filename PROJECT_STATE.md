@@ -1,6 +1,6 @@
 # AIR implementation state
 
-## AIR-25 deterministic impact layers — source candidate (2026-10-24)
+## AIR-25 deterministic impact layers — source verified (2026-10-25)
 
 Completeness-warning source/records PRs #60/#61 are fully verified through
 exact main `a281b1fc9ea65ed18964122b572257405058d75d`; writer
@@ -14,8 +14,14 @@ not rank importance or risk, infer undeclared dependencies, or expose raw
 dependency metadata.
 Local Python 3.12.14 validation passed 34 focused tests and 496 portable product
 tests with 351 PostgreSQL cases deselected; infrastructure passed 15 guards with
-one documented Memory-only skip. Exact PostgreSQL 16/17 CI remains pending.
-AIR-25 remains in progress at 2/12.
+one documented Memory-only skip. Source PR #62 exact head
+`14b76274f4a6a63942e2fa5188a93eb59b445e08`, tree
+`d3042f92a9e8a7d32d9f714bb87845a5a24652b1`, passed run 40133889617 on
+Python 3.12.15. PostgreSQL 16 and 17 each passed 847 product tests with zero
+product skips. Guarded merge produced exact main
+`2724254d91ea3a019eadcacd61470917bddcdfc2`; merged-main run 40168781130
+passed the same matrix. Canonical records CI and explicit writer release remain
+required. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 impact completeness warnings — source verified (2026-10-24)
 
