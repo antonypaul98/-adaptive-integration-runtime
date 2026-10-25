@@ -17,8 +17,14 @@ observation, repair, approval, deployment, external action or execution.
 
 Local Python 3.12.14 validation passed 15 focused tests and 498 portable product
 tests with 351 PostgreSQL cases deselected. Infrastructure passed 15 guards with
-one documented Memory-only skip. Exact PostgreSQL 16/17 PR and merged-main CI
-with zero product skips remain required. AIR-25 remains in progress at 2/12.
+one documented Memory-only skip. Source PR #64 exact head
+`571478f1ad3287060dba2cf39582a24ee25f5f20`, tree
+`b5508d3f2f039676a46cdd4b277fefcfc7c566be`, passed run 40192674817 on
+Python 3.12.15. PostgreSQL 16 and 17 each passed 849 product tests with zero
+product skips. Guarded merge produced exact main
+`32f26d7cb4aa322832b5ab85b068ba8402e6a315`; merged-main run 40192856747
+passed the same matrix. Canonical records CI and explicit writer release remain
+required. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 deterministic impact layers — source verified (2026-10-25)
 
