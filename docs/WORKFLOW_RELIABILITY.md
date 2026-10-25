@@ -467,7 +467,7 @@ with zero product skips per matrix. Guarded merge produced exact main
 passed the same matrix. Canonical records CI and explicit writer release remain
 required. AIR-25 remains in progress at 2/12.
 
-## AIR-25 declared convergence source candidate (2026-10-25)
+## AIR-25 declared convergence source receipt (2026-10-25)
 
 Seed-partition records PR #65 head
 `1d213832d34b72fb7310b8cd18e6a486245c67ed` and exact main
@@ -482,7 +482,14 @@ states a fixed warning that declared convergence is not path completeness.
 Local Python 3.12.14 validation passed 17 focused tests, 500 portable product
 tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with
 one documented Memory-only skip. Dependency, compilation, JSON and whitespace
-checks passed. Exact PostgreSQL 16/17 PR and merged-main CI are pending. The
-slice adds no discovery, production observation, raw metadata, importance,
-risk, probability, completeness, safety, repair, approval, deployment,
-external action or execution authority.
+checks passed. Source PR #66 exact head
+`eca262eafbfd6ec32bd41fec7a728b0658bdc294`, tree
+`628720232a652cfdd6b80469414dc01f7da3ff7f`, passed exact-head run
+40244575096 on Python 3.12.15. PostgreSQL 16 and 17 each passed 851 product
+tests with zero product skips. Guarded merge produced exact main
+`a972727054957248f6758c91fa7326fb98daf97a`; merged-main run 40244766661
+passed the same matrix. Canonical records CI and explicit writer release remain
+required. The slice adds no discovery, production observation, raw metadata,
+importance, risk, probability, completeness, safety, repair, approval,
+deployment, external action or execution authority. AIR-25 remains in progress
+at 2/12.
