@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-25 dependency visualization and impact reports",
-  "active_branch": "work/air25-witness-convergence-summary",
+  "active_branch": "records/air25-declared-convergence-summary",
   "main_sha_at_start": "99af6847a3e4d08dbde0811c684aaf78ff7fe689",
   "current_branch_sha": "99af6847a3e4d08dbde0811c684aaf78ff7fe689",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Seed-partition records PR #65 is merged and released through exact main 99af6847a3e4d08dbde0811c684aaf78ff7fe689. The declared-convergence summary is a local source candidate based on that exact main; no remote source SHA or CI receipt exists yet.",
+  "branch_remote_status": "Declared-convergence source PR #66 head eca262eafbfd6ec32bd41fec7a728b0658bdc294 passed exact-head CI and is guarded-merged through exact main a972727054957248f6758c91fa7326fb98daf97a; merged-main CI also passed. Canonical records CI and explicit writer release remain pending.",
   "local_test_status": "Python 3.12.14: 17 focused impact-report tests passed; 500 portable product tests passed with 351 PostgreSQL cases deselected; infrastructure suite passed 15 guards with one documented Memory-only skip; dependency checks, compile, JSON validation and whitespace checks passed.",
-  "pr_number": null,
-  "ci_status": "NOT_RUN on the declared-convergence source candidate; exact-head PostgreSQL 16/17 PR CI is required.",
-  "merge_status": "AIR25_DECLARED_CONVERGENCE_SOURCE_CANDIDATE_LOCAL",
+  "pr_number": 66,
+  "ci_status": "SUCCESS on source PR run 40244575096 and merged-main run 40244766661; Python 3.12.15 with PostgreSQL 16/17 passed 851 product tests and zero product skips per lane. Records CI remains required.",
+  "merge_status": "AIR25_DECLARED_CONVERGENCE_SOURCE_VERIFIED_RECORDS_PENDING",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Publish the bounded declared-convergence source candidate, require exact-head PostgreSQL 16/17 PR CI with zero product skips, then guarded merge and exact merged-main verification before canonical records.",
+  "next_action": "Publish these canonical source receipts as a records-only PR, require exact-head PostgreSQL 16/17 CI and merged-main verification with zero product skips, then explicitly release the writer.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -143,40 +143,40 @@
     "reexecuted_this_run": false
   },
   "pr_state": {
-    "number": 62,
+    "number": 66,
     "state": "closed",
     "merged": true,
-    "head_sha": "14b76274f4a6a63942e2fa5188a93eb59b445e08",
-    "merge_commit_sha": "2724254d91ea3a019eadcacd61470917bddcdfc2",
-    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/62"
+    "head_sha": "eca262eafbfd6ec32bd41fec7a728b0658bdc294",
+    "merge_commit_sha": "a972727054957248f6758c91fa7326fb98daf97a",
+    "url": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/66"
   },
   "ci_state": {
     "status": "success",
     "pr_run": {
-      "id": 40133889617,
-      "sha": "14b76274f4a6a63942e2fa5188a93eb59b445e08",
+      "id": 40244575096,
+      "sha": "eca262eafbfd6ec32bd41fec7a728b0658bdc294",
       "event": "pull_request",
       "conclusion": "success"
     },
     "merged_main_run": {
-      "id": 40168781130,
-      "sha": "2724254d91ea3a019eadcacd61470917bddcdfc2",
+      "id": 40244766661,
+      "sha": "a972727054957248f6758c91fa7326fb98daf97a",
       "event": "push",
       "conclusion": "success"
     },
     "pr_jobs": [
-      {"id": 120991197957, "name": "postgres (16)", "python": "3.12.15", "passed": 847, "failed": 0, "skipped": 0, "conclusion": "success"},
-      {"id": 120991197806, "name": "postgres (17)", "python": "3.12.15", "passed": 847, "failed": 0, "skipped": 0, "conclusion": "success"}
+      {"id": 121323321920, "name": "postgres (16)", "python": "3.12.15", "passed": 851, "failed": 0, "skipped": 0, "conclusion": "success"},
+      {"id": 121323322157, "name": "postgres (17)", "python": "3.12.15", "passed": 851, "failed": 0, "skipped": 0, "conclusion": "success"}
     ],
     "merged_main_jobs": [
-      {"id": 121095191707, "name": "postgres (16)", "python": "3.12.15", "passed": 847, "failed": 0, "skipped": 0, "conclusion": "success"},
-      {"id": 121095191785, "name": "postgres (17)", "python": "3.12.15", "passed": 847, "failed": 0, "skipped": 0, "conclusion": "success"}
+      {"id": 121323888828, "name": "postgres (16)", "python": "3.12.15", "passed": 851, "failed": 0, "skipped": 0, "conclusion": "success"},
+      {"id": 121323888718, "name": "postgres (17)", "python": "3.12.15", "passed": 851, "failed": 0, "skipped": 0, "conclusion": "success"}
     ],
-    "postgres_16": {"passed": 847, "failed": 0, "skipped": 0},
-    "postgres_17": {"passed": 847, "failed": 0, "skipped": 0},
+    "postgres_16": {"passed": 851, "failed": 0, "skipped": 0},
+    "postgres_17": {"passed": 851, "failed": 0, "skipped": 0},
     "database_tests_executed": true,
     "zero_database_skips_required": true,
-    "local_product_tests": "496 passed; 351 PostgreSQL cases deselected; exact database coverage supplied by source PR and merged-main CI"
+    "local_product_tests": "500 passed; 351 PostgreSQL cases deselected; exact database coverage supplied by source PR and merged-main CI"
   },
   "prior_verified_ci": {
     "checkpoint_slice": "AIR-25 projection persistence records",
@@ -194,9 +194,9 @@
   "last_session_exit": {
     "BLOCKED_LAYER": null,
     "BLOCKER": null,
-    "SAFE_WORK_COMPLETED": "Impact-layer source PR #62 head 14b76274f4a6a63942e2fa5188a93eb59b445e08 passed exact PostgreSQL 16/17 run 40133889617 with 847 tests and zero product skips per matrix. Guarded merge produced exact main 2724254d91ea3a019eadcacd61470917bddcdfc2; run 40168781130 passed the same matrix.",
-    "REMOTE_SHA": "2724254d91ea3a019eadcacd61470917bddcdfc2",
-    "NEXT_ACTION": "Publish canonical impact-layer records, require exact records PR and merged-main CI, then explicitly release the writer."
+    "SAFE_WORK_COMPLETED": "Declared-convergence source PR #66 head eca262eafbfd6ec32bd41fec7a728b0658bdc294 passed exact PostgreSQL 16/17 run 40244575096 with 851 product tests and zero product skips per matrix. Guarded merge produced exact main a972727054957248f6758c91fa7326fb98daf97a; run 40244766661 passed the same matrix.",
+    "REMOTE_SHA": "a972727054957248f6758c91fa7326fb98daf97a",
+    "NEXT_ACTION": "Publish canonical declared-convergence records, require exact records PR and merged-main CI, then explicitly release the writer."
   },
   "infrastructure_validation": {
     "interpreter": "Python 3.12.14 (available audit runtime; not a full pinned-CI environment run)",
@@ -204,16 +204,16 @@
     "skipped": 1,
     "skip_reason": "Memory-only source-layout regression is not applicable",
     "yaml": "All existing workflow YAML parsed",
-    "product_tests": "496 portable product tests passed; 351 PostgreSQL-only cases deselected locally and remain required on the new exact CI head",
+    "product_tests": "500 portable product tests passed; 351 PostgreSQL-only cases deselected locally; source PR and merged-main CI each passed 851 product tests on PostgreSQL 16/17 with zero product skips",
     "physical_camera": "not_run",
     "new_head_CI": "source PR and merged-main verified; records CI pending"
   },
   "next_checkpoint": "AIR-25 dependency visualization and impact reports",
   "replay_started": true,
-  "checkpoint_status": "IN_PROGRESS_IMPACT_LAYER_SUMMARY_SOURCE_VERIFIED_RECORDS_PENDING",
-  "merge_commit_sha": "2724254d91ea3a019eadcacd61470917bddcdfc2",
-  "verified_main_sha": "2724254d91ea3a019eadcacd61470917bddcdfc2",
-  "final_pr_head": "14b76274f4a6a63942e2fa5188a93eb59b445e08",
+  "checkpoint_status": "IN_PROGRESS_DECLARED_CONVERGENCE_SOURCE_VERIFIED_RECORDS_PENDING",
+  "merge_commit_sha": "a972727054957248f6758c91fa7326fb98daf97a",
+  "verified_main_sha": "a972727054957248f6758c91fa7326fb98daf97a",
+  "final_pr_head": "eca262eafbfd6ec32bd41fec7a728b0658bdc294",
   "shell_transport_limitation": "Public fetch succeeds; shell Git push credentials unavailable. Authorized connector PR creation and guarded merge verified; repository-approved connected Git preservation used for metadata.",
   "previous_checkpoint_receipt": {
     "current_checkpoint": "sandbox-evaluation foundation",
@@ -365,17 +365,17 @@
   "writer_handoff": {
     "owner": "AIR Hourly Build",
     "ownership_id": "AIR25-DECLARED-CONVERGENCE-SUMMARY-20261025",
-    "status": "source_candidate_local",
-    "source_writing_stopped": false,
+    "status": "source_verified_records_pending",
+    "source_writing_stopped": true,
     "next_owner": null,
     "base_main_sha": "99af6847a3e4d08dbde0811c684aaf78ff7fe689",
-    "branch": "work/air25-witness-convergence-summary",
-    "source_head": null,
-    "source_tree": null,
-    "merge_commit": null,
-    "pr": null,
-    "source_pr_ci_run": null,
-    "source_merged_main_ci_run": null,
+    "branch": "records/air25-declared-convergence-summary",
+    "source_head": "eca262eafbfd6ec32bd41fec7a728b0658bdc294",
+    "source_tree": "628720232a652cfdd6b80469414dc01f7da3ff7f",
+    "merge_commit": "a972727054957248f6758c91fa7326fb98daf97a",
+    "pr": 66,
+    "source_pr_ci_run": 40244575096,
+    "source_merged_main_ci_run": 40244766661,
     "release_condition": "Exact declared-convergence source and records PR/merged-main PostgreSQL 16/17 CI green, followed by an explicit writer release receipt.",
     "no_private_data_or_secrets_committed": true,
     "no_deployment_performed": true,

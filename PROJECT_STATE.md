@@ -1,6 +1,6 @@
 # AIR implementation state
 
-## AIR-25 declared convergence summary — source candidate (2026-10-25)
+## AIR-25 declared convergence summary — source verified (2026-10-25)
 
 Seed-partition source/records PRs #64/#65 are fully verified through exact main
 `99af6847a3e4d08dbde0811c684aaf78ff7fe689` and final-main run 40193307096.
@@ -20,8 +20,14 @@ external action or execution authority.
 Local Python 3.12.14 validation passed 17 focused tests and 500 portable product
 tests with 351 PostgreSQL cases deselected. Infrastructure passed 15 guards with
 one documented Memory-only skip; dependency, compilation, JSON and whitespace
-checks passed. Exact PostgreSQL 16/17 PR-head and merged-main CI remain required.
-AIR-25 remains in progress at 2/12.
+checks passed. Source PR #66 exact head
+`eca262eafbfd6ec32bd41fec7a728b0658bdc294`, tree
+`628720232a652cfdd6b80469414dc01f7da3ff7f`, passed run 40244575096 on
+Python 3.12.15. PostgreSQL 16 and 17 each passed 851 product tests with zero
+product skips. Guarded merge produced exact main
+`a972727054957248f6758c91fa7326fb98daf97a`; merged-main run 40244766661
+passed the same matrix. Canonical records CI and explicit writer release remain
+required. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 deterministic seed partitions — source candidate (2026-10-25)
 
