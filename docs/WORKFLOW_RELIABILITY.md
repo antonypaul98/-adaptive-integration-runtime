@@ -413,3 +413,21 @@ with zero product skips per matrix. Guarded merge produced exact main
 `86ffa37cd1f7f89d73bf9567cdfe14f54535a35a`; exact merged-main run
 40081774837 passed the same matrix. Canonical records CI and writer release
 remain pending. AIR-25 remains in progress at 2/12.
+
+## AIR-25 deterministic impact-layer source candidate (2026-10-24)
+
+Completeness-warning source/records PRs #60/#61 are fully verified through
+exact main `a281b1fc9ea65ed18964122b572257405058d75d` and final-main run
+40130405432; PostgreSQL 16 and 17 each passed 845 product tests with zero
+product skips. The prior writer is explicitly released in PR #61.
+
+The new candidate groups reachable hash-only node identities by minimum
+declared hops from the selected seeds, with deterministic content-derived layer
+identities and exact reconciliation to the reachable report body. Layer number
+is not importance, risk, probability, completeness or safety. The slice infers
+no undeclared dependency and adds no production observation, raw metadata,
+repair, approval, deployment, external action or execution authority. Local
+Python 3.12.14 validation passed 34 focused tests and 496 portable product tests
+with 351 PostgreSQL cases deselected; infrastructure passed 15 guards with one
+documented Memory-only skip. Exact PostgreSQL 16/17 PR and merged-main CI remain
+required.

@@ -215,3 +215,20 @@ product skips. Guarded merge produced exact main
 `f276519803d5d85a9eaedc00ea4b40a4c7d3db75`; run 40129867893 passed the
 same matrix. Canonical records CI and explicit writer release remain required;
 AIR-25 stays in progress at 2/12.
+
+## Impact-layer summary source candidate
+
+Starting from exact verified main
+`a281b1fc9ea65ed18964122b572257405058d75d`, this bounded candidate groups
+reachable hash-only node identities by their minimum declared hops from the
+selected seeds. Each layer has a deterministic content-derived identity and the
+layer membership must reconcile exactly with the existing reachable report
+body. Multiple seeds use minimum-hop semantics.
+
+The layer number is not importance, risk, probability, completeness or safety.
+The report remains bounded to one validated explicit projection and adds no raw
+dependency metadata, discovery, production observation, repair, approval,
+deployment, external action or execution authority. Local Python 3.12.14
+validation passed 34 focused tests and 496 portable product tests with 351
+PostgreSQL cases deselected; infrastructure passed 15 guards with one documented
+Memory-only skip. Exact PostgreSQL 16/17 CI is required before canonical records.

@@ -1,5 +1,22 @@
 # AIR implementation state
 
+## AIR-25 deterministic impact layers — source candidate (2026-10-24)
+
+Completeness-warning source/records PRs #60/#61 are fully verified through
+exact main `a281b1fc9ea65ed18964122b572257405058d75d`; writer
+`AIR25-IMPACT-COMPLETENESS-WARNINGS-20261024` is released.
+
+The new bounded candidate groups reachable hash-only node identities into
+deterministic layers by minimum declared hops from the selected seeds. Every
+layer has a content-derived identity, nodes reconcile exactly with the existing
+reachable report body, and multiple seeds retain minimum-hop semantics. It does
+not rank importance or risk, infer undeclared dependencies, or expose raw
+dependency metadata.
+Local Python 3.12.14 validation passed 34 focused tests and 496 portable product
+tests with 351 PostgreSQL cases deselected; infrastructure passed 15 guards with
+one documented Memory-only skip. Exact PostgreSQL 16/17 CI remains pending.
+AIR-25 remains in progress at 2/12.
+
 ## AIR-25 impact completeness warnings — source verified (2026-10-24)
 
 Impact-path records PR #59 and exact main
