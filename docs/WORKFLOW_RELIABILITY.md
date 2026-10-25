@@ -466,3 +466,23 @@ with zero product skips per matrix. Guarded merge produced exact main
 `32f26d7cb4aa322832b5ab85b068ba8402e6a315`; merged-main run 40192856747
 passed the same matrix. Canonical records CI and explicit writer release remain
 required. AIR-25 remains in progress at 2/12.
+
+## AIR-25 declared convergence source candidate (2026-10-25)
+
+Seed-partition records PR #65 head
+`1d213832d34b72fb7310b8cd18e6a486245c67ed` and exact main
+`99af6847a3e4d08dbde0811c684aaf78ff7fe689` passed final run 40193307096.
+Python 3.12.15 on PostgreSQL 16 and 17 passed 849 product tests with zero
+product skips, and the prior writer is explicitly released.
+
+The new bounded candidate summarizes reachable nodes with multiple incoming
+traversed declared edges. It records only hash identities and counts, excludes
+incoming edges whose sources were not reachable from the selected seeds, and
+states a fixed warning that declared convergence is not path completeness.
+Local Python 3.12.14 validation passed 17 focused tests, 500 portable product
+tests with 351 PostgreSQL cases deselected, and 15 infrastructure guards with
+one documented Memory-only skip. Dependency, compilation, JSON and whitespace
+checks passed. Exact PostgreSQL 16/17 PR and merged-main CI are pending. The
+slice adds no discovery, production observation, raw metadata, importance,
+risk, probability, completeness, safety, repair, approval, deployment,
+external action or execution authority.

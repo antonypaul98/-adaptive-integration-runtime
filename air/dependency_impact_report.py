@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v5'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v6'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -216,7 +216,27 @@ def build_cycle_safe_impact_report(
             'member_node_ids_hash': _digest({'node_ids': node_ids}),
         }
         seed_partitions.append({'partition_id': _digest(core), **core})
+    incoming_edge_ids: dict[str, list[str]] = {
+        node_id: [] for node_id in reachable
+    }
+    for edge in edges:
+        incoming_edge_ids[edge['target_node_id']].append(edge['edge_id'])
+    declared_convergence_summaries = []
+    for node_id in sorted(reachable):
+        edge_ids = sorted(incoming_edge_ids[node_id])
+        if len(edge_ids) < 2:
+            continue
+        core = {
+            'node_id': node_id,
+            'incoming_declared_edge_count': len(edge_ids),
+            'incoming_declared_edge_ids_hash': _digest({'edge_ids': edge_ids}),
+        }
+        declared_convergence_summaries.append({
+            'convergence_id': _digest(core),
+            **core,
+        })
     coverage_warnings = [
+        'declared_convergence_is_not_path_completeness',
         'seed_reachability_is_not_registry_completeness',
         'undeclared_dependencies_are_out_of_scope',
     ]
@@ -238,6 +258,7 @@ def build_cycle_safe_impact_report(
         'cycle_components': cycles,
         'impact_layers': impact_layers,
         'seed_partitions': seed_partitions,
+        'declared_convergence_summaries': declared_convergence_summaries,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
             'seed_count': len(seeds),
@@ -249,6 +270,9 @@ def build_cycle_safe_impact_report(
             'impact_layer_count': len(impact_layers),
             'shortest_path_witness_count': len(witnesses),
             'seed_partition_count': len(seed_partitions),
+            'declared_convergence_count': len(
+                declared_convergence_summaries
+            ),
             'maximum_minimum_hops': max(distances.values()),
         },
         'coverage': {
@@ -262,6 +286,9 @@ def build_cycle_safe_impact_report(
             'impact_layer_basis': 'minimum_declared_hops_from_selected_seeds',
             'seed_partition_basis': (
                 'selected_shortest_path_witness_seed_only'
+            ),
+            'declared_convergence_basis': (
+                'multiple_reachable_incoming_traversed_declared_edges_only'
             ),
             'undeclared_dependencies_inferred': False,
             'no_recorded_impact_is_not_safe': True,

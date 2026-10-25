@@ -1,5 +1,28 @@
 # AIR implementation state
 
+## AIR-25 declared convergence summary — source candidate (2026-10-25)
+
+Seed-partition source/records PRs #64/#65 are fully verified through exact main
+`99af6847a3e4d08dbde0811c684aaf78ff7fe689` and final-main run 40193307096.
+Python 3.12.15 on PostgreSQL 16 and 17 passed 849 product tests with zero
+product skips per matrix, and writer `AIR25-SEED-PARTITION-SUMMARY-20261025`
+is explicitly released.
+
+The new bounded candidate emits one compact summary for each reachable node
+with two or more incoming traversed declared edges. Each summary retains only
+the node hash identity, incoming-edge count, a content hash over the sorted edge
+identities and a content-derived convergence identity. Incoming edges from
+unreachable sources are excluded. This is a review aid over one explicit
+projection, not all-path completeness, discovery, importance, risk, probability
+or safety, and it adds no production observation, repair, approval, deployment,
+external action or execution authority.
+
+Local Python 3.12.14 validation passed 17 focused tests and 500 portable product
+tests with 351 PostgreSQL cases deselected. Infrastructure passed 15 guards with
+one documented Memory-only skip; dependency, compilation, JSON and whitespace
+checks passed. Exact PostgreSQL 16/17 PR-head and merged-main CI remain required.
+AIR-25 remains in progress at 2/12.
+
 ## AIR-25 deterministic seed partitions — source candidate (2026-10-25)
 
 Impact-layer source and records PRs #62/#63 are fully verified through exact
