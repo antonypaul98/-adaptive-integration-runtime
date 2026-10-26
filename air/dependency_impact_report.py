@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v7'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v8'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -235,6 +235,25 @@ def build_cycle_safe_impact_report(
             'convergence_id': _digest(core),
             **core,
         })
+    outgoing_edge_ids: dict[str, list[str]] = {
+        node_id: [] for node_id in reachable
+    }
+    for edge in edges:
+        outgoing_edge_ids[edge['source_node_id']].append(edge['edge_id'])
+    declared_branch_summaries = []
+    for node_id in sorted(reachable):
+        edge_ids = sorted(outgoing_edge_ids[node_id])
+        if len(edge_ids) < 2:
+            continue
+        core = {
+            'node_id': node_id,
+            'outgoing_declared_edge_count': len(edge_ids),
+            'outgoing_declared_edge_ids_hash': _digest({'edge_ids': edge_ids}),
+        }
+        declared_branch_summaries.append({
+            'branch_id': _digest(core),
+            **core,
+        })
     outgoing_edge_counts = {node_id: 0 for node_id in reachable}
     for edge in edges:
         outgoing_edge_counts[edge['source_node_id']] += 1
@@ -252,6 +271,7 @@ def build_cycle_safe_impact_report(
         **frontier_core,
     }
     coverage_warnings = [
+        'declared_branches_are_not_alternative_path_completeness',
         'declared_convergence_is_not_path_completeness',
         'declared_frontier_is_not_downstream_completeness',
         'seed_reachability_is_not_registry_completeness',
@@ -276,6 +296,7 @@ def build_cycle_safe_impact_report(
         'impact_layers': impact_layers,
         'seed_partitions': seed_partitions,
         'declared_convergence_summaries': declared_convergence_summaries,
+        'declared_branch_summaries': declared_branch_summaries,
         'declared_frontier_summary': declared_frontier_summary,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
@@ -291,6 +312,7 @@ def build_cycle_safe_impact_report(
             'declared_convergence_count': len(
                 declared_convergence_summaries
             ),
+            'declared_branch_count': len(declared_branch_summaries),
             'declared_frontier_node_count': len(frontier_node_ids),
             'maximum_minimum_hops': max(distances.values()),
         },
@@ -308,6 +330,9 @@ def build_cycle_safe_impact_report(
             ),
             'declared_convergence_basis': (
                 'multiple_reachable_incoming_traversed_declared_edges_only'
+            ),
+            'declared_branch_basis': (
+                'multiple_reachable_outgoing_traversed_declared_edges_only'
             ),
             'declared_frontier_basis': (
                 'reachable_nodes_without_outgoing_traversed_declared_edges_only'

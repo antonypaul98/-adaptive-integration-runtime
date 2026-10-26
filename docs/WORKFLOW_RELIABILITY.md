@@ -1,5 +1,19 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## AIR-25 declared branch source candidate (2026-10-26)
+
+The candidate is based on exact verified main
+`234800f5b4f7d20568d3917604dfabd4bf4b74d3`. It records only hash identities,
+counts and content hashes for reachable nodes with multiple outgoing traversed
+declared edges. Unreachable edges are excluded. Declared branching is not
+alternative-path completeness and no undeclared dependency is inferred.
+
+Local Python 3.12.14 validation passed 21 focused and 504 portable product
+tests, with 351 PostgreSQL cases reserved for exact CI. Infrastructure passed
+15 guards with one documented Memory-only skip; dependency, import,
+diagnostics, compile, JSON and diff checks passed. Exact PostgreSQL 16/17 PR
+and merged-main CI with zero product skips remain required.
+
 ## AIR-25 deterministic visualization candidate (2026-10-23)
 
 The source candidate is based on exact main
