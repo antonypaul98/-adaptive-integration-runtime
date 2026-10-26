@@ -1,6 +1,28 @@
 # AIR implementation state
 
-## AIR-25 declared convergence summary — source verified (2026-10-25)
+## AIR-25 declared frontier summary — source candidate (2026-10-26)
+
+Declared-convergence source/records PRs #66/#67 are fully verified through
+exact main `4d73997fe895b21b17c31fcc356f5978e56049fb` and final-main run
+40245135755. Python 3.12.15 on PostgreSQL 16 and 17 passed 851 product tests
+with zero product skips per matrix, and writer
+`AIR25-DECLARED-CONVERGENCE-SUMMARY-20261025` is explicitly released.
+
+The next bounded candidate emits one compact hash-only summary for reachable
+nodes that have no outgoing traversed declared edge. It records only a count,
+a content hash over sorted node identities and a content-derived frontier
+identity. Cycles are not terminals. A fixed warning states that the declared
+frontier is not downstream completeness. The summary does not discover
+undeclared dependencies or grant importance, risk, probability, safety,
+repair, approval, deployment, external-action or execution authority.
+
+Python 3.12.14 validation passed 19 focused and 502 portable product tests;
+351 PostgreSQL cases were deselected for exact CI. Infrastructure passed 15
+guards with one documented Memory-only skip; dependency, diagnostics,
+compilation, JSON and whitespace checks passed. Exact PostgreSQL 16/17 CI
+remains required. AIR-25 remains in progress at 2/12.
+
+## AIR-25 declared convergence summary — verified and released (2026-10-25)
 
 Seed-partition source/records PRs #64/#65 are fully verified through exact main
 `99af6847a3e4d08dbde0811c684aaf78ff7fe689` and final-main run 40193307096.
@@ -26,8 +48,12 @@ checks passed. Source PR #66 exact head
 Python 3.12.15. PostgreSQL 16 and 17 each passed 851 product tests with zero
 product skips. Guarded merge produced exact main
 `a972727054957248f6758c91fa7326fb98daf97a`; merged-main run 40244766661
-passed the same matrix. Canonical records CI and explicit writer release remain
-required. AIR-25 remains in progress at 2/12.
+passed the same matrix. Records PR #67 head
+`01441699de053776ab8b96a275d5bcd90d75b0f6` passed run 40244992819;
+guarded merge produced final main
+`4d73997fe895b21b17c31fcc356f5978e56049fb`, which passed run 40245135755
+with the same matrix. The writer is explicitly released. AIR-25 remains in
+progress at 2/12.
 
 ## AIR-25 deterministic seed partitions — source candidate (2026-10-25)
 

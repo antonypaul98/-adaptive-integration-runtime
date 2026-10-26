@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v6'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v7'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -235,8 +235,25 @@ def build_cycle_safe_impact_report(
             'convergence_id': _digest(core),
             **core,
         })
+    outgoing_edge_counts = {node_id: 0 for node_id in reachable}
+    for edge in edges:
+        outgoing_edge_counts[edge['source_node_id']] += 1
+    frontier_node_ids = sorted(
+        node_id
+        for node_id, edge_count in outgoing_edge_counts.items()
+        if edge_count == 0
+    )
+    frontier_core = {
+        'node_count': len(frontier_node_ids),
+        'node_ids_hash': _digest({'node_ids': frontier_node_ids}),
+    }
+    declared_frontier_summary = {
+        'frontier_id': _digest(frontier_core),
+        **frontier_core,
+    }
     coverage_warnings = [
         'declared_convergence_is_not_path_completeness',
+        'declared_frontier_is_not_downstream_completeness',
         'seed_reachability_is_not_registry_completeness',
         'undeclared_dependencies_are_out_of_scope',
     ]
@@ -259,6 +276,7 @@ def build_cycle_safe_impact_report(
         'impact_layers': impact_layers,
         'seed_partitions': seed_partitions,
         'declared_convergence_summaries': declared_convergence_summaries,
+        'declared_frontier_summary': declared_frontier_summary,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
             'seed_count': len(seeds),
@@ -273,6 +291,7 @@ def build_cycle_safe_impact_report(
             'declared_convergence_count': len(
                 declared_convergence_summaries
             ),
+            'declared_frontier_node_count': len(frontier_node_ids),
             'maximum_minimum_hops': max(distances.values()),
         },
         'coverage': {
@@ -289,6 +308,9 @@ def build_cycle_safe_impact_report(
             ),
             'declared_convergence_basis': (
                 'multiple_reachable_incoming_traversed_declared_edges_only'
+            ),
+            'declared_frontier_basis': (
+                'reachable_nodes_without_outgoing_traversed_declared_edges_only'
             ),
             'undeclared_dependencies_inferred': False,
             'no_recorded_impact_is_not_safe': True,
