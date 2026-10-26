@@ -493,3 +493,26 @@ required. The slice adds no discovery, production observation, raw metadata,
 importance, risk, probability, completeness, safety, repair, approval,
 deployment, external action or execution authority. AIR-25 remains in progress
 at 2/12.
+
+## AIR-25 declared frontier source candidate (2026-10-26)
+
+Declared-convergence records PR #67 head
+`01441699de053776ab8b96a275d5bcd90d75b0f6` passed exact run 40244992819;
+guarded merge produced exact main
+`4d73997fe895b21b17c31fcc356f5978e56049fb`, and final-main run 40245135755
+passed. Python 3.12.15 on PostgreSQL 16 and 17 passed 851 product tests with
+zero product skips per matrix, and the prior writer is explicitly released.
+
+The new bounded candidate summarizes reachable nodes without outgoing
+traversed declared edges. It retains only the terminal count, a content hash
+over sorted hash-only node identities and a content-derived frontier identity.
+Cycles are not treated as terminals, and a fixed warning states that this
+declared frontier is not downstream completeness. Python 3.12.14 validation
+passed 19 focused and 502 portable product tests, with 351 PostgreSQL cases
+deselected for exact CI. Infrastructure passed 15 guards with one documented
+Memory-only skip; diagnostics, dependencies, compilation, JSON and whitespace
+checks passed. Exact PR-head and merged-main PostgreSQL 16/17 CI remain
+required. The slice adds no
+dependency discovery, production observation, raw metadata, importance, risk,
+probability, completeness, safety, repair, approval, deployment, external
+action or execution authority. AIR-25 remains in progress at 2/12.

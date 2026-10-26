@@ -52,6 +52,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'shortest_path_witness_count': 3,
         'seed_partition_count': 1,
         'declared_convergence_count': 0,
+        'declared_frontier_node_count': 0,
         'maximum_minimum_hops': 2,
     }
     assert ids['isolated'] not in {node['node_id'] for node in payload['nodes']}
@@ -82,6 +83,7 @@ def test_report_is_redacted_and_has_no_action_authority():
         'source_warning_count': 0,
         'warnings': [
             'declared_convergence_is_not_path_completeness',
+            'declared_frontier_is_not_downstream_completeness',
             'seed_reachability_is_not_registry_completeness',
             'undeclared_dependencies_are_out_of_scope',
             'unreachable_registered_nodes_omitted_from_impact_body',
@@ -94,6 +96,9 @@ def test_report_is_redacted_and_has_no_action_authority():
         'seed_partition_basis': 'selected_shortest_path_witness_seed_only',
         'declared_convergence_basis': (
             'multiple_reachable_incoming_traversed_declared_edges_only'
+        ),
+        'declared_frontier_basis': (
+            'reachable_nodes_without_outgoing_traversed_declared_edges_only'
         ),
         'undeclared_dependencies_inferred': False,
         'no_recorded_impact_is_not_safe': True,
@@ -157,6 +162,7 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['shortest_path_witness_count'] == 1000
     assert report['summary']['seed_partition_count'] == 1
     assert report['summary']['declared_convergence_count'] == 0
+    assert report['summary']['declared_frontier_node_count'] == 1
     assert len(report['shortest_path_witnesses']) == 1000
     assert report['unreachable_registered_node_ids'] == []
     assert len(report['impact_layers']) == 1000
@@ -423,5 +429,48 @@ def test_declared_convergence_excludes_unreachable_incoming_edges():
         'multiple_reachable_incoming_traversed_declared_edges_only'
     )
     assert 'declared_convergence_is_not_path_completeness' in (
+        payload['coverage']['warnings']
+    )
+
+
+def test_declared_frontier_summary_is_deterministic_hash_only_and_compact():
+    seed, left, right, target = (
+        dep(name) for name in ('seed', 'left', 'right', 'target')
+    )
+    projection = project_dependency_graph(
+        [target, right, seed, left],
+        workflow_edges=[
+            WorkflowEdge(seed, left),
+            WorkflowEdge(seed, right),
+            WorkflowEdge(right, target),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    first = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+    second = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+
+    assert first['declared_frontier_summary'] == (
+        second['declared_frontier_summary']
+    )
+    summary = first['declared_frontier_summary']
+    assert summary['node_count'] == 2
+    assert first['summary']['declared_frontier_node_count'] == 2
+    assert len(summary['node_ids_hash']) == 64
+    assert len(summary['frontier_id']) == 64
+    assert 'node_ids' not in summary
+
+
+def test_declared_frontier_summary_does_not_treat_cycles_as_terminals():
+    projection, ids = cyclic_projection()
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['secret-a']]
+    ).to_dict()
+
+    assert payload['declared_frontier_summary']['node_count'] == 0
+    assert payload['summary']['declared_frontier_node_count'] == 0
+    assert 'declared_frontier_is_not_downstream_completeness' in (
         payload['coverage']['warnings']
     )
