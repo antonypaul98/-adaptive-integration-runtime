@@ -52,6 +52,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'shortest_path_witness_count': 3,
         'seed_partition_count': 1,
         'declared_convergence_count': 0,
+        'declared_branch_count': 0,
         'declared_frontier_node_count': 0,
         'maximum_minimum_hops': 2,
     }
@@ -82,6 +83,7 @@ def test_report_is_redacted_and_has_no_action_authority():
         'scope': 'validated_explicit_projection_only',
         'source_warning_count': 0,
         'warnings': [
+            'declared_branches_are_not_alternative_path_completeness',
             'declared_convergence_is_not_path_completeness',
             'declared_frontier_is_not_downstream_completeness',
             'seed_reachability_is_not_registry_completeness',
@@ -96,6 +98,9 @@ def test_report_is_redacted_and_has_no_action_authority():
         'seed_partition_basis': 'selected_shortest_path_witness_seed_only',
         'declared_convergence_basis': (
             'multiple_reachable_incoming_traversed_declared_edges_only'
+        ),
+        'declared_branch_basis': (
+            'multiple_reachable_outgoing_traversed_declared_edges_only'
         ),
         'declared_frontier_basis': (
             'reachable_nodes_without_outgoing_traversed_declared_edges_only'
@@ -162,6 +167,7 @@ def test_maximum_bounded_chain_does_not_depend_on_python_recursion_limit():
     assert report['summary']['shortest_path_witness_count'] == 1000
     assert report['summary']['seed_partition_count'] == 1
     assert report['summary']['declared_convergence_count'] == 0
+    assert report['summary']['declared_branch_count'] == 0
     assert report['summary']['declared_frontier_node_count'] == 1
     assert len(report['shortest_path_witnesses']) == 1000
     assert report['unreachable_registered_node_ids'] == []
@@ -429,6 +435,67 @@ def test_declared_convergence_excludes_unreachable_incoming_edges():
         'multiple_reachable_incoming_traversed_declared_edges_only'
     )
     assert 'declared_convergence_is_not_path_completeness' in (
+        payload['coverage']['warnings']
+    )
+
+
+def test_declared_branch_summary_is_deterministic_hash_only_and_compact():
+    seed, left, right, target = (
+        dep(name) for name in ('seed', 'left', 'right', 'target')
+    )
+    projection = project_dependency_graph(
+        [target, right, seed, left],
+        workflow_edges=[
+            WorkflowEdge(seed, left),
+            WorkflowEdge(seed, right),
+            WorkflowEdge(right, target),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    first = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+    second = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+
+    assert first['declared_branch_summaries'] == second[
+        'declared_branch_summaries'
+    ]
+    assert first['summary']['declared_branch_count'] == 1
+    summary = first['declared_branch_summaries'][0]
+    assert summary['node_id'] == ids['seed']
+    assert summary['outgoing_declared_edge_count'] == 2
+    assert len(summary['outgoing_declared_edge_ids_hash']) == 64
+    assert len(summary['branch_id']) == 64
+    assert 'edge_ids' not in summary
+
+
+def test_declared_branch_summary_excludes_unreachable_outgoing_edges():
+    seed, reachable, unreachable = (
+        dep(name) for name in ('seed', 'reachable', 'unreachable')
+    )
+    projection = project_dependency_graph(
+        [unreachable, reachable, seed],
+        workflow_edges=[
+            WorkflowEdge(seed, reachable),
+            WorkflowEdge(unreachable, seed),
+            WorkflowEdge(unreachable, reachable),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['seed']]
+    ).to_dict()
+
+    assert payload['declared_branch_summaries'] == []
+    assert payload['summary']['declared_branch_count'] == 0
+    assert payload['coverage']['declared_branch_basis'] == (
+        'multiple_reachable_outgoing_traversed_declared_edges_only'
+    )
+    assert 'declared_branches_are_not_alternative_path_completeness' in (
         payload['coverage']['warnings']
     )
 

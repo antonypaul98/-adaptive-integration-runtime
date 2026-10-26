@@ -1,5 +1,21 @@
 # AIR implementation state
 
+## AIR-25 declared branch summary — source candidate (2026-10-26)
+
+Declared-frontier source/records PRs #68/#69 are fully verified through exact
+main `234800f5b4f7d20568d3917604dfabd4bf4b74d3`; writer
+`AIR25-DECLARED-FRONTIER-SUMMARY-20261025` is released. The new bounded
+candidate emits compact hash-only summaries for reachable nodes with at least
+two outgoing traversed declared edges. Unreachable edges are excluded, and a
+fixed warning states that declared branching is not alternative-path
+completeness.
+
+Python 3.12.14 validation passed 21 focused and 504 portable product tests;
+351 PostgreSQL cases are reserved for exact CI. Infrastructure passed 15
+guards with one documented Memory-only skip. The slice discovers no dependency
+and grants no repair, approval, deployment, external-action or execution
+authority. Exact PostgreSQL 16/17 PR and merged-main CI remain required.
+
 ## AIR-25 declared frontier summary — source verified, records pending (2026-10-26)
 
 Declared-convergence source/records PRs #66/#67 are fully verified through
