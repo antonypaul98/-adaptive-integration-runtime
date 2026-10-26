@@ -516,3 +516,20 @@ required. The slice adds no
 dependency discovery, production observation, raw metadata, importance, risk,
 probability, completeness, safety, repair, approval, deployment, external
 action or execution authority. AIR-25 remains in progress at 2/12.
+
+## AIR-25 declared-frontier source receipt (2026-10-26)
+
+Source PR #68 exact head `e3e775355a2b63ba2270d87cae944165b14091f7`,
+tree `660fbc13ff3a42ea51de2f2f5e33740fdcf38539`, passed exact-head run
+40279147493 on Python 3.12.15. PostgreSQL 16 and 17 each passed 853 product
+tests with zero product skips. Its expected-head guarded merge produced exact
+main `f62e630d8f95f729e975ef5669aaf4621e30a563`; push run 40279349524
+passed the same matrix. Each lane executed 16 infrastructure guards: 15 passed
+and one established Memory-only case skipped. Diagnostics passed.
+
+The slice remains a bounded deterministic hash-only summary of reachable nodes
+without outgoing traversed declared edges. It discovers no undeclared
+dependency, reads no production payload or secret, and grants no repair,
+approval, deployment, external-action or execution authority. Independent
+canonical records and exact PR/final-main CI remain required before writer
+release. AIR-25 remains in progress at 2/12.
