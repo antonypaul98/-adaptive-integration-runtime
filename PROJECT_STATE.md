@@ -1,6 +1,6 @@
 # AIR implementation state
 
-## AIR-25 declared branch summary — source candidate (2026-10-26)
+## AIR-25 declared branch summary — source verified, records pending (2026-10-26)
 
 Declared-frontier source/records PRs #68/#69 are fully verified through exact
 main `234800f5b4f7d20568d3917604dfabd4bf4b74d3`; writer
@@ -14,7 +14,14 @@ Python 3.12.14 validation passed 21 focused and 504 portable product tests;
 351 PostgreSQL cases are reserved for exact CI. Infrastructure passed 15
 guards with one documented Memory-only skip. The slice discovers no dependency
 and grants no repair, approval, deployment, external-action or execution
-authority. Exact PostgreSQL 16/17 PR and merged-main CI remain required.
+authority. Source PR #70 exact head
+`d9e420c00ed1e939d4ed92f4b70968f3fd4997ef`, tree
+`85d1e989927a3f54e8e4967cfe17938d593afa42`, passed run 40368414126 on
+Python 3.12.15. PostgreSQL 16 and 17 each passed 855 product tests with zero
+product skips. Guarded merge produced exact main
+`490a2a2628b6f69c549778de52f17f816e58e75a`; merged-main run 40368709577
+passed the same matrix. Canonical records and their exact CI remain required
+before writer release. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 declared frontier summary — source verified, records pending (2026-10-26)
 
