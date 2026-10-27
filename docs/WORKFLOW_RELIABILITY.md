@@ -1,5 +1,25 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## AIR-25 declared branch target candidate (2026-10-27)
+
+Prior declared-branch PRs #70/#71 are fully verified and writer
+`AIR25-DECLARED-BRANCH-SUMMARY-20261026` is released through exact main
+`685f3fb5e2f47565d2d74897c6139230c0e9b8a8` and final-main run 40479256326.
+Python 3.12.15 on PostgreSQL 16 and 17 passed 855 product tests with zero
+product skips per lane.
+
+This source candidate adds deterministic compact commitments from each existing
+declared branch to its distinct target-node set: one count and one canonical
+hash over sorted opaque target identities. The values derive only from already
+traversed declared edges and expose no raw dependency metadata. Python 3.12.14
+validation passes 22 focused and 505 portable product tests, with 351
+PostgreSQL cases reserved for exact CI. Infrastructure passes 15 guards with
+one documented Memory-only skip; dependency, import, compile, JSON and
+whitespace checks pass. Exact PostgreSQL 16/17 PR and merged-main CI remain
+required. The commitment is not alternative-path or dependency
+completeness, discovery, importance, risk, probability or safety, and grants no
+repair, approval, deployment, external-action or execution authority.
+
 ## AIR-25 declared branch source candidate (2026-10-26)
 
 The candidate is based on exact verified main

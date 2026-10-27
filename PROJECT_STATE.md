@@ -1,6 +1,28 @@
 # AIR implementation state
 
-## AIR-25 declared branch summary — source verified, records pending (2026-10-26)
+## AIR-25 declared branch target commitments — source candidate (2026-10-27)
+
+The prior declared-branch source and records PRs #70/#71 are fully verified
+through exact main `685f3fb5e2f47565d2d74897c6139230c0e9b8a8` and final-main run
+40479256326. Python 3.12.15 on PostgreSQL 16 and 17 passed 855 product tests
+with zero product skips per lane, and writer
+`AIR25-DECLARED-BRANCH-SUMMARY-20261026` is explicitly released.
+
+The new bounded candidate adds a distinct target-node count and a canonical
+hash over sorted distinct target-node identities to each existing reachable
+declared-branch summary. Both values are derived solely from the report's
+already traversed declared edges, remain compact and hash-only, and can be
+reconciled independently with the report edge body. The candidate discovers no
+dependency and grants no importance, risk, probability, safety, repair,
+approval, deployment, external-action or execution authority.
+
+Python 3.12.14 validation passes 22 focused and 505 portable product tests;
+351 PostgreSQL cases are reserved for exact CI. Infrastructure passes 15
+guards with one documented Memory-only skip; dependency, import, compile, JSON
+and whitespace checks pass. Exact PostgreSQL 16/17 PR and merged-main CI remain
+required. AIR-25 remains in progress at 2/12.
+
+## AIR-25 declared branch summary — verified and released (2026-10-27)
 
 Declared-frontier source/records PRs #68/#69 are fully verified through exact
 main `234800f5b4f7d20568d3917604dfabd4bf4b74d3`; writer
@@ -20,8 +42,12 @@ authority. Source PR #70 exact head
 Python 3.12.15. PostgreSQL 16 and 17 each passed 855 product tests with zero
 product skips. Guarded merge produced exact main
 `490a2a2628b6f69c549778de52f17f816e58e75a`; merged-main run 40368709577
-passed the same matrix. Canonical records and their exact CI remain required
-before writer release. AIR-25 remains in progress at 2/12.
+passed the same matrix. Records PR #71 exact head
+`a4fbfd8f34ac588b1d306a4a65a6733c0979eede` passed run 40473250761. Its
+guarded merge produced exact final main
+`685f3fb5e2f47565d2d74897c6139230c0e9b8a8`; final-main run 40479256326
+passed the same matrix. Writer `AIR25-DECLARED-BRANCH-SUMMARY-20261026` is
+explicitly released. AIR-25 remains in progress at 2/12.
 
 ## AIR-25 declared frontier summary — source verified, records pending (2026-10-26)
 

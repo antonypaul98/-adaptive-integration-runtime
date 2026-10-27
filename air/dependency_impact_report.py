@@ -235,20 +235,29 @@ def build_cycle_safe_impact_report(
             'convergence_id': _digest(core),
             **core,
         })
-    outgoing_edge_ids: dict[str, list[str]] = {
+    outgoing_edges: dict[str, list[dict]] = {
         node_id: [] for node_id in reachable
     }
     for edge in edges:
-        outgoing_edge_ids[edge['source_node_id']].append(edge['edge_id'])
+        outgoing_edges[edge['source_node_id']].append(edge)
     declared_branch_summaries = []
     for node_id in sorted(reachable):
-        edge_ids = sorted(outgoing_edge_ids[node_id])
+        branch_edges = outgoing_edges[node_id]
+        edge_ids = sorted(edge['edge_id'] for edge in branch_edges)
         if len(edge_ids) < 2:
             continue
+        target_node_ids = sorted({
+            edge['target_node_id']
+            for edge in branch_edges
+        })
         core = {
             'node_id': node_id,
             'outgoing_declared_edge_count': len(edge_ids),
             'outgoing_declared_edge_ids_hash': _digest({'edge_ids': edge_ids}),
+            'distinct_target_node_count': len(target_node_ids),
+            'target_node_ids_hash': _digest({
+                'target_node_ids': target_node_ids,
+            }),
         }
         declared_branch_summaries.append({
             'branch_id': _digest(core),
