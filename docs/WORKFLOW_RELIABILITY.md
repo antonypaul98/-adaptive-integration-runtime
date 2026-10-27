@@ -14,6 +14,23 @@ tests, with 351 PostgreSQL cases reserved for exact CI. Infrastructure passed
 diagnostics, compile, JSON and diff checks passed. Exact PostgreSQL 16/17 PR
 and merged-main CI with zero product skips remain required.
 
+## AIR-25 declared-branch source receipt (2026-10-26)
+
+Source PR #70 exact head `d9e420c00ed1e939d4ed92f4b70968f3fd4997ef`,
+tree `85d1e989927a3f54e8e4967cfe17938d593afa42`, passed exact-head run
+40368414126 on Python 3.12.15. PostgreSQL 16 and 17 each passed 855 product
+tests with zero product skips. Its expected-head guarded merge produced exact
+main `490a2a2628b6f69c549778de52f17f816e58e75a`; push run 40368709577
+passed the same matrix. Each lane executed 16 infrastructure guards: 15 passed
+and one established Memory-only case skipped. Diagnostics passed.
+
+The slice remains a bounded deterministic hash-only summary of reachable nodes
+with multiple outgoing traversed declared edges. It discovers no undeclared
+dependency, reads no production payload or secret, and grants no repair,
+approval, deployment, external-action or execution authority. Independent
+canonical records and exact PR/final-main CI remain required before writer
+release. AIR-25 remains in progress at 2/12.
+
 ## AIR-25 deterministic visualization candidate (2026-10-23)
 
 The source candidate is based on exact main
