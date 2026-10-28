@@ -1,5 +1,20 @@
 # AIR implementation state
 
+## AIR-25 declared branch reach overlap — source verified (2026-10-28)
+
+Source PR #75 exact head `5aff77872ccf8892b1e200b2ad69e2689db40daa`,
+tree `5a0234f28a5d41f8fc1e9658adccecf44143ed06`, passed exact run
+40687735433 on Python 3.12.15. PostgreSQL 16 and 17 each passed 858 product
+tests with zero product skips. Expected-head guarded merge produced exact main
+`5d4d479ffa0b7b2e7df2ce4040e5303c5a459ca6`; merged-main run 40688022997
+passed the same matrix.
+
+The slice remains a compact, hash-only review aid over one validated explicit
+projection. It commits to overlap among immediate declared branch targets'
+reachable cones without enumerating paths or inferring undeclared dependencies.
+Independent canonical records and their exact PR/final-main CI remain required
+before writer release. AIR-25 remains in progress at 2/12.
+
 ## AIR-25 declared branch reach overlap — source candidate (2026-10-28)
 
 Declared-branch-target source/records PRs #72/#74 are fully verified through
