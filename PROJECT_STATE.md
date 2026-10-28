@@ -1,5 +1,23 @@
 # AIR implementation state
 
+## AIR-25 declared branch target commitments — source verified (2026-10-28)
+
+Source PR #72 exact head `137cfe077d18f541dac3e98d3f71ab4368b62f93`,
+tree `6ee7b6720d04035f3798f173850a95cf020f37ef`, passed exact run
+40512164020 on Python 3.12.15. PostgreSQL 16 and 17 each passed 856
+product tests with zero product skips. Expected-head guarded merge produced
+exact main `2fb8abf905835cf9cba86be17b88b5a38cadc5a3`; merged-main run
+40648809391 passed the same matrix.
+
+The slice adds a distinct target-node count and canonical hash commitment over
+the sorted distinct target-node identities already present in each reachable
+declared-branch summary. It remains a deterministic, compact, hash-only review
+aid over one explicit projection. It discovers no dependency and grants no
+importance, risk, probability, safety, repair, approval, deployment,
+external-action or execution authority. Independent canonical records and
+their exact PostgreSQL 16/17 PR/final-main CI remain required before writer
+release. AIR-25 remains in progress at 2/12.
+
 ## AIR-25 declared branch target commitments — source candidate (2026-10-27)
 
 The prior declared-branch source and records PRs #70/#71 are fully verified
