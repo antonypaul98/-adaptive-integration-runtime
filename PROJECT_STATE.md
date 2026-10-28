@@ -1,5 +1,22 @@
 # AIR implementation state
 
+## AIR-25 declared branch reach overlap — source candidate (2026-10-28)
+
+Declared-branch-target source/records PRs #72/#74 are fully verified through
+exact main `ffb3554b361864d250ba4853d4727f0d870f8174` and final-main run
+40656899885. PostgreSQL 16 and 17 each passed 856 product tests with zero
+product skips, and writer `AIR25-DECLARED-BRANCH-TARGETS-20261027` is released.
+
+The new bounded candidate reuses the existing validated explicit projection,
+cycle-safe traversal and canonical hash commitments. For each reachable
+declared branch it records only a count and hash commitment when nodes are
+reachable from at least two distinct immediate branch targets. It enumerates
+neither paths nor raw dependency metadata and infers no undeclared dependency.
+Python 3.12.14 validation passed 24 focused and 507 portable product tests;
+351 PostgreSQL cases remain reserved for exact CI. Infrastructure passed 15
+guards with one documented Memory-only skip. Exact PostgreSQL 16/17 PR and
+merged-main CI remain required.
+
 ## AIR-25 declared branch target commitments — source verified (2026-10-28)
 
 Source PR #72 exact head `137cfe077d18f541dac3e98d3f71ab4368b62f93`,

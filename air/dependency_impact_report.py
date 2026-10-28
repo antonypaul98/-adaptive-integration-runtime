@@ -18,7 +18,7 @@ from air.dependency_projection import DependencyProjection
 from air.dependency_visualization import VisualizationError, _validated_projection
 from air.postgres import canonical_json
 
-IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v8'
+IMPACT_REPORT_VERSION = 'air-dependency-impact-traversal-v9'
 _HEX_64 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -241,6 +241,7 @@ def build_cycle_safe_impact_report(
     for edge in edges:
         outgoing_edges[edge['source_node_id']].append(edge)
     declared_branch_summaries = []
+    declared_branch_reach_overlap_summaries = []
     for node_id in sorted(reachable):
         branch_edges = outgoing_edges[node_id]
         edge_ids = sorted(edge['edge_id'] for edge in branch_edges)
@@ -263,6 +264,39 @@ def build_cycle_safe_impact_report(
             'branch_id': _digest(core),
             **core,
         })
+        target_reach_counts: dict[str, int] = {}
+        for target_node_id in target_node_ids:
+            target_reachable = {target_node_id}
+            target_queue = deque([target_node_id])
+            while target_queue:
+                target_source_id = target_queue.popleft()
+                for edge in outgoing_edges[target_source_id]:
+                    target = edge['target_node_id']
+                    if target not in target_reachable:
+                        target_reachable.add(target)
+                        target_queue.append(target)
+            for target in target_reachable:
+                target_reach_counts[target] = (
+                    target_reach_counts.get(target, 0) + 1
+                )
+        shared_node_ids = sorted(
+            target
+            for target, reach_count in target_reach_counts.items()
+            if reach_count >= 2
+        )
+        if shared_node_ids:
+            overlap_core = {
+                'branch_id': _digest(core),
+                'branch_target_count': len(target_node_ids),
+                'shared_reachable_node_count': len(shared_node_ids),
+                'shared_reachable_node_ids_hash': _digest({
+                    'node_ids': shared_node_ids,
+                }),
+            }
+            declared_branch_reach_overlap_summaries.append({
+                'overlap_id': _digest(overlap_core),
+                **overlap_core,
+            })
     outgoing_edge_counts = {node_id: 0 for node_id in reachable}
     for edge in edges:
         outgoing_edge_counts[edge['source_node_id']] += 1
@@ -280,6 +314,7 @@ def build_cycle_safe_impact_report(
         **frontier_core,
     }
     coverage_warnings = [
+        'declared_branch_reach_overlap_is_not_path_completeness',
         'declared_branches_are_not_alternative_path_completeness',
         'declared_convergence_is_not_path_completeness',
         'declared_frontier_is_not_downstream_completeness',
@@ -306,6 +341,9 @@ def build_cycle_safe_impact_report(
         'seed_partitions': seed_partitions,
         'declared_convergence_summaries': declared_convergence_summaries,
         'declared_branch_summaries': declared_branch_summaries,
+        'declared_branch_reach_overlap_summaries': (
+            declared_branch_reach_overlap_summaries
+        ),
         'declared_frontier_summary': declared_frontier_summary,
         'unreachable_registered_node_ids': unreachable,
         'summary': {
@@ -322,6 +360,9 @@ def build_cycle_safe_impact_report(
                 declared_convergence_summaries
             ),
             'declared_branch_count': len(declared_branch_summaries),
+            'declared_branch_reach_overlap_count': len(
+                declared_branch_reach_overlap_summaries
+            ),
             'declared_frontier_node_count': len(frontier_node_ids),
             'maximum_minimum_hops': max(distances.values()),
         },
@@ -342,6 +383,10 @@ def build_cycle_safe_impact_report(
             ),
             'declared_branch_basis': (
                 'multiple_reachable_outgoing_traversed_declared_edges_only'
+            ),
+            'declared_branch_reach_overlap_basis': (
+                'shared_reachable_nodes_from_distinct_immediate_declared_'
+                'branch_targets_only'
             ),
             'declared_frontier_basis': (
                 'reachable_nodes_without_outgoing_traversed_declared_edges_only'

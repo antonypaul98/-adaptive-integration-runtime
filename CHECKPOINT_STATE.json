@@ -1,18 +1,18 @@
 {
   "repository": "antonypaul98/-adaptive-integration-runtime",
   "current_checkpoint": "AIR-25 dependency visualization and impact reports",
-  "active_branch": "records/air25-declared-branch-targets",
-  "main_sha_at_start": "2fb8abf905835cf9cba86be17b88b5a38cadc5a3",
-  "current_branch_sha": "2fb8abf905835cf9cba86be17b88b5a38cadc5a3",
+  "active_branch": "work/air25-declared-branch-overlap",
+  "main_sha_at_start": "ffb3554b361864d250ba4853d4727f0d870f8174",
+  "current_branch_sha": "ffb3554b361864d250ba4853d4727f0d870f8174",
   "sha_semantics": "observed_* and current_branch_sha are immutable pre-edit observations, not the SHA of the containing commit. Resolve current_repository_sha at runtime with the command; preflight prints it. CI receipts apply only to their recorded SHA.",
-  "branch_remote_status": "Declared-branch-target source PR #72 head 137cfe077d18f541dac3e98d3f71ab4368b62f93 passed exact PostgreSQL 16/17 CI 40512164020; expected-head merge 2fb8abf905835cf9cba86be17b88b5a38cadc5a3 passed main-push CI 40648809391. This independent records candidate is rooted at that exact merge; writer AIR25-DECLARED-BRANCH-TARGETS-20261027 remains claimed.",
-  "local_test_status": "Python 3.12.14 declared-branch-target records candidate: 22 focused and 505 portable product tests passed; 351 PostgreSQL cases are reserved for exact records CI. Infrastructure executed 16 guards: 15 passed with one documented Memory-only skip; dependency diagnostics, import, compile, JSON and whitespace checks passed. Exact source CI passed 856 product tests with zero product skips on PostgreSQL 16 and 17.",
-  "pr_number": 72,
-  "ci_status": "Source PR and merged-main PostgreSQL 16/17 CI passed with 856 product tests and zero product skips per lane; independent records CI pending",
-  "merge_status": "AIR25_DECLARED_BRANCH_TARGETS_SOURCE_MERGED_VERIFIED_RECORDS_LOCAL",
+  "branch_remote_status": "No open PRs. Declared-branch-target source/records PRs #72/#74 are verified through exact main ffb3554b361864d250ba4853d4727f0d870f8174 and final-main CI 40656899885; writer AIR25-DECLARED-BRANCH-TARGETS-20261027 is released. Branch-reach-overlap source candidate is local and unpublished.",
+  "local_test_status": "Python 3.12.14 branch-reach-overlap candidate: 24 focused and 507 portable product tests passed; 351 PostgreSQL cases are reserved for exact CI. Infrastructure executed 16 guards: 15 passed with one documented Memory-only skip.",
+  "pr_number": null,
+  "ci_status": "Prior declared-branch-target records/final-main PostgreSQL 16/17 CI passed with 856 product tests and zero product skips per lane; branch-reach-overlap CI has not run.",
+  "merge_status": "AIR25_DECLARED_BRANCH_REACH_OVERLAP_SOURCE_LOCAL",
   "external_acceptance_required": false,
   "known_blocker": null,
-  "next_action": "Validate and publish this independent records candidate, require exact PostgreSQL 16/17 PR CI with zero product skips, guarded merge, final-main CI, then explicitly release the writer.",
+  "next_action": "Publish the branch-reach-overlap source candidate, require exact PostgreSQL 16/17 PR CI with zero product skips, guarded merge and final-main CI, then prepare independent records.",
   "feature_checkpoint_advanced": false,
   "roadmap_expansion": {
     "authorized_at": "2026-10-12",
@@ -837,7 +837,7 @@
       "limitations": "Declared branching is not alternative-path completeness, dependency discovery, importance, risk, probability, safety, repair, approval, deployment, external action or execution authority."
     },
     "declared_branch_target_slice": {
-      "status": "SOURCE_MERGED_VERIFIED_RECORDS_LOCAL",
+      "status": "MERGED_VERIFIED_AND_RELEASED",
       "base_main_sha": "685f3fb5e2f47565d2d74897c6139230c0e9b8a8",
       "source_sha": "137cfe077d18f541dac3e98d3f71ab4368b62f93",
       "source_tree_sha": "6ee7b6720d04035f3798f173850a95cf020f37ef",
@@ -845,10 +845,29 @@
       "source_pr_ci_run": 40512164020,
       "source_merge_sha": "2fb8abf905835cf9cba86be17b88b5a38cadc5a3",
       "source_merged_main_ci_run": 40648809391,
+      "records_sha": "13bbd4c2a1fb21b9b1c3f797f38b6655df6e493a",
+      "records_pr": 74,
+      "records_merge_sha": "ffb3554b361864d250ba4853d4727f0d870f8174",
+      "records_pr_ci_run": 40656700416,
+      "records_merged_main_ci_run": 40656899885,
+      "release_receipt": "https://github.com/antonypaul98/-adaptive-integration-runtime/pull/74#issuecomment-6464306844",
       "postgres_16": {"passed": 856, "failed": 0, "skipped": 0},
       "postgres_17": {"passed": 856, "failed": 0, "skipped": 0},
       "scope": "Deterministic compact count and hash commitments to the distinct reachable target nodes of each declared branch, derived only from traversed declared edges in one validated explicit projection.",
       "limitations": "Target commitments are not alternative-path or dependency completeness, discovery, importance, risk, probability, safety, repair, approval, deployment, external action or execution authority."
+    },
+    "declared_branch_reach_overlap_slice": {
+      "status": "SOURCE_LOCAL_UNPUBLISHED",
+      "base_main_sha": "ffb3554b361864d250ba4853d4727f0d870f8174",
+      "source_sha": null,
+      "source_pr": null,
+      "source_pr_ci_run": null,
+      "source_merge_sha": null,
+      "source_merged_main_ci_run": null,
+      "postgres_16": null,
+      "postgres_17": null,
+      "scope": "Deterministic compact count and hash commitments to nodes reachable from at least two distinct immediate targets of each reachable declared branch.",
+      "limitations": "Branch reach overlap is not path or dependency completeness, discovery, importance, risk, probability, safety, repair, approval, deployment, external action or execution authority."
     }
   }
 }
