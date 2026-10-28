@@ -1,5 +1,24 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## AIR-25 declared branch reach overlap candidate (2026-10-28)
+
+The candidate is rooted at exact verified main
+`ffb3554b361864d250ba4853d4727f0d870f8174`, after declared-branch-target
+writer release. Reuse-first review selected the existing in-repository
+validated projection, cycle-safe queue traversal and canonical hash contracts;
+no third-party code, dependency, model, network access or external account is
+used.
+
+Each compact summary is bound to one existing branch identity and commits to
+the count and sorted hash-only identities of nodes reachable from at least two
+distinct immediate branch targets. The output does not enumerate paths, expose
+raw dependency metadata or infer undeclared dependencies. Python 3.12.14 local
+validation passed 24 focused and 507 portable product tests, with 351
+PostgreSQL cases reserved for exact CI. Infrastructure ran 16 guards: 15 passed
+and one documented Memory-only case skipped. Exact PostgreSQL 16/17 PR and
+merged-main CI with zero product skips remain required. This evidence grants no
+repair, approval, deployment, external-action or execution authority.
+
 ## AIR-25 declared branch target candidate (2026-10-27)
 
 Prior declared-branch PRs #70/#71 are fully verified and writer
