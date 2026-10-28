@@ -1,5 +1,21 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## AIR-25 declared branch reach overlap source receipt (2026-10-28)
+
+Source PR #75 exact head `5aff77872ccf8892b1e200b2ad69e2689db40daa`,
+tree `5a0234f28a5d41f8fc1e9658adccecf44143ed06`, passed exact run
+40687735433. Expected-head merge produced main
+`5d4d479ffa0b7b2e7df2ce4040e5303c5a459ca6`, and main-push run 40688022997
+passed. Python 3.12.15 on PostgreSQL 16 and 17 passed 858 product tests with
+zero product skips in both gates. Each lane ran 16 infrastructure guards: 15
+passed and one established Memory-only case skipped.
+
+The evidence remains synthetic, deterministic, hash-only and read-only. It
+does not establish path or dependency completeness, importance, risk,
+probability or safety, and grants no repair, approval, deployment,
+external-action or execution authority. Independent records CI and explicit
+writer release remain required.
+
 ## AIR-25 declared branch reach overlap candidate (2026-10-28)
 
 The candidate is rooted at exact verified main
