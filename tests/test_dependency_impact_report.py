@@ -1,4 +1,5 @@
 from dataclasses import FrozenInstanceError
+from hashlib import sha256
 
 import pytest
 
@@ -466,8 +467,14 @@ def test_declared_branch_summary_is_deterministic_hash_only_and_compact():
     assert summary['node_id'] == ids['seed']
     assert summary['outgoing_declared_edge_count'] == 2
     assert len(summary['outgoing_declared_edge_ids_hash']) == 64
+    assert summary['distinct_target_node_count'] == 2
+    target_node_ids = sorted([ids['left'], ids['right']])
+    assert summary['target_node_ids_hash'] == sha256(canonical_json({
+        'target_node_ids': target_node_ids,
+    }).encode()).hexdigest()
     assert len(summary['branch_id']) == 64
     assert 'edge_ids' not in summary
+    assert 'target_node_ids' not in summary
 
 
 def test_declared_branch_summary_excludes_unreachable_outgoing_edges():
@@ -498,6 +505,33 @@ def test_declared_branch_summary_excludes_unreachable_outgoing_edges():
     assert 'declared_branches_are_not_alternative_path_completeness' in (
         payload['coverage']['warnings']
     )
+
+
+def test_declared_branch_target_commitment_reconciles_with_traversed_edges():
+    seed, left, right = (dep(name) for name in ('seed', 'left', 'right'))
+    projection = project_dependency_graph(
+        [right, seed, left],
+        workflow_edges=[WorkflowEdge(seed, right), WorkflowEdge(seed, left)],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['seed']]
+    ).to_dict()
+    summary = payload['declared_branch_summaries'][0]
+    traversed_target_ids = sorted({
+        edge['target_node_id']
+        for edge in payload['edges']
+        if edge['source_node_id'] == summary['node_id']
+    })
+
+    assert summary['distinct_target_node_count'] == len(traversed_target_ids)
+    assert summary['target_node_ids_hash'] == sha256(canonical_json({
+        'target_node_ids': traversed_target_ids,
+    }).encode()).hexdigest()
+    assert traversed_target_ids == sorted([ids['left'], ids['right']])
 
 
 def test_declared_frontier_summary_is_deterministic_hash_only_and_compact():
