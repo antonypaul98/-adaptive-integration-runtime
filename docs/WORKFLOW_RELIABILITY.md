@@ -51,6 +51,28 @@ approval, deployment, external-action or execution authority. Independent
 canonical records and exact PR/final-main CI remain required before writer
 release. AIR-25 remains in progress at 2/12.
 
+## AIR-25 declared branch target source receipt (2026-10-28)
+
+Source PR #72 exact head `137cfe077d18f541dac3e98d3f71ab4368b62f93`,
+tree `6ee7b6720d04035f3798f173850a95cf020f37ef`, passed Python 3.12.15
+exact-head run 40512164020. PostgreSQL 16 and 17 each passed 856 product
+tests with zero failures and zero product skips. Expected-head guarded merge
+`2fb8abf905835cf9cba86be17b88b5a38cadc5a3` passed exact main-push run
+40648809391 with the same result. Each lane executed 16 infrastructure guards:
+15 passed and one established Memory-only case skipped. Diagnostics passed.
+
+The verifier derives each branch's distinct target-node count and canonical
+target-set hash solely from the report's already traversed declared edges.
+Ordering, duplicate targets, unreachable edges, tampered commitments and
+payload-size boundaries have deterministic synthetic regression coverage.
+
+This remains a bounded compact hash-only review aid over one explicit
+projection. It discovers no dependency, reads no production payload or secret,
+and grants no importance, risk, probability, safety, repair, approval,
+deployment, external-action or execution authority. Independent canonical
+records and exact PostgreSQL 16/17 PR/final-main CI remain required before
+writer release. AIR-25 remains in progress at 2/12.
+
 ## AIR-25 deterministic visualization candidate (2026-10-23)
 
 The source candidate is based on exact main
