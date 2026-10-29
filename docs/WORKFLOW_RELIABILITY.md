@@ -1,5 +1,21 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## AIR-25 declared branch exclusive reach source receipt (2026-10-29)
+
+Source PR #77 exact head `31f73365d068f736ea08968e39707dfa93fd884a`,
+tree `ce54488773a8b6199ed6059bc7992dd65183d180`, passed exact run
+40850076507. Expected-head merge produced main
+`e056d2cda11c5d4cf3ff448449ecef39e7efcc51`, and main-push run 40850408809
+passed. Python 3.12.15 on PostgreSQL 16 and 17 passed 860 product tests with
+zero product skips in both gates. Each lane ran 16 infrastructure guards: 15
+passed and one established Memory-only case skipped.
+
+The evidence remains deterministic, compact, hash-only and read-only over one
+validated explicit projection. It does not establish path or dependency
+completeness, importance, risk, probability or safety and grants no repair,
+approval, deployment, external-action or execution authority. Independent
+records CI, final-main CI and explicit writer release remain required.
+
 ## AIR-25 declared branch exclusive reach candidate (2026-10-29)
 
 The candidate is rooted at exact verified main
