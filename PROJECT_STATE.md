@@ -1,5 +1,26 @@
 # AIR implementation state
 
+## AIR-25 declared branch exclusive reach — source candidate (2026-10-29)
+
+Declared branch reach overlap source/records PRs #75/#76 are verified through
+exact main `48c544e117fb5c2f340d4aa463ab83e7a526f4b8` and final-main run
+40688930065. PostgreSQL 16 and 17 each passed 858 product tests with zero
+product skips; writer `AIR25-DECLARED-BRANCH-REACH-OVERLAP-20261028` is
+explicitly released.
+
+This bounded candidate reuses the existing validated projection and traversal
+contracts to record one compact count and hash commitment for nodes reachable
+from exactly one immediate target of each declared branch. Shared nodes are
+excluded deterministically. It exposes no raw dependency metadata, infers no
+undeclared dependency and adds no third-party code or dependency.
+
+Python 3.12.14 validation passed 26 focused and 509 portable product tests;
+351 PostgreSQL tests remain reserved for exact CI. Infrastructure passed 15
+guards with one documented Memory-only skip. Exact PostgreSQL 16/17 PR and
+merged-main CI remain required. The slice grants no repair, approval,
+deployment, external-action or execution authority. AIR-25 remains in progress
+at 2/12.
+
 ## AIR-25 declared branch reach overlap — source verified (2026-10-28)
 
 Source PR #75 exact head `5aff77872ccf8892b1e200b2ad69e2689db40daa`,

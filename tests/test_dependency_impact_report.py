@@ -55,6 +55,7 @@ def test_cycle_safe_report_is_deterministic_and_bounded_to_reachable_graph():
         'declared_convergence_count': 0,
         'declared_branch_count': 0,
         'declared_branch_reach_overlap_count': 0,
+        'declared_branch_exclusive_reach_count': 0,
         'declared_frontier_node_count': 0,
         'maximum_minimum_hops': 2,
     }
@@ -85,6 +86,7 @@ def test_report_is_redacted_and_has_no_action_authority():
         'scope': 'validated_explicit_projection_only',
         'source_warning_count': 0,
         'warnings': [
+            'declared_branch_exclusive_reach_is_not_path_completeness',
             'declared_branch_reach_overlap_is_not_path_completeness',
             'declared_branches_are_not_alternative_path_completeness',
             'declared_convergence_is_not_path_completeness',
@@ -108,6 +110,10 @@ def test_report_is_redacted_and_has_no_action_authority():
         'declared_branch_reach_overlap_basis': (
             'shared_reachable_nodes_from_distinct_immediate_declared_'
             'branch_targets_only'
+        ),
+        'declared_branch_exclusive_reach_basis': (
+            'nodes_reachable_from_exactly_one_immediate_declared_branch_'
+            'target_only'
         ),
         'declared_frontier_basis': (
             'reachable_nodes_without_outgoing_traversed_declared_edges_only'
@@ -601,6 +607,81 @@ def test_declared_branch_reach_overlap_omits_disjoint_target_cones():
         'branch_targets_only'
     )
     assert 'declared_branch_reach_overlap_is_not_path_completeness' in (
+        payload['coverage']['warnings']
+    )
+
+
+def test_declared_branch_exclusive_reach_is_deterministic_hash_only_and_compact():
+    seed, left, right, shared, left_only = (
+        dep(name)
+        for name in ('seed', 'left', 'right', 'shared', 'left-only')
+    )
+    projection = project_dependency_graph(
+        [shared, right, seed, left_only, left],
+        workflow_edges=[
+            WorkflowEdge(seed, right),
+            WorkflowEdge(left, shared),
+            WorkflowEdge(seed, left),
+            WorkflowEdge(right, shared),
+            WorkflowEdge(left, left_only),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    first = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+    second = build_cycle_safe_impact_report(projection, [ids['seed']]).to_dict()
+
+    assert first['declared_branch_exclusive_reach_summaries'] == second[
+        'declared_branch_exclusive_reach_summaries'
+    ]
+    assert first['summary']['declared_branch_exclusive_reach_count'] == 2
+    seed_branch = next(
+        summary for summary in first['declared_branch_summaries']
+        if summary['node_id'] == ids['seed']
+    )
+    exclusive = next(
+        summary for summary in first['declared_branch_exclusive_reach_summaries']
+        if summary['branch_id'] == seed_branch['branch_id']
+    )
+    assert exclusive['branch_target_count'] == 2
+    exclusive_node_ids = sorted([ids['left'], ids['right'], ids['left-only']])
+    assert exclusive['exclusive_reachable_node_count'] == 3
+    assert exclusive['exclusive_reachable_node_ids_hash'] == sha256(
+        canonical_json({'node_ids': exclusive_node_ids}).encode()
+    ).hexdigest()
+    assert len(exclusive['exclusive_reach_id']) == 64
+    assert 'node_ids' not in exclusive
+    assert ids['shared'] not in exclusive_node_ids
+
+
+def test_declared_branch_exclusive_reach_omits_fully_shared_target_cones():
+    seed, left, right = (dep(name) for name in ('seed', 'left', 'right'))
+    projection = project_dependency_graph(
+        [right, seed, left],
+        workflow_edges=[
+            WorkflowEdge(seed, right),
+            WorkflowEdge(seed, left),
+            WorkflowEdge(left, right),
+            WorkflowEdge(right, left),
+        ],
+    )
+    ids = {
+        node['dependency']['integration_id']: node['node_id']
+        for node in projection.to_dict()['nodes']
+    }
+    payload = build_cycle_safe_impact_report(
+        projection, [ids['seed']]
+    ).to_dict()
+
+    assert payload['declared_branch_exclusive_reach_summaries'] == []
+    assert payload['summary']['declared_branch_exclusive_reach_count'] == 0
+    assert payload['coverage']['declared_branch_exclusive_reach_basis'] == (
+        'nodes_reachable_from_exactly_one_immediate_declared_branch_'
+        'target_only'
+    )
+    assert 'declared_branch_exclusive_reach_is_not_path_completeness' in (
         payload['coverage']['warnings']
     )
 
