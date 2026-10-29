@@ -1,5 +1,22 @@
 # AIR implementation state
 
+## AIR-25 declared branch exclusive reach — source verified (2026-10-29)
+
+Source PR #77 exact head `31f73365d068f736ea08968e39707dfa93fd884a`,
+tree `ce54488773a8b6199ed6059bc7992dd65183d180`, passed Python 3.12.15
+exact-head run 40850076507. PostgreSQL 16 and 17 each passed 860 product tests
+with zero product skips. Expected-head guarded merge produced exact main
+`e056d2cda11c5d4cf3ff448449ecef39e7efcc51`; merged-main run 40850408809
+passed the same matrix.
+
+The slice commits to the count and canonical hash of nodes reachable from
+exactly one immediate target of each reachable declared branch. It exposes no
+raw dependency metadata and grants no path/dependency completeness, discovery,
+importance, risk, probability, safety, repair, approval, deployment,
+external-action or execution authority. Independent canonical records and
+their exact PR/final-main CI remain required before writer release. AIR-25
+remains in progress at 2/12.
+
 ## AIR-25 declared branch exclusive reach — source candidate (2026-10-29)
 
 Declared branch reach overlap source/records PRs #75/#76 are verified through
