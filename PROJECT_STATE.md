@@ -2,6 +2,17 @@
 
 ## Demo-first offline impact candidate (2026-10-30)
 
+Source PR #79 exact head `86da3e95a0cd015e3f1af8b5b4ffe9caa7de5b30`,
+tree `419038cd20e68839dc7b46bc32797b7e8c7f5287`, passed exact-head CI
+41008196526. Expected-head merge produced main
+`39668bef31373217dd5f34ddb90d8eb01c3cb0e5`; merged-main CI 41008493283
+passed. Python 3.12.15 with PostgreSQL 16 and 17 passed 866 product tests with
+zero product skips in both gates. Each lane ran 16 infrastructure guards: 15
+passed and one established Memory-only case skipped.
+
+The source is verified. Independent canonical records and their exact PR and
+final-main CI remain required before demo acceptance or writer release.
+
 The previous AIR-25 declared-branch exclusive-reach source/records chain is fully
 verified through exact main `de0920370a882f03b458114e373fd20ab68770fb`, final
 CI 40851201173, and explicit writer release. No prior slice remains unfinished.

@@ -2,6 +2,15 @@
 
 ## Demo-first offline impact candidate (2026-10-30)
 
+Source PR #79 exact head `86da3e95a0cd015e3f1af8b5b4ffe9caa7de5b30`
+and tree `419038cd20e68839dc7b46bc32797b7e8c7f5287` passed exact run
+41008196526. Expected-head merge produced exact main
+`39668bef31373217dd5f34ddb90d8eb01c3cb0e5`; main-push run 41008493283
+passed. Python 3.12.15 on PostgreSQL 16 and 17 passed 866 product tests with
+zero product skips in both gates. Each lane ran 16 infrastructure guards: 15
+passed and one established Memory-only case skipped. Canonical records and
+their own PR/final-main CI remain required before writer release.
+
 Live GitHub reconciliation found no open PR and exact final main
 `de0920370a882f03b458114e373fd20ab68770fb`; the prior AIR-25 writer is released.
 Writer `AIR-DEMO-OFFLINE-IMPACT-20261030` is claimed at PR #78 comment
