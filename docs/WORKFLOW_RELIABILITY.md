@@ -1,5 +1,24 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## Demo-first offline impact candidate (2026-10-30)
+
+Live GitHub reconciliation found no open PR and exact final main
+`de0920370a882f03b458114e373fd20ab68770fb`; the prior AIR-25 writer is released.
+Writer `AIR-DEMO-OFFLINE-IMPACT-20261030` is claimed at PR #78 comment
+6515580522. The candidate is based on that exact main and contains no third-party
+code, dependency, model, account, download, or network operation.
+
+The checked-in CLI and fixtures exercise the existing pure change to impact to
+projection to redacted-visualization pipeline. Local Python 3.12.14 validation
+passes 6 focused and 515 portable tests, with 351 PostgreSQL cases reserved for
+CI. Infrastructure runs 16 guards: 15 pass and one established Memory-only case
+is skipped. Exact PostgreSQL 16/17 PR and merged-main CI with zero product skips,
+independent canonical records, and explicit writer release remain mandatory.
+
+This evidence is local candidate evidence only. It grants no network access,
+production observation, dependency discovery, compatibility/safety conclusion,
+repair, approval, deployment, external action, or execution authority.
+
 ## AIR-25 declared branch exclusive reach source receipt (2026-10-29)
 
 Source PR #77 exact head `31f73365d068f736ea08968e39707dfa93fd884a`,

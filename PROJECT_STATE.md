@@ -1,5 +1,32 @@
 # AIR implementation state
 
+## Demo-first offline impact candidate (2026-10-30)
+
+The previous AIR-25 declared-branch exclusive-reach source/records chain is fully
+verified through exact main `de0920370a882f03b458114e373fd20ab68770fb`, final
+CI 40851201173, and explicit writer release. No prior slice remains unfinished.
+
+The new demo candidate accepts two local OpenAPI JSON contracts and one explicit
+dependency/workflow registry. It reuses the existing deterministic change,
+impact, projection, and redacted-visualization contracts to emit one canonical
+report with stable evidence hashes and explicit authority/coverage limits. The
+checked-in example produces 2 changes, 2 direct impacts, 2 downstream impacts,
+2 review nodes, and repeatable report hash
+`d3d6898e4c4d5963c3a58b32594de3d292dbdc4452c285150e07327bb0677c85`.
+
+Python 3.12.14 local validation passes 6 focused and 515 portable product tests,
+with 351 PostgreSQL cases reserved for exact CI. Infrastructure runs 16 guards:
+15 pass and one established Memory-only case is skipped. Dependency, diagnostic,
+compile, JSON, and whitespace checks pass. Exact PostgreSQL 16/17 PR CI, guarded
+merge, merged-main CI, independent canonical records, and writer release remain
+required. Demo readiness is therefore a validated local candidate, not accepted;
+full product completion remains unverified and AIR-25 remains 2/12.
+
+The demo uses no network, credentials, production I/O, model, external account,
+repair, approval, deployment, or execution authority. Reuse review found no
+missing third-party component: only repository-native verified contracts are
+orchestrated.
+
 ## AIR-25 declared branch exclusive reach — source verified (2026-10-29)
 
 Source PR #77 exact head `31f73365d068f736ea08968e39707dfa93fd884a`,
