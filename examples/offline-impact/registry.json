@@ -1,0 +1,37 @@
+{
+  "dependencies": [
+    {
+      "integration_id": "billing-client",
+      "mapping_id": "invoice-id",
+      "location": "/paths/~1invoices/get/responses/200/content/application~1json/schema/properties/id",
+      "operation": "GET /invoices",
+      "integration_kind": "adapter"
+    },
+    {
+      "integration_id": "invoice-worker",
+      "mapping_id": "billing-result",
+      "location": "/paths/~1ledger/get/responses/200",
+      "operation": "GET /ledger",
+      "integration_kind": "workflow"
+    }
+  ],
+  "workflow_edges": [
+    {
+      "upstream": {
+        "integration_id": "billing-client",
+        "mapping_id": "invoice-id",
+        "location": "/paths/~1invoices/get/responses/200/content/application~1json/schema/properties/id",
+        "operation": "GET /invoices",
+        "integration_kind": "adapter"
+      },
+      "downstream": {
+        "integration_id": "invoice-worker",
+        "mapping_id": "billing-result",
+        "location": "/paths/~1ledger/get/responses/200",
+        "operation": "GET /ledger",
+        "integration_kind": "workflow"
+      },
+      "relation": "consumes_output"
+    }
+  ]
+}

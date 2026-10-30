@@ -167,3 +167,11 @@ It converts only explicit registry entries, declared workflow edges and verified
 impact metadata into deterministic content-addressed nodes and edges. An
 unannotated node is explicitly not treated as safe; no dependency discovery,
 production access, repair, deployment or execution is performed.
+
+## Repeatable offline demo
+
+The [offline OpenAPI impact demo](docs/OFFLINE_IMPACT_DEMO.md) runs the verified
+pure change → impact → projection → redacted-visualization path over checked-in
+local JSON fixtures. It performs no network access or action and makes coverage
+limits explicit. This demo is separate from full product completion and from
+the PostgreSQL-backed authoritative evidence path.
