@@ -1,5 +1,40 @@
 # Workflow reliability — stabilization 2026-10-03
 
+## Demo-first persisted impact candidate (2026-10-31)
+
+Live reconciliation found no open PR and exact main
+`2125fe57735990849945e338f8e7867229a901d5`. The prior offline demo source and
+records chain is accepted through final-main run 41009164051 and explicit writer
+release. Writer `AIR-DEMO-PERSISTED-20261031` is now claimed for the next bounded
+demo gap.
+
+The candidate adds one repository-native orchestration boundary over the existing
+tenant-scoped change, registry, impact, projection and redacted-visualization
+artifacts. It accepts only already authenticated immutable snapshot IDs plus an
+explicit registry, persists all derived artifacts in one caller transaction,
+reloads and recomputes all five, and returns a redacted receipt of identities,
+hashes and bounded counts. It does not invent observation provenance. A rejected
+registry or unauthorized snapshot rolls the complete new chain back.
+
+Reuse review selected the existing verified AIR contracts; there is no
+third-party source, translated logic, dependency, schema, model, account,
+download or network operation. Python 3.12.14 passes 28 focused tests with three
+PostgreSQL cases reserved and 515 portable tests with 355 PostgreSQL cases
+deselected. Exact-head PostgreSQL 16/17 PR CI with zero product skips, guarded
+merge, merged-main CI, independent records acceptance and writer release remain
+mandatory.
+
+This is local candidate evidence only. It grants no production observation,
+dependency discovery, compatibility or safety conclusion, repair, approval,
+deployment, external action or execution authority.
+
+Initial exact-head run 41185987620 correctly failed both PostgreSQL lanes: each
+reported 868 passed, two failed and zero skipped. The synthetic snapshot used an
+IP rejected by the established provenance validator, and the rollback case used
+a dependency whose operation conflicted during input parsing instead of reaching
+the intended post-write validation failure. Both fixtures are corrected locally;
+the failed run remains evidence and a new exact-head run is required.
+
 ## Demo-first offline impact candidate (2026-10-30)
 
 Source PR #79 exact head `86da3e95a0cd015e3f1af8b5b4ffe9caa7de5b30`

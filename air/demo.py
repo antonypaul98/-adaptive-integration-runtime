@@ -12,18 +12,32 @@ from pathlib import Path
 import sys
 from typing import Any, Iterable
 
+from air.change_evidence import detect_and_persist, load_change_evidence
 from air.change_intelligence import compare_openapi
 from air.dependency_impact import (
     Dependency,
     ImpactError,
     WorkflowEdge,
     analyze_changes,
+    analyze_and_persist,
+    load_impact,
+    load_registry,
+    register_dependencies,
 )
-from air.dependency_projection import project_dependency_graph
-from air.dependency_visualization import visualize_dependency_projection
-from air.postgres import MAX_PAYLOAD_BYTES, canonical_json
+from air.dependency_projection import (
+    load_projection,
+    project_and_persist,
+    project_dependency_graph,
+)
+from air.dependency_visualization import (
+    load_visualization,
+    visualize_and_persist,
+    visualize_dependency_projection,
+)
+from air.postgres import EvidenceTransaction, MAX_PAYLOAD_BYTES, canonical_json
 
 DEMO_VERSION = "air-offline-impact-demo-v1"
+PERSISTED_DEMO_VERSION = "air-persisted-impact-demo-v1"
 MAX_INPUT_BYTES = 512_000
 
 
@@ -159,6 +173,121 @@ def run_offline_impact_demo(
     }
     encoded = canonical_json(report)
     return {"report_hash": sha256(encoded.encode("utf-8")).hexdigest(), **report}
+
+
+def _artifact_reference(record: dict[str, Any], kind: str) -> dict[str, str]:
+    return {
+        "kind": kind,
+        "artifact_id": str(record["artifact_id"]),
+        "content_hash": record["content_hash"],
+    }
+
+
+def persist_impact_demo(
+    transaction: EvidenceTransaction,
+    previous_snapshot_id: str,
+    current_snapshot_id: str,
+    registry: dict[str, Any],
+) -> dict[str, Any]:
+    """Persist and reload the existing tenant-scoped impact evidence chain.
+
+    Snapshot capture remains outside this function so provenance is never
+    invented for local values.  The caller supplies two already authenticated,
+    immutable observations and an explicit registry.  Every write is performed
+    through the caller's transaction, so any rejection rolls the complete chain
+    back.  The returned receipt is redacted to identities, hashes, bounded
+    counts, coverage, and authority; dependency metadata remains in the
+    tenant-authorized registry artifact.
+    """
+    if not isinstance(transaction, EvidenceTransaction):
+        raise DemoError("invalid_evidence_transaction")
+    dependencies, edges = _registry(registry)
+
+    change = detect_and_persist(
+        transaction, previous_snapshot_id, current_snapshot_id
+    )
+    registered = register_dependencies(
+        transaction,
+        previous_snapshot_id,
+        dependencies,
+        workflow_edges=edges,
+    )
+    impact = analyze_and_persist(
+        transaction, change["artifact_id"], registered["artifact_id"]
+    )
+    projection = project_and_persist(
+        transaction,
+        registered["artifact_id"],
+        impact_id=impact["artifact_id"],
+    )
+    visualization = visualize_and_persist(
+        transaction, projection["artifact_id"]
+    )
+
+    # Reloading recomputes each derived artifact and re-authorizes all links.
+    change = load_change_evidence(transaction, change["artifact_id"])
+    registered = load_registry(transaction, registered["artifact_id"])
+    impact = load_impact(transaction, impact["artifact_id"])
+    projection = load_projection(transaction, projection["artifact_id"])
+    visualization = load_visualization(transaction, visualization["artifact_id"])
+
+    change_payload = json.loads(change["payload"])["comparison"]
+    impact_payload = json.loads(impact["payload"])["analysis"]
+    projection_payload = json.loads(
+        json.loads(projection["payload"])["projection_payload"]
+    )
+    visualization_payload = json.loads(
+        json.loads(visualization["payload"])["visualization_payload"]
+    )
+    receipt = {
+        "persisted_demo_version": PERSISTED_DEMO_VERSION,
+        "tenant_id": str(transaction.tenant_id),
+        "artifacts": {
+            "change": _artifact_reference(change, "contract_change_set"),
+            "registry": _artifact_reference(
+                registered, "contract_dependency_registry"
+            ),
+            "impact": _artifact_reference(
+                impact, "contract_dependency_impact"
+            ),
+            "projection": _artifact_reference(
+                projection, "dependency_projection"
+            ),
+            "redacted_visualization": _artifact_reference(
+                visualization, "dependency_visualization"
+            ),
+        },
+        "summary": {
+            "change_count": len(change_payload["changes"]),
+            "direct_impact_count": len(impact_payload["impacts"]),
+            "transitive_impact_count": len(
+                impact_payload.get("downstream_impacts", [])
+            ),
+            "recorded_review_node_count": projection_payload[
+                "impact_summary"
+            ]["recorded_review_node_count"],
+            "redacted_visual_node_count": len(visualization_payload["nodes"]),
+        },
+        "coverage": {
+            "scope": "tenant_authorized_snapshots_and_explicit_registry_only",
+            "dependency_discovery_performed": False,
+            "no_recorded_impact_is_not_safe": True,
+            "all_artifacts_reloaded_and_recomputed": True,
+        },
+        "authority": {
+            "read_only_analysis": True,
+            "network_access": False,
+            "external_actions": False,
+            "repair_authority": False,
+            "approval_authority": False,
+            "deployment_authority": False,
+        },
+    }
+    encoded = canonical_json(receipt)
+    return {
+        "receipt_hash": sha256(encoded.encode("utf-8")).hexdigest(),
+        **receipt,
+    }
 
 
 def _parser() -> argparse.ArgumentParser:
