@@ -1,6 +1,33 @@
 # AIR implementation state
 
-## Demo-first offline impact candidate (2026-10-30)
+## Demo-first persisted impact candidate (2026-10-31)
+
+The offline demo source/records chain is accepted through exact main
+`2125fe57735990849945e338f8e7867229a901d5`, final-main CI 41009164051 and
+explicit writer release. The next smallest verified demo gap is authoritative
+tenant-scoped persistence, not another analysis or storage primitive.
+
+The local candidate reuses the existing change-evidence, dependency-registry,
+impact, projection and redacted-visualization persistence contracts. Given two
+already authenticated immutable snapshot IDs and one explicit registry, it
+persists the five-artifact chain in one caller transaction, reloads and
+recomputes every derived artifact, then returns a redacted receipt containing
+only tenant/artifact identities, hashes, bounded counts, coverage and authority.
+It never invents snapshot provenance. Rejection rolls back the entire new chain.
+
+Python 3.12.14 passes 28 focused tests with three PostgreSQL cases reserved and
+the complete portable suite passes 515 tests with 355 PostgreSQL cases
+deselected. Exact-head PostgreSQL 16/17 PR CI, guarded merge, merged-main CI and
+independent records acceptance remain required. Demo readiness is therefore a
+portable local persisted candidate; full product completion remains unverified
+and AIR-25 remains 2/12.
+
+No third-party code, translated algorithm, schema, dependency, model, network
+activity, production write, external action, repair, approval, deployment or
+execution authority is added. Reuse review selected only repository-native
+verified contracts.
+
+## Demo-first offline impact accepted (2026-10-30)
 
 Source PR #79 exact head `86da3e95a0cd015e3f1af8b5b4ffe9caa7de5b30`,
 tree `419038cd20e68839dc7b46bc32797b7e8c7f5287`, passed exact-head CI
@@ -10,8 +37,9 @@ passed. Python 3.12.15 with PostgreSQL 16 and 17 passed 866 product tests with
 zero product skips in both gates. Each lane ran 16 infrastructure guards: 15
 passed and one established Memory-only case skipped.
 
-The source is verified. Independent canonical records and their exact PR and
-final-main CI remain required before demo acceptance or writer release.
+Independent canonical records PR #80 and final-main CI 41009164051 subsequently
+passed, producing accepted exact main
+`2125fe57735990849945e338f8e7867229a901d5`; the writer was explicitly released.
 
 The previous AIR-25 declared-branch exclusive-reach source/records chain is fully
 verified through exact main `de0920370a882f03b458114e373fd20ab68770fb`, final
@@ -25,13 +53,10 @@ checked-in example produces 2 changes, 2 direct impacts, 2 downstream impacts,
 2 review nodes, and repeatable report hash
 `d3d6898e4c4d5963c3a58b32594de3d292dbdc4452c285150e07327bb0677c85`.
 
-Python 3.12.14 local validation passes 6 focused and 515 portable product tests,
-with 351 PostgreSQL cases reserved for exact CI. Infrastructure runs 16 guards:
-15 pass and one established Memory-only case is skipped. Dependency, diagnostic,
-compile, JSON, and whitespace checks pass. Exact PostgreSQL 16/17 PR CI, guarded
-merge, merged-main CI, independent canonical records, and writer release remain
-required. Demo readiness is therefore a validated local candidate, not accepted;
-full product completion remains unverified and AIR-25 remains 2/12.
+The source and records gates passed Python 3.12.15 with PostgreSQL 16 and 17,
+866 product tests and zero product skips per lane. Demo readiness for the offline
+path is accepted; full product completion remains unverified and AIR-25 remains
+2/12.
 
 The demo uses no network, credentials, production I/O, model, external account,
 repair, approval, deployment, or execution authority. Reuse review found no
