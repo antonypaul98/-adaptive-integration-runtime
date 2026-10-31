@@ -34,6 +34,14 @@
     "infrastructure": {"passed": 15, "skipped": 1, "diagnostics": "passed"},
     "postgres_16": "pending_exact_head_ci",
     "postgres_17": "pending_exact_head_ci",
+    "prior_failed_ci": {
+      "run": 41185987620,
+      "head_sha": "0b7fa0af76ad6511d7cd4f884f127bc4dab491e7",
+      "postgres_16": "2 failed, 868 passed, 0 skipped",
+      "postgres_17": "2 failed, 868 passed, 0 skipped",
+      "cause": "Synthetic fixtures used an IP rejected by the established provenance validator and made the rollback registry fail during parsing rather than after the first write.",
+      "status": "FIXED_LOCALLY_PENDING_NEW_EXACT_HEAD_CI"
+    },
     "limitations": "No dependency discovery, production observation, network access, external action, repair, approval, deployment or execution authority. Snapshot provenance must already exist and is never invented by the demo."
   },
   "air23_progress": {

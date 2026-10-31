@@ -53,7 +53,7 @@ def _snapshot(tx, contract, observed_at):
         "persisted-demo-fixture",
         "https://example.com",
         observed_at,
-        "192.0.2.10",
+        "8.8.8.8",
         0,
         value,
         sha256(value.encode()).hexdigest(),
@@ -74,7 +74,7 @@ def _registry(*, invalid_location=False):
     direct = _dependency(
         "private-client",
         (
-            "/paths/~1missing/get"
+            "/paths/~1items/get/responses/999"
             if invalid_location
             else "/paths/~1items/get/responses/200/content/"
             "application~1json/schema/properties/id"
@@ -177,7 +177,7 @@ def test_persisted_demo_failure_rolls_back_partial_chain(database, repos, snapsh
         before = tx._connection.execute(
             "SELECT count(*) FROM air.artifacts WHERE tenant_id=%s", (tenant,)
         ).fetchone()["count"]
-    with pytest.raises(ImpactError, match="dependency_operation_not_found"):
+    with pytest.raises(ImpactError, match="dependency_location_not_found"):
         with repos[0].transaction(tenant) as tx:
             persist_impact_demo(
                 tx,

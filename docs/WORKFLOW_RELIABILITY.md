@@ -28,6 +28,13 @@ This is local candidate evidence only. It grants no production observation,
 dependency discovery, compatibility or safety conclusion, repair, approval,
 deployment, external action or execution authority.
 
+Initial exact-head run 41185987620 correctly failed both PostgreSQL lanes: each
+reported 868 passed, two failed and zero skipped. The synthetic snapshot used an
+IP rejected by the established provenance validator, and the rollback case used
+a dependency whose operation conflicted during input parsing instead of reaching
+the intended post-write validation failure. Both fixtures are corrected locally;
+the failed run remains evidence and a new exact-head run is required.
+
 ## Demo-first offline impact candidate (2026-10-30)
 
 Source PR #79 exact head `86da3e95a0cd015e3f1af8b5b4ffe9caa7de5b30`
